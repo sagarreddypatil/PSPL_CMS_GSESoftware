@@ -1,7 +1,7 @@
 import struct
 
 
-class StructSchema(object):
+class StructDecoder(object):
     """
     Example Schema File:
     < # specifies LE
@@ -43,6 +43,9 @@ class StructSchema(object):
         values = struct.unpack(self.format_string, data)
         return dict(zip(self.vars, values))
 
+    def size(self, data: bytes) -> int:
+        return struct.calcsize(self.format_string)
+
 
 if __name__ == "__main__":
     schema = """
@@ -54,7 +57,7 @@ if __name__ == "__main__":
     x 6
     """
 
-    s = StructSchema(schema)
+    s = StructDecoder(schema)
     print(
         s.decode(
             b"\x20\x00\x00\x00\x00\x00\x00\x00\x31\xd4\x00\x00\x00\x00\x00\x00\xdb\x03\x65\x80\xfd\x7f\x00\x00"
