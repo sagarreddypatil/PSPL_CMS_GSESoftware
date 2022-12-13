@@ -4,7 +4,6 @@ Abstraction of an SensorNet source
 
 import socket
 import struct
-from packets import decode_packet
 from threading import Thread
 
 UDP_MAX_SIZE = 65535
