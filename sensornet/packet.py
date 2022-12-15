@@ -1,5 +1,5 @@
 import struct
-from sensor import SensorRegistry
+from conversion.sensor import SensorRegistry
 
 """
 Basic Data Struct
