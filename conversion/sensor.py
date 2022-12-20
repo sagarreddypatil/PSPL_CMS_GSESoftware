@@ -1,14 +1,13 @@
-from influxdb_client import WriteApi
+from influxdb_client import WriteApi, WritePrecision
 from typing import NamedTuple
 import pandas as pd
 
 
 class SensorPoint(NamedTuple):
-    id: int
     name: str
     time: int
-    value: int
-    unit: str
+    raw_value: int
+    value: float
 
 
 class ADC(object):
@@ -26,19 +25,17 @@ class ADC(object):
 class CalibratedSensor(object):
     """Abstraction for a sensor with slope and offset calibration"""
 
-    def __init__(self, id: int, name: str, adc: ADC, slope: float, offset: float, unit: str):
-        self.id = id
+    def __init__(self, name: str, adc: ADC, slope: float, offset: float):
         self.name = name
         self.adc = adc
         self.slope = slope
         self.offset = offset
-        self.unit = unit
 
-    def convert(self, time, value):
-        voltage = self.adc.convert(value)
+    def convert(self, time, raw_value):
+        voltage = self.adc.convert(raw_value)
         value = voltage * self.slope + self.offset
 
-        return SensorPoint(self.id, self.name, time, value, self.unit)
+        return SensorPoint(self.name, time, value, value)
 
 
 class SensorRegistry(object):
@@ -49,34 +46,41 @@ class SensorRegistry(object):
     def __init__(self, df: pd.DataFrame):
         self.df = df
         self._registry = {}
+        self._units = {}
 
         self._build_registry()
 
     def _build_registry(self):
         for i, row in self.df.iterrows():
+            device = row["device"]
             id = row["id"]
             name = row["name"]
 
             adc = ADC(row["bitness"], row["base_fsr"], row["gain"])
-            sensor = CalibratedSensor(id, name, adc, row["slope"], row["offset"], row["unit"])
+            sensor = CalibratedSensor(name, adc, row["slope"], row["offset"])
 
-            self._registry[id] = sensor
+            self._registry[(device, id)] = sensor
+            self._units[name] = row["unit"]
 
-    def get_sensor(self, id: int):
-        return self._registry[id]
+    def get_sensor(self, device: str, id: int):
+        return self._registry[(device, id)]
+
+    def get_unit(self, name: str):
+        return self._units[name]
 
 
 class SensorInfluxWriter(object):
-    def __init__(self, write_api: WriteApi, bucket: str, measurement: str):
+    def __init__(self, write_api: WriteApi, bucket: str):
         self.write_api = write_api
         self.bucket = bucket
-        self.measurement = measurement
 
     def write(self, point: SensorPoint):
         self.write_api.write(
-            self.bucket,
+            bucket=self.bucket,
+            write_precision=WritePrecision.US,  # type: ignore
             record=point,
+            record_measurement=point.name,
             record_tag_keys=["id", "name"],
-            record_field_keys=["value", "unit"],
+            record_field_keys=["raw_value", "value"],
             record_time_key="time",
         )
