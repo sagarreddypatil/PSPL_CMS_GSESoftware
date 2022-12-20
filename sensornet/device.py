@@ -15,7 +15,7 @@ UDP_MAX_SIZE = 65535
 
 
 class Device(object):
-    def __init__(self, name: str, ip: str, port: int, sensor_registry: SensorRegistry, write_api: WriteApi):
+    def __init__(self, ip: str, port: int, sensor_registry: SensorRegistry, write_api: WriteApi):
         # Code plagarized from: https://stackoverflow.com/questions/603852/how-do-you-udp-multicast-in-python
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -25,7 +25,7 @@ class Device(object):
         mreq = struct.pack("4sl", socket.inet_aton(ip), socket.INADDR_ANY)
         self.socket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
-        self.decoder = PacketDecoder(name, sensor_registry)
+        self.packet_decoder = PacketDecoder(sensor_registry)
         self.sensor_writer = SensorInfluxWriter(write_api)
 
     def start(self) -> Thread:

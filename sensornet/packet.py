@@ -19,7 +19,7 @@ sensor_id_mask = 0xFFFF
 
 
 class PacketDecoder(object):
-    def __init__(self, device: str, sensor_registry: SensorRegistry):
+    def __init__(self, sensor_registry: SensorRegistry):
         self.sensor_registry = sensor_registry
         self.header_prefix_matcher = {
             0xDA7A0000: self.decode_sensor_data,
@@ -28,13 +28,11 @@ class PacketDecoder(object):
             0x11FE0000: None,
         }
 
-        self.device = device
-
     def decode_sensor_data(self, data: bytes):
         (header, data, time, counter) = basic_data_struct.unpack_from(data, offset=0)
         sensor_id = header & sensor_id_mask
 
-        sensor = self.sensor_registry.get_sensor(self.device, sensor_id)
+        sensor = self.sensor_registry.get_sensor(sensor_id)
         if sensor is None:
             raise ValueError("Unknown sensor ID: " + hex(sensor_id))
 

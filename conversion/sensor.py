@@ -5,7 +5,7 @@ import pandas as pd
 
 class SensorPoint(NamedTuple):
     name: str
-    time: int
+    timestamp: int
     raw_value: int
     value: float
 
@@ -40,7 +40,7 @@ class CalibratedSensor(object):
 
 class SensorRegistry(object):
     """
-    Maps per-device sensor IDs to sensor objects, gets info from a pandas DataFrame
+    Maps SensorNet sensor IDs to sensor objects, gets info from a pandas DataFrame
     """
 
     def __init__(self, df: pd.DataFrame):
@@ -52,18 +52,17 @@ class SensorRegistry(object):
 
     def _build_registry(self):
         for i, row in self.df.iterrows():
-            device = row["device"]
             id = row["id"]
             name = row["name"]
 
             adc = ADC(row["bitness"], row["base_fsr"], row["gain"])
             sensor = CalibratedSensor(name, adc, row["slope"], row["offset"])
 
-            self._registry[(device, id)] = sensor
+            self._registry[id] = sensor
             self._units[name] = row["unit"]
 
-    def get_sensor(self, device: str, id: int):
-        return self._registry[(device, id)]
+    def get_sensor(self, id: int):
+        return self._registry[id]
 
     def get_unit(self, name: str):
         return self._units[name]
@@ -82,5 +81,5 @@ class SensorInfluxWriter(object):
             record_measurement=point.name,
             record_tag_keys=["id", "name"],
             record_field_keys=["raw_value", "value"],
-            record_time_key="time",
+            record_time_key="timestamp",
         )
