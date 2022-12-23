@@ -61,7 +61,7 @@ class SensorRegistry(object):
             self._registry[id] = sensor
             self._units[name] = row["unit"]
 
-    def get_sensor(self, id: int):
+    def get_sensor(self, id: int) -> CalibratedSensor:
         return self._registry[id]
 
     def get_unit(self, name: str):

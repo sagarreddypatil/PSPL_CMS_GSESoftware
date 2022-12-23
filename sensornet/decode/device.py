@@ -6,7 +6,7 @@ import socket
 import struct
 from threading import Thread
 
-from conversion.sensor import SensorRegistry, SensorInfluxWriter
+from conversion.sensor import SensorPoint, SensorRegistry, SensorInfluxWriter
 from .packet import PacketDecoder
 
 from influxdb_client import WriteApi
@@ -26,7 +26,7 @@ class Device(object):
         self.socket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
         self.packet_decoder = PacketDecoder(sensor_registry)
-        self.sensor_writer = SensorInfluxWriter(write_api)
+        self.sensor_writer = SensorInfluxWriter(write_api, "sensornet")
 
     def start(self) -> Thread:
         t = Thread(target=self.run)
@@ -38,4 +38,8 @@ class Device(object):
         while True:
             data, addr = self.socket.recvfrom(UDP_MAX_SIZE)
 
-            packet = self.decoder.decode(data)
+            packet = self.packet_decoder.decode(data)
+            # if it is of type SensorPoint or list[SensorPoint]
+            if isinstance(packet, list) and isinstance(packet[0], SensorPoint):
+                for point in packet:
+                    self.sensor_writer.write(point)
