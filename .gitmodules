@@ -1,3 +1,0 @@
-[submodule "grafonnet-lib"]
-	path = configuration-ui/grafana/grafonnet-lib
-	url = git@github.com:rhowe/grafonnet-lib.git
