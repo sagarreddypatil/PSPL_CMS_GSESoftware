@@ -1,4 +1,31 @@
 /* Variables and mixins declared here will be available in all other SCSS files */
+
+// Primary PSP Palette
+$psp-black: #000;
+$psp-night-sky: #252526;
+$psp-rush: #daaa00;
+$psp-moondust: #f2efe9;
+$psp-white: #fff;
+
+// Secondary Palette
+$psp-boilermaker-gold: #cfb991;
+$psp-aged: #8e6f3e;
+$psp-field: #8E6F3E;
+$psp-dust: #EBD99F;
+$psp-steel: #555960;
+$psp-cool-gray: #6F727B;
+$psp-railway-gray: #9D9795;
+$psp-steam: #C4BFC0;
+
+$body-bg: $psp-night-sky;
+$body-color: $psp-moondust;
+
+$primary: $psp-rush;
+$black: $psp-black;
+$white: $psp-white;
+$dark: $psp-night-sky;
+$light: $psp-white;
+
 @import 'bootstrap/scss/functions'; /* Override Bootstrap's variables here */
 @import 'bootstrap/scss/variables';
 @import 'bootstrap/scss/maps';
