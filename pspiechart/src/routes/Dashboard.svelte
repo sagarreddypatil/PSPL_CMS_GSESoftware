@@ -2,7 +2,7 @@
 	import Grid from 'svelte-grid';
 	import gridHelp from 'svelte-grid/build/helper/index.mjs';
 
-	const COLS = 6;
+	const COLS = 12;
 
 	const id = () => '_' + Math.random().toString(36).substr(2, 9);
 
@@ -30,13 +30,13 @@
 		}
 	];
 
-	const cols = [[1100, 6]];
+	const cols = [[1600, COLS]];
 
 	function add() {
 		let newItem = {
-			6: gridHelp.item({
-				w: Math.round(randomNumberInRange(1, 4)),
-				h: Math.round(randomNumberInRange(1, 4)),
+			[COLS]: gridHelp.item({
+				w: 2,
+				h: 2,
 				x: 0,
 				y: 0
 			}),
@@ -58,9 +58,9 @@
 
 	const addAt = () => {
 		let newItem = {
-			6: gridHelp.item({
-				w: Math.round(randomNumberInRange(1, 4)),
-				h: Math.round(randomNumberInRange(1, 4)),
+			[COLS]: gridHelp.item({
+				w: 2,
+				h: 2,
 				x: 0,
 				y: 0
 			}),
@@ -79,15 +79,17 @@
 </script>
 
 <div class="flex-fill">
-	<Grid {items} rowHeight={100} let:item {cols} let:dataItem>
+	<button on:click={add}>goofy aah</button>
+
+	<Grid bind:items rowHeight={100} let:item let:dataItem {cols}>
 		<div class="dashboard-widget card bg-dark">
-			<span
+			<button
 				on:pointerdown={(e) => e.stopPropagation()}
 				on:click={() => remove(dataItem)}
 				class="remove"
 			>
 				✕
-			</span>
+			</button>
 			<h3>
 				{dataItem.id}
 			</h3>
