@@ -1,0 +1,55 @@
+// Primary PSP Palette
+$campus-gold: #cd9f26;
+
+$psp-black: #000;
+$psp-night-sky: #252526;
+$psp-rush: #daaa00;
+$psp-moondust: #f2efe9;
+$psp-white: #fff;
+
+// Secondary Palette
+$psp-boilermaker-gold: #cfb991;
+$psp-aged: #8e6f3e;
+$psp-field: #8E6F3E;
+$psp-dust: #EBD99F;
+$psp-steel: #555960;
+$psp-cool-gray: #6F727B;
+$psp-railway-gray: #9D9795;
+$psp-steam: #C4BFC0;
+
+
+@import 'bootstrap/scss/functions';
+
+$primary: $campus-gold;
+$black: $psp-black;
+$white: $psp-white;
+$dark: $psp-night-sky;
+$light: $psp-white;
+
+$body-bg: $psp-steel;
+$body-color: $psp-moondust;
+
+$font-family-sans-serif:
+    "Libre Franklin",
+    sans-serif;
+
+$headings-font-family: "Saira";
+$headings-font-weight: bold;
+
+@import 'bootstrap/scss/variables';
+
+$custom-colors: (
+  "boilermaker-gold": $psp-boilermaker-gold,
+  "aged": $psp-aged,
+  "field": $psp-field,
+  "dust": $psp-dust,
+  "steel": $psp-steel,
+  "cool-gray": $psp-cool-gray,
+  "railway-gray": $psp-railway-gray,
+  "steam": $psp-steam,
+);
+$theme-colors: map-merge($theme-colors, $custom-colors);
+
+@import 'bootstrap/scss/maps';
+@import 'bootstrap/scss/mixins';
+@import 'bootstrap/scss/utilities';
