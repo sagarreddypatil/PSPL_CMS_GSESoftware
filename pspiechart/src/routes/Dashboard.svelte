@@ -1,6 +1,7 @@
 <script>
 	import Grid from 'svelte-grid';
 	import gridHelp from 'svelte-grid/build/helper/index.mjs';
+	import bottomRightIcon from '$lib/assets/bottom-right.svg';
 
 	let editMode = false;
 
@@ -10,27 +11,7 @@
 
 	const randomNumberInRange = (min, max) => Math.random() * (max - min) + min;
 
-	let items = [
-		{
-			[COLS]: gridHelp.item({
-				x: 0,
-				y: 0,
-				w: 2,
-				h: 2
-			}),
-			id: id()
-		},
-
-		{
-			[COLS]: gridHelp.item({
-				x: 2,
-				y: 0,
-				w: 2,
-				h: 2
-			}),
-			id: id()
-		}
-	];
+	let items = [];
 
 	const cols = [[1600, COLS]];
 
@@ -40,7 +21,8 @@
 				w: 2,
 				h: 2,
 				x: 0,
-				y: 0
+				y: 0,
+				customResizer: true
 			}),
 			id: id()
 		};
@@ -58,22 +40,6 @@
 		items = [...items, ...[newItem]];
 	}
 
-	const addAt = () => {
-		let newItem = {
-			[COLS]: gridHelp.item({
-				w: 2,
-				h: 2,
-				x: 0,
-				y: 0
-			}),
-			id: id()
-		};
-
-		items = [...[newItem], ...items];
-
-		items = gridHelp.adjust(items, COLS);
-	};
-
 	const remove = (item) => {
 		items = items.filter((value) => value.id !== item.id);
 		items = gridHelp.adjust(items, COLS);
@@ -81,12 +47,12 @@
 </script>
 
 <div class="dashboard-container flex-fill">
-	<nav class="navbar navbar-expand-lg navbar-dark">
+	<nav class="navbar navbar-expand-lg navbar-dark p-0">
 		<div class="container-fluid justify-content-end">
-			<button class="btn btn-outline-primary mx-2" on:click={add} disabled={!editMode}
+			<button class="btn bruh btn-outline-primary m-2" on:click={add} disabled={!editMode}
 				>+ Add Panel</button
 			>
-			<div class="form-check form-switch mx-2">
+			<div class="form-check form-switch m-2">
 				<input
 					class="form-check-input"
 					type="checkbox"
@@ -99,7 +65,15 @@
 		</div>
 	</nav>
 
-	<Grid bind:items rowHeight={100} let:item let:dataItem {cols} fastStart={true}>
+	<Grid
+		bind:items
+		rowHeight={100}
+		let:item
+		let:dataItem
+		{cols}
+		fastStart={true}
+		let:resizePointerDown
+	>
 		<div class="dashboard-widget card bg-dark">
 			<button
 				on:pointerdown={(e) => e.stopPropagation()}
@@ -111,6 +85,16 @@
 			<h3>
 				{dataItem.id}
 			</h3>
+
+			{#if editMode}
+				<img
+					class="resizer"
+					draggable="false"
+					on:pointerdown={resizePointerDown}
+					src={bottomRightIcon}
+					alt="resize"
+				/>
+			{/if}
 		</div>
 	</Grid>
 </div>
@@ -127,7 +111,15 @@
 		justify-content: center;
 		align-items: center;
 	}
+
 	.bruh:hover {
 		color: white !important;
+	}
+
+	.resizer {
+		position: absolute;
+		bottom: 5px;
+		right: 5px;
+		cursor: se-resize;
 	}
 </style>
