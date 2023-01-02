@@ -4,6 +4,27 @@
 	import bottomRightIcon from '$lib/assets/bottom-right.svg';
 
 	let editMode = false;
+	$: {
+		updateDraggable(editMode);
+	}
+
+	function updateDraggable(editMode) {
+		let fixed = !editMode;
+		let draggable = editMode;
+		let resizable = editMode;
+
+		items = items.map((item) => {
+			return {
+				...item,
+				[COLS]: {
+					...item[COLS],
+					fixed,
+					draggable,
+					resizable
+				}
+			};
+		});
+	}
 
 	const COLS = 12;
 
