@@ -2,6 +2,8 @@
 	import Grid from 'svelte-grid';
 	import gridHelp from 'svelte-grid/build/helper/index.mjs';
 
+	let editMode = false;
+
 	const COLS = 12;
 
 	const id = () => '_' + Math.random().toString(36).substr(2, 9);
@@ -78,10 +80,26 @@
 	};
 </script>
 
-<div class="flex-fill">
-	<button on:click={add}>goofy aah</button>
+<div class="dashboard-container flex-fill">
+	<nav class="navbar navbar-expand-lg navbar-dark">
+		<div class="container-fluid justify-content-end">
+			<button class="btn btn-outline-primary mx-2" on:click={add} disabled={!editMode}
+				>+ Add Panel</button
+			>
+			<div class="form-check form-switch mx-2">
+				<input
+					class="form-check-input"
+					type="checkbox"
+					role="switch"
+					id="editModeSwitch"
+					bind:checked={editMode}
+				/>
+				<label class="form-check-label" for="editModeSwitch">Edit Mode</label>
+			</div>
+		</div>
+	</nav>
 
-	<Grid bind:items rowHeight={100} let:item let:dataItem {cols}>
+	<Grid bind:items rowHeight={100} let:item let:dataItem {cols} fastStart={true}>
 		<div class="dashboard-widget card bg-dark">
 			<button
 				on:pointerdown={(e) => e.stopPropagation()}
@@ -98,11 +116,18 @@
 </div>
 
 <style>
+	.dashboard-container {
+		overflow-y: auto;
+	}
+
 	.dashboard-widget {
 		height: 100%;
 		width: 100%;
 		display: flex;
 		justify-content: center;
 		align-items: center;
+	}
+	.bruh:hover {
+		color: white !important;
 	}
 </style>
