@@ -37,8 +37,6 @@ export default function Grid() {
     xxs: genSmallLayout(layout),
   };
 
-  console.log(layouts);
-
   return (
     <div className={`${styles["dashboard-container"]} flex-fill p-2`}>
       <ResponsiveGridLayout
