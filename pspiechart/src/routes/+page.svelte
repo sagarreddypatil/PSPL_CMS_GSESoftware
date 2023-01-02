@@ -1,6 +1,6 @@
 <script>
-	import Dashboard from './Dashboard.svelte';
-	import Sidebar from './Sidebar.svelte';
+	import Dashboard from '../lib/components/Dashboard.svelte';
+	import Sidebar from '../lib/components/Sidebar.svelte';
 </script>
 
 <main class="d-flex flex-row">
