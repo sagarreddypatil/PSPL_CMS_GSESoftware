@@ -7,3 +7,11 @@
     @extend .card;
     @extend .bg-primary;
 }
+
+html,
+body,
+body > div:first-child,
+div#__next,
+div#__next > div {
+    height: 100%;
+}

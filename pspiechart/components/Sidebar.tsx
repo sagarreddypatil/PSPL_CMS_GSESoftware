@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import pspColor from "../public/PSP-2Color-Reversed.svg";
+import styles from "../styles/Sidebar.module.scss";
 
 export default function Sidebar() {
   return (
@@ -11,12 +12,9 @@ export default function Sidebar() {
         className="d-flex row align-items-center text-white text-decoration-none"
       >
         <div className="col pe-0">
-          <Image
-            src={pspColor}
-            alt="logo"
-            className="mb-2"
-            layout="responsive"
-          />
+          <div className={`${styles["image-container"]} mb-2`}>
+            <Image src={pspColor} alt="logo" fill className={styles["image"]} />
+          </div>
         </div>
         <div className="col">
           <h3 className="m-0">Mission Control</h3>
