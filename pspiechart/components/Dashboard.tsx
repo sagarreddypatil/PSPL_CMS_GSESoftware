@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import styles from "../styles/Dashboard.module.scss";
 import ReactGridLayout from "react-grid-layout";
 import { Responsive, WidthProvider } from "react-grid-layout";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { getSystemErrorMap } from "util";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -28,22 +27,20 @@ export default function Grid() {
         ...item,
         x: 0,
         y: (y += item.h),
+        w: 5,
       };
     });
   };
 
   const layouts = {
     lg: layout,
-    xss: genSmallLayout(layout),
+    xxs: genSmallLayout(layout),
   };
 
   console.log(layouts);
 
   return (
-    <div
-      className="flex-fill p-2"
-      style={{ overflowY: "auto", overflowX: "hidden" }}
-    >
+    <div className={`${styles["dashboard-container"]} flex-fill p-2`}>
       <ResponsiveGridLayout
         isDraggable={true}
         isResizable={true}
