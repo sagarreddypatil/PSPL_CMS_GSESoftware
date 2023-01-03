@@ -4,23 +4,39 @@ import ReactGridLayout from "react-grid-layout";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import { Form, Nav, ToggleButton, Button } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
+import Widget from "./Widget";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
+let counter = 0;
+
+const COLS = 25;
+const BASE_WIDTH = 5;
+const ROW_HEIGHT = 32;
 
 export default function Grid() {
   const [editMode, setEditMode] = useState(false);
+  const [layout, setLayout] = useState<ReactGridLayout.Layout[]>([]);
 
-  // create a state called layout
-  function genericCell(name: string) {
-    return { i: name, x: 0, y: 0, w: 5, h: 5 };
-  }
-  const [layout, setLayout] = useState([
-    genericCell("a"),
-    genericCell("b"),
-    genericCell("c"),
-    genericCell("d"),
-    genericCell("e"),
-  ]);
+  const addPanel = () => {
+    let widthSum = layout.reduce((acc, item) => acc + item.w, 0);
+
+    let newPanel: ReactGridLayout.Layout = {
+      i: counter.toString(),
+      x: widthSum % COLS,
+      y: Infinity,
+      h: BASE_WIDTH,
+      w: BASE_WIDTH,
+    };
+
+    let newLayout = [...layout, newPanel];
+    counter++;
+
+    setLayout(newLayout);
+  };
+
+  const removePanel = (i: string) => {
+    setLayout(layout.filter((item) => item.i !== i));
+  };
 
   const genSmallLayout = (layout: ReactGridLayout.Layout[]) => {
     if (layout.length === 0) return [];
@@ -31,7 +47,7 @@ export default function Grid() {
         ...item,
         x: 0,
         y: (y += item.h),
-        w: 5,
+        w: BASE_WIDTH,
       };
     });
   };
@@ -47,9 +63,14 @@ export default function Grid() {
         <div className="container-fluid">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <button className="btn btn-outline-primary p-1 px-2 m-1 ms-2">
-                <Icon.Plus /> Add Panel
-              </button>
+              <Button
+                variant="outline-primary"
+                className="p-1 px-2 m-1 ms-2"
+                disabled={!editMode}
+                onClick={addPanel}
+              >
+                <Icon.PlusLg /> Add Panel
+              </Button>
             </li>
           </ul>
           <ul className="navbar-nav">
@@ -76,21 +97,33 @@ export default function Grid() {
       </nav>
       <div className="p-2">
         <ResponsiveGridLayout
-          isDraggable={true}
-          isResizable={true}
+          isDraggable={editMode}
+          isResizable={editMode}
           containerPadding={[0, 0]}
           useCSSTransforms={false}
           margin={[8, 8]}
           breakpoints={{ lg: 480, xxs: 0 }}
-          cols={{ lg: 25, xxs: 5 }}
-          rowHeight={32}
+          cols={{ lg: COLS, xxs: BASE_WIDTH }}
+          rowHeight={ROW_HEIGHT}
           layouts={layouts}
           onLayoutChange={(layout, layouts) => setLayout(layouts.lg)}
         >
           {layout.map((item) => (
-            <div className="card bg-dark" key={item.i}>
-              {item.i}
+            <div key={item.i}>
+              <Widget title={item.i}>
+                <p> hello </p>
+              </Widget>
             </div>
+            // <div className="card bg-dark" key={item.i}>
+            //   <Button
+            //     variant="outline-danger"
+            //     className={`p-2 m-2`}
+            //     onClick={() => removePanel(item.i)}
+            //     hidden={!editMode}
+            //   >
+            //     <Icon.XLg />
+            //   </Button>
+            // </div>
           ))}
         </ResponsiveGridLayout>
       </div>
