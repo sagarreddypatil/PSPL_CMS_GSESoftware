@@ -6,7 +6,7 @@ import styles from "../styles/Sidebar.module.scss";
 
 export default function Sidebar() {
   return (
-    <div className="d-flex flex-column flex-shrink-0 p-3 bg-dark">
+    <div className="d-flex flex-column flex-shrink-0 p-3 bg-black">
       <a
         href="#"
         className="d-flex row align-items-center text-white text-decoration-none"

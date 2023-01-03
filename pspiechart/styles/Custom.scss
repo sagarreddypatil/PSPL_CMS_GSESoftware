@@ -20,14 +20,14 @@ $psp-steam: #C4BFC0;
 
 @import 'bootstrap/scss/functions';
 
-$primary: $campus-gold;
+$primary: $psp-rush;
 $black: $psp-black;
 $white: $psp-white;
 $dark: $psp-night-sky;
 $light: $psp-white;
 
 $body-bg: $psp-steel;
-$body-color: $psp-moondust;
+$body-color: $psp-white;
 
 $font-family-sans-serif:
     "Libre Franklin",
@@ -53,3 +53,14 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
 @import 'bootstrap/scss/maps';
 @import 'bootstrap/scss/mixins';
 @import 'bootstrap/scss/utilities';
+
+.btn-primary{
+    --bs-btn-color: #fff !important;
+    --bs-btn-hover-color: #fff !important;
+    --bs-btn-active-color: #fff !important;
+}
+
+.btn-outline-primary{
+    --bs-btn-hover-color: #fff !important;
+    --bs-btn-active-color: #fff !important;
+}
