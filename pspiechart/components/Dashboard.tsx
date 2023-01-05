@@ -5,6 +5,7 @@ import { Responsive, WidthProvider } from "react-grid-layout";
 import { Form, Nav, ToggleButton, Button } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
 import Widget from "./Widget";
+import TimeChartPlot from "./TimeChartPlot";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 let counter = 0;
@@ -95,7 +96,7 @@ export default function Grid() {
           </ul>
         </div>
       </nav>
-      <div className="p-2">
+      <div className={"p-2" + (editMode ? " user-select-none" : "")}>
         <ResponsiveGridLayout
           isDraggable={editMode}
           isResizable={editMode}
@@ -107,11 +108,17 @@ export default function Grid() {
           rowHeight={ROW_HEIGHT}
           layouts={layouts}
           onLayoutChange={(layout, layouts) => setLayout(layouts.lg)}
+          resizeHandle={
+            <Icon.ArrowDownRight
+              className={`react-resizable-handle react-resizable-handle-se m-1 user-select-none`}
+            />
+          }
         >
           {layout.map((item) => (
             <div key={item.i}>
               <Widget title={item.i}>
-                <p> hello </p>
+                <TimeChartPlot />
+                {/* <p> hello </p> */}
               </Widget>
             </div>
             // <div className="card bg-dark" key={item.i}>
