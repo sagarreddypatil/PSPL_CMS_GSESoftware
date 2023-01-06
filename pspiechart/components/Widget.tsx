@@ -12,7 +12,9 @@ export default function Widget(props: WidgetProps) {
       >
         <h5 className="card-title my-1">{props.title}</h5>
       </div>
-      <div className="card-body flex-column h-100">{props.children}</div>
+      <div className="card-body flex-column d-flex p-2 h-100">
+        {props.children}
+      </div>
     </div>
   );
 }

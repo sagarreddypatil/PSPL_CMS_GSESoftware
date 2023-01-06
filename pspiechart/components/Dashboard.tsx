@@ -5,7 +5,7 @@ import { Responsive, WidthProvider } from "react-grid-layout";
 import { Form, Nav, ToggleButton, Button } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
 import Widget from "./Widget";
-import TimeChartPlot from "./TimeChartPlot";
+import TimePlot from "./TimePlot";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 let counter = 0;
@@ -117,20 +117,15 @@ export default function Grid() {
           {layout.map((item) => (
             <div key={item.i}>
               <Widget title={item.i}>
-                <TimeChartPlot />
-                {/* <p> hello </p> */}
+                {editMode ? (
+                  <div className="flex-fill bg-secondary text-center d-flex align-items-center">
+                    <h3 className="flex-fill">Panel Goes Here</h3>
+                  </div>
+                ) : (
+                  <TimePlot />
+                )}
               </Widget>
             </div>
-            // <div className="card bg-dark" key={item.i}>
-            //   <Button
-            //     variant="outline-danger"
-            //     className={`p-2 m-2`}
-            //     onClick={() => removePanel(item.i)}
-            //     hidden={!editMode}
-            //   >
-            //     <Icon.XLg />
-            //   </Button>
-            // </div>
           ))}
         </ResponsiveGridLayout>
       </div>
