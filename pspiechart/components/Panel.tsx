@@ -3,7 +3,7 @@ interface WidgetProps {
   children?: React.ReactNode;
 }
 
-export default function Widget(props: WidgetProps) {
+export default function Panel(props: WidgetProps) {
   return (
     <div className="card bg-dark" style={{ height: "100%" }}>
       <div

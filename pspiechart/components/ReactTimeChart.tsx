@@ -23,12 +23,9 @@ const ReactTimeChart = () => {
   };
 
   useEffect(() => {
-    // for (let x = 0; x < 100; x++) {
-    //   data.current.push({ x, y: Math.random() });
-    // }
     chartRef.current = new TimeChart(chartDivRef.current!, {
       series: [{ name: "Random", data: dataRef.current }],
-      xRange: { min: 0, max: 20 * 1000 },
+      xRange: { min: 0, max: 20 },
       realTime: true,
       plugins: {
         lineChart,
@@ -38,7 +35,7 @@ const ReactTimeChart = () => {
         zoom: new TimeChartZoomPlugin({
           x: {
             autoRange: true,
-            minDomainExtent: 50,
+            minDomainExtent: 1,
           },
           y: {
             autoRange: true,
@@ -49,16 +46,7 @@ const ReactTimeChart = () => {
     });
   }, []);
 
-  return (
-    <div className="flex-fill">
-      <button onClick={addData} className="btn btn-primary">
-        Add Data
-      </button>
-      <div ref={chartDivRef} style={{ width: "100%", height: "100%" }}>
-        {" "}
-      </div>
-    </div>
-  );
+  return <div ref={chartDivRef} className="flex-fill"></div>;
 };
 
 export default ReactTimeChart;

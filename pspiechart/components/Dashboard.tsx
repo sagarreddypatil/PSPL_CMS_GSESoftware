@@ -4,7 +4,7 @@ import ReactGridLayout from "react-grid-layout";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import { Form, Nav, ToggleButton, Button } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
-import Widget from "./Widget";
+import Panel from "./Panel";
 import TimePlot from "./TimePlot";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -16,6 +16,7 @@ const ROW_HEIGHT = 32;
 
 export default function Grid() {
   const [editMode, setEditMode] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [layout, setLayout] = useState<ReactGridLayout.Layout[]>([]);
 
   const addPanel = () => {
@@ -64,6 +65,19 @@ export default function Grid() {
         <div className="container-fluid">
           <ul className="navbar-nav">
             <li className="nav-item">
+              <ToggleButton
+                variant="outline-primary"
+                className="p-1 px-2 m-1 ms-2"
+                type="checkbox"
+                checked={editMode}
+                value="1"
+                onClick={(e) => setEditMode(!editMode)}
+              >
+                <Icon.PencilSquare />
+                {"  "} Edit Mode
+              </ToggleButton>
+            </li>
+            <li className="nav-item">
               <Button
                 variant="outline-primary"
                 className="p-1 px-2 m-1 ms-2"
@@ -80,12 +94,11 @@ export default function Grid() {
                 variant="outline-primary"
                 className="p-1 px-2 m-1 ms-2"
                 type="checkbox"
-                checked={editMode}
+                checked={paused}
                 value="1"
-                onClick={(e) => setEditMode(!editMode)}
+                onClick={(e) => setPaused(!paused)}
               >
-                <Icon.PencilSquare />
-                {"  "} Edit Mode
+                <Icon.PauseFill /> Pause Plots
               </ToggleButton>
             </li>
             <li className="nav-item">
@@ -116,7 +129,7 @@ export default function Grid() {
         >
           {layout.map((item) => (
             <div key={item.i}>
-              <Widget title={item.i}>
+              <Panel title={item.i}>
                 {editMode ? (
                   <div className="flex-fill bg-secondary text-center d-flex align-items-center">
                     <h3 className="flex-fill">Panel Goes Here</h3>
@@ -124,7 +137,7 @@ export default function Grid() {
                 ) : (
                   <TimePlot />
                 )}
-              </Widget>
+              </Panel>
             </div>
           ))}
         </ResponsiveGridLayout>
