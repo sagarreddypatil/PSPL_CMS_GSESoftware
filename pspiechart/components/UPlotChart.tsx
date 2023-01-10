@@ -44,6 +44,8 @@ export default function UPlotChart(props: UPlotChartProps) {
       return;
     }
 
+    // console.log(dsTimeQueueRef.current.length);
+
     const timeAvg =
       dsTimeQueueRef.current.reduce((a, b) => a + b, 0) /
       dsTimeQueueRef.current.length;
@@ -51,11 +53,22 @@ export default function UPlotChart(props: UPlotChartProps) {
       dsValueQueueRef.current.reduce((a, b) => a + b, 0) /
       dsValueQueueRef.current.length;
 
+    // const timeAvg = dsTimeQueueRef.current[dsTimeQueueRef.current.length - 1];
+    // const valueAvg =
+    //   dsValueQueueRef.current[dsValueQueueRef.current.length - 1];
+
     xRef.current.push(timeAvg);
     yRef.current.push(valueAvg);
 
-    dsTimeQueueRef.current = new Array<number>();
-    dsValueQueueRef.current = new Array<number>();
+    const emptyArray = (arr: Array<any>) => {
+      // js is stupid, this is the fastest way to empty an array
+      while (arr.length > 0) {
+        arr.pop();
+      }
+    };
+
+    emptyArray(dsTimeQueueRef.current);
+    emptyArray(dsValueQueueRef.current);
 
     if (totalDt > props.timeWidth) {
       const pts = Math.ceil(props.timeWidth / avgDt);
@@ -86,8 +99,8 @@ export default function UPlotChart(props: UPlotChartProps) {
 
     const opts: Options = {
       title: "",
-      // width: width,
-      // height: height - 30.6,
+      width: 1,
+      height: 1,
       pxAlign: false,
       cursor: {
         y: false,

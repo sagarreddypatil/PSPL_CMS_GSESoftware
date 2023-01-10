@@ -26,7 +26,8 @@ export default function TimePlot(props: TimePlotProps) {
 
         addCallback.current({
           time: actual / 1000,
-          value: Math.random(),
+          value: Math.sin(time / 100) + Math.random() * 0.5,
+          // value: Math.random(),
         });
         i++;
       }
