@@ -26,7 +26,7 @@ export default function Panel(props: WidgetProps) {
           <></>
         )}
       </div>
-      <div className="card-body flex-column d-flex p-2 h-100">
+      <div className="card-body flex-column d-flex p-0 h-100">
         {props.editMode ? (
           <div className="flex-fill bg-secondary text-center d-flex align-items-center">
             <h3 className="flex-fill">Panel Goes Here</h3>

@@ -1,32 +1,50 @@
+import { TimeDataPoint } from "@/types/DataInterfaces";
 import dynamic from "next/dynamic";
-import { DataPoint } from "timechart/core/renderModel";
 import { useEffect, useRef, useState } from "react";
 
-const ReactTimeChart = dynamic(() => import("./ReactTimeChart"), {
+const UPlotChart = dynamic(() => import("./UPlotChart"), {
   ssr: false,
 });
 
-export default function TimePlot() {
-  const addCallback = useRef((points: DataPoint[]) => {});
-  const resetCallback = useRef(() => {});
+interface TimePlotProps {
+  paused: boolean;
+}
+
+export default function TimePlot(props: TimePlotProps) {
+  const addCallback = useRef((points: TimeDataPoint[]) => {});
+  const divRef = useRef<HTMLDivElement | null>(null);
+  const lastRef = useRef(Date.now());
 
   useEffect(() => {
-    const start = Date.now();
-
     const addData = () => {
-      const time = Date.now() - start;
-      addCallback.current([{ x: time, y: Math.sin(time) }]);
+      const time = Date.now();
+      const dt = time - lastRef.current;
+
+      let i = 1;
+      while (i <= dt) {
+        const actual = lastRef.current + i;
+
+        addCallback.current([
+          { time: actual / 1000, value: Math.sin(actual / 50) },
+        ]);
+        i++;
+      }
+
+      lastRef.current = time;
     };
 
-    const interval = setInterval(addData, 100);
+    const interval = setInterval(addData, 1);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="flex-fill d-flex">
-      <ReactTimeChart
-        registerAddCallback={(callback) => (addCallback.current = callback)}
-        registerResetCallback={(callback) => (resetCallback.current = callback)}
+    <div ref={divRef} className="flex-fill d-flex">
+      <UPlotChart
+        maxLen={2500}
+        paused={props.paused}
+        registerTimeDataCallback={(callback) =>
+          (addCallback.current = callback)
+        }
       />
     </div>
   );

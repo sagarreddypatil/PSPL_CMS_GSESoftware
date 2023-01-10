@@ -10,8 +10,9 @@ import TimePlot from "./TimePlot";
 const ResponsiveGridLayout = WidthProvider(Responsive);
 let counter = 0;
 
-const COLS = 25;
-const BASE_WIDTH = 5;
+const COLS = 24;
+const BASE_HEIGHT = 10;
+const BASE_WIDTH = 8;
 const ROW_HEIGHT = 40 - 6;
 
 export default function Grid() {
@@ -26,7 +27,7 @@ export default function Grid() {
       i: counter.toString(),
       x: widthSum % COLS,
       y: Infinity,
-      h: BASE_WIDTH,
+      h: BASE_HEIGHT,
       w: BASE_WIDTH,
     };
 
@@ -134,7 +135,7 @@ export default function Grid() {
                 editMode={editMode}
                 removeCallback={() => removePanel(item.i)}
               >
-                <TimePlot />
+                <TimePlot paused={paused} />
               </Panel>
             </div>
           ))}
