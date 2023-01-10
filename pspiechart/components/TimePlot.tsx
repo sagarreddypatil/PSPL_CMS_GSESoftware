@@ -1,6 +1,7 @@
 import { TimeDataPoint } from "@/types/DataInterfaces";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
+import uPlot from "uplot";
 
 const UPlotChart = dynamic(() => import("./UPlotChart"), {
   ssr: false,
@@ -8,11 +9,11 @@ const UPlotChart = dynamic(() => import("./UPlotChart"), {
 
 interface TimePlotProps {
   paused: boolean;
+  syncRef: React.MutableRefObject<uPlot.SyncPubSub>;
 }
 
 export default function TimePlot(props: TimePlotProps) {
   const addCallback = useRef((points: TimeDataPoint) => {});
-  const divRef = useRef<HTMLDivElement | null>(null);
   const lastRef = useRef(Date.now());
 
   useEffect(() => {
@@ -26,7 +27,7 @@ export default function TimePlot(props: TimePlotProps) {
 
         addCallback.current({
           time: actual / 1000,
-          value: Math.sin(actual / 50),
+          value: Math.sin(actual / 100),
         });
         i++;
       }
@@ -39,14 +40,13 @@ export default function TimePlot(props: TimePlotProps) {
   }, []);
 
   return (
-    <div ref={divRef} className="flex-fill d-flex">
-      <UPlotChart
-        timeWidth={10}
-        paused={props.paused}
-        registerTimeDataCallback={(callback) =>
-          (addCallback.current = callback)
-        }
-      />
-    </div>
+    // <div className="flex-fill d-flex">
+    <UPlotChart
+      timeWidth={10}
+      paused={props.paused}
+      registerTimeDataCallback={(callback) => (addCallback.current = callback)}
+      syncRef={props.syncRef}
+    />
+    // </div>
   );
 }

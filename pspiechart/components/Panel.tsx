@@ -9,7 +9,10 @@ interface WidgetProps {
 
 export default function Panel(props: WidgetProps) {
   return (
-    <div className="card bg-dark" style={{ height: "100%" }}>
+    <div
+      className="card bg-dark align-items-stretch"
+      style={{ height: "100%" }}
+    >
       <div
         className="card-header d-flex align-items-center py-0 ps-2 pe-1"
         style={{ height: "40px" }}
@@ -26,10 +29,10 @@ export default function Panel(props: WidgetProps) {
           <></>
         )}
       </div>
-      <div className="card-body flex-column d-flex p-0 h-100">
+      <div className="card-body p-0 overflow-hidden">
         {props.editMode ? (
-          <div className="flex-fill bg-secondary text-center d-flex align-items-center">
-            <h3 className="flex-fill">Panel Goes Here</h3>
+          <div className="bg-secondary text-center h-100 w-100 align-items-center justify-content-center d-flex">
+            <h3 className="">Panel Goes Here</h3>
           </div>
         ) : (
           props.children

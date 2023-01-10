@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import styles from "../styles/Dashboard.module.scss";
 import ReactGridLayout from "react-grid-layout";
 import { Responsive, WidthProvider } from "react-grid-layout";
@@ -6,6 +6,7 @@ import { Form, Nav, ToggleButton, Button } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
 import Panel from "./Panel";
 import TimePlot from "./TimePlot";
+import uPlot from "uplot";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 let counter = 0;
@@ -19,6 +20,7 @@ export default function Grid() {
   const [editMode, setEditMode] = useState(false);
   const [paused, setPaused] = useState(false);
   const [layout, setLayout] = useState<ReactGridLayout.Layout[]>([]);
+  const syncRef = useRef(uPlot.sync("sync"));
 
   const addPanel = () => {
     let widthSum = layout.reduce((acc, item) => acc + item.w, 0);
@@ -135,7 +137,7 @@ export default function Grid() {
                 editMode={editMode}
                 removeCallback={() => removePanel(item.i)}
               >
-                <TimePlot paused={paused} />
+                <TimePlot paused={paused} syncRef={syncRef} />
               </Panel>
             </div>
           ))}

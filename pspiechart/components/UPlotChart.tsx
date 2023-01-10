@@ -1,5 +1,6 @@
 import { FrequencyDataPoint, TimeDataPoint } from "@/types/DataInterfaces";
-import { useEffect, useRef } from "react";
+import { match } from "assert";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";
 
@@ -9,6 +10,7 @@ interface UPlotChartProps {
   registerTimeDataCallback?: (
     callback: (points: TimeDataPoint) => void
   ) => void;
+  syncRef: React.MutableRefObject<uPlot.SyncPubSub>;
 }
 
 export default function UPlotChart(props: UPlotChartProps) {
@@ -63,20 +65,35 @@ export default function UPlotChart(props: UPlotChartProps) {
   });
 
   useEffect(() => {
-    const height = containerRef.current!.clientHeight;
     const width = containerRef.current!.clientWidth;
+    const height = containerRef.current!.clientHeight;
 
     widthRef.current = width * window.devicePixelRatio;
 
+    const matchSyncKeys = (own, ext) => own == ext;
+    function upDownFilter(type) {
+      return type != "mouseup" && type != "mousedown";
+    }
     const opts: Options = {
       title: "",
-      width: width,
-      height: height - 30.6,
+      // width: width,
+      // height: height - 30.6,
       pxAlign: false,
+      cursor: {
+        y: false,
+        sync: {
+          key: props.syncRef.current.key,
+          setSeries: true,
+          match: [matchSyncKeys, matchSyncKeys],
+          filters: {
+            pub: upDownFilter,
+          },
+        },
+        lock: true,
+      },
       scales: {
         y: {
           auto: true,
-          // range: [-6, 6],
         },
       },
       axes: [
@@ -85,10 +102,18 @@ export default function UPlotChart(props: UPlotChartProps) {
           grid: {
             stroke: "#ffffff50",
           },
+          ticks: {
+            show: true,
+            stroke: "#ffffff50",
+          },
         },
         {
           stroke: "#fff",
           grid: {
+            stroke: "#ffffff50",
+          },
+          ticks: {
+            show: true,
             stroke: "#ffffff50",
           },
         },
@@ -110,13 +135,44 @@ export default function UPlotChart(props: UPlotChartProps) {
       divRef.current ? divRef.current : undefined
     );
 
+    props.syncRef.current.sub(plotRef.current);
+
     return () => {
+      props.syncRef.current.unsub(plotRef.current!);
       plotRef.current?.destroy();
     };
   }, []);
 
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  useLayoutEffect(() => {
+    function updateSize() {
+      const newSize = {
+        width: containerRef.current?.clientWidth ?? 0,
+        height: containerRef.current?.clientHeight ?? 0,
+      };
+
+      console.log(newSize);
+
+      setSize(newSize);
+    }
+
+    window.addEventListener("resize", updateSize);
+    updateSize();
+
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
+  useEffect(() => {
+    console.log(size);
+
+    plotRef.current?.setSize({
+      width: size.width,
+      height: size.height - 30.6,
+    });
+  }, [size]);
+
   return (
-    <div ref={containerRef} className="flex-fill">
+    <div ref={containerRef} className="h-100 w-100 min-vw-0 min-vh-0">
       <div ref={divRef}></div>
     </div>
   );
