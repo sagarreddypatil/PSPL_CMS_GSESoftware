@@ -10,16 +10,19 @@ interface UPlotChartProps {
   registerTimeDataCallback?: (
     callback: (points: TimeDataPoint) => void
   ) => void;
-  syncRef: React.MutableRefObject<uPlot.SyncPubSub>;
 }
 
 export default function UPlotChart(props: UPlotChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const divRef = useRef<HTMLDivElement | null>(null);
   const plotRef = useRef<uPlot | null>(null);
-  const widthRef = useRef(1); // points per pixel
   const animationRef = useRef(0);
 
+  // Downsampling queues
+  const dsValueQueueRef = useRef(new Array<number>());
+  const dsTimeQueueRef = useRef(new Array<number>());
+
+  // current chart data
   const xRef = useRef<number[]>([]);
   const yRef = useRef<number[]>([]);
 
@@ -30,16 +33,29 @@ export default function UPlotChart(props: UPlotChartProps) {
     const avgFreq = 1 / avgDt;
     const insFreq = 1 / insDt;
 
-    const desiredPts = Math.floor(widthRef.current);
+    const desiredPts = Math.floor(size.width * window.devicePixelRatio);
     const ppx = (props.timeWidth * insFreq) / desiredPts;
     const desiredDt = insDt * ppx;
+
+    dsTimeQueueRef.current.push(point.time);
+    dsValueQueueRef.current.push(point.value);
 
     if (insDt < desiredDt) {
       return;
     }
 
-    xRef.current.push(point.time);
-    yRef.current.push(point.value);
+    const timeAvg =
+      dsTimeQueueRef.current.reduce((a, b) => a + b, 0) /
+      dsTimeQueueRef.current.length;
+    const valueAvg =
+      dsValueQueueRef.current.reduce((a, b) => a + b, 0) /
+      dsValueQueueRef.current.length;
+
+    xRef.current.push(timeAvg);
+    yRef.current.push(valueAvg);
+
+    dsTimeQueueRef.current = new Array<number>();
+    dsValueQueueRef.current = new Array<number>();
 
     if (totalDt > props.timeWidth) {
       const pts = Math.ceil(props.timeWidth / avgDt);
@@ -68,12 +84,6 @@ export default function UPlotChart(props: UPlotChartProps) {
     const width = containerRef.current!.clientWidth;
     const height = containerRef.current!.clientHeight;
 
-    widthRef.current = width * window.devicePixelRatio;
-
-    const matchSyncKeys = (own, ext) => own == ext;
-    function upDownFilter(type) {
-      return type != "mouseup" && type != "mousedown";
-    }
     const opts: Options = {
       title: "",
       // width: width,
@@ -81,14 +91,6 @@ export default function UPlotChart(props: UPlotChartProps) {
       pxAlign: false,
       cursor: {
         y: false,
-        sync: {
-          key: props.syncRef.current.key,
-          setSeries: true,
-          match: [matchSyncKeys, matchSyncKeys],
-          filters: {
-            pub: upDownFilter,
-          },
-        },
         lock: true,
       },
       scales: {
@@ -135,10 +137,7 @@ export default function UPlotChart(props: UPlotChartProps) {
       divRef.current ? divRef.current : undefined
     );
 
-    props.syncRef.current.sub(plotRef.current);
-
     return () => {
-      props.syncRef.current.unsub(plotRef.current!);
       plotRef.current?.destroy();
     };
   }, []);
@@ -151,8 +150,6 @@ export default function UPlotChart(props: UPlotChartProps) {
         height: containerRef.current?.clientHeight ?? 0,
       };
 
-      console.log(newSize);
-
       setSize(newSize);
     }
 
@@ -163,8 +160,6 @@ export default function UPlotChart(props: UPlotChartProps) {
   }, []);
 
   useEffect(() => {
-    console.log(size);
-
     plotRef.current?.setSize({
       width: size.width,
       height: size.height - 30.6,

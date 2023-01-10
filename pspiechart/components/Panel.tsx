@@ -10,7 +10,9 @@ interface WidgetProps {
 export default function Panel(props: WidgetProps) {
   return (
     <div
-      className="card bg-dark align-items-stretch"
+      className={`card bg-dark align-items-stretch ${
+        props.editMode ? "draggable" : ""
+      }`}
       style={{ height: "100%" }}
     >
       <div

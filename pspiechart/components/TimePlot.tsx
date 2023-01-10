@@ -9,7 +9,6 @@ const UPlotChart = dynamic(() => import("./UPlotChart"), {
 
 interface TimePlotProps {
   paused: boolean;
-  syncRef: React.MutableRefObject<uPlot.SyncPubSub>;
 }
 
 export default function TimePlot(props: TimePlotProps) {
@@ -27,7 +26,7 @@ export default function TimePlot(props: TimePlotProps) {
 
         addCallback.current({
           time: actual / 1000,
-          value: Math.sin(actual / 100),
+          value: Math.random(),
         });
         i++;
       }
@@ -45,7 +44,6 @@ export default function TimePlot(props: TimePlotProps) {
       timeWidth={10}
       paused={props.paused}
       registerTimeDataCallback={(callback) => (addCallback.current = callback)}
-      syncRef={props.syncRef}
     />
     // </div>
   );
