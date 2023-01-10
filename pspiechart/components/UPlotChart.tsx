@@ -22,23 +22,26 @@ export default function UPlotChart(props: UPlotChartProps) {
   const yRef = useRef<number[]>([]);
 
   const addTimeData = (point: TimeDataPoint) => {
-    const dt = point.time - xRef.current[0];
-    const dtPoint = dt / (xRef.current.length + 1);
-    const freq = 1 / dtPoint;
+    const totalDt = point.time - xRef.current[0];
+    const avgDt = totalDt / (xRef.current.length + 1);
+    const insDt = point.time - xRef.current[xRef.current.length - 1];
+    const avgFreq = 1 / avgDt;
+    const insFreq = 1 / insDt;
 
     const desiredPts = Math.floor(widthRef.current);
-    const ppx = (props.timeWidth * freq) / desiredPts;
-    const desiredFreq = freq / ppx;
+    console.log(desiredPts - xRef.current.length);
+    const ppx = (props.timeWidth * insFreq) / desiredPts;
+    const desiredDt = insDt * ppx;
 
-    if (freq > desiredFreq) {
+    if (insDt < desiredDt) {
       return;
     }
 
     xRef.current.push(point.time);
     yRef.current.push(point.value);
 
-    if (dt > props.timeWidth) {
-      const pts = Math.ceil(props.timeWidth / dtPoint);
+    if (totalDt > props.timeWidth) {
+      const pts = Math.ceil(props.timeWidth / avgDt);
       xRef.current = xRef.current.slice(xRef.current.length - pts);
       yRef.current = yRef.current.slice(yRef.current.length - pts);
     }

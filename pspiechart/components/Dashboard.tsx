@@ -12,7 +12,7 @@ let counter = 0;
 
 const COLS = 24;
 const BASE_HEIGHT = 10;
-const BASE_WIDTH = 8;
+const BASE_WIDTH = 6;
 const ROW_HEIGHT = 40 - 6;
 
 export default function Grid() {

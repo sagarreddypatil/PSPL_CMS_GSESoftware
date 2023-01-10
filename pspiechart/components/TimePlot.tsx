@@ -41,7 +41,7 @@ export default function TimePlot(props: TimePlotProps) {
   return (
     <div ref={divRef} className="flex-fill d-flex">
       <UPlotChart
-        timeWidth={5}
+        timeWidth={10}
         paused={props.paused}
         registerTimeDataCallback={(callback) =>
           (addCallback.current = callback)
