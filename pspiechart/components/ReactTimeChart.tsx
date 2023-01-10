@@ -5,27 +5,43 @@ import { d3Axis } from "timechart/plugins/d3Axis";
 import { crosshair } from "timechart/plugins/crosshair";
 import { nearestPoint } from "timechart/plugins/nearestPoint";
 import { TimeChartZoomPlugin } from "timechart/plugins/chartZoom";
+import { DataPointsBuffer } from "timechart/core/dataPointsBuffer";
+import { DataPoint } from "timechart/core/renderModel";
+import { propTypes } from "react-bootstrap/esm/Image";
 
-const ReactTimeChart = () => {
+interface ReactTimeChartProps {
+  registerAddCallback(callback: (points: DataPoint[]) => void): void;
+  registerResetCallback(callback: () => void): void;
+}
+
+const ReactTimeChart = (props: ReactTimeChartProps) => {
   const chartDivRef = useRef<HTMLDivElement | null>(null);
-  const dataRef = useRef([] as { x: number; y: number }[]);
+  const dataRef = useRef(new DataPointsBuffer({ x: 0, y: 0 }));
   const chartRef = useRef<TimeChart | null>(null);
 
-  const addData = () => {
+  const addData = (points: DataPoint[]) => {
     if (chartRef == null) return;
 
-    dataRef.current.push({ x: dataRef.current.length, y: Math.random() });
-    console.log(dataRef.current);
+    dataRef.current.push(...points);
 
-    chartRef.current.options.realTime = true;
+    if (chartRef.current) chartRef.current.options.realTime = true;
 
     chartRef.current?.update();
   };
 
+  props.registerAddCallback(addData);
+
+  const reset = () => {
+    dataRef.current = new DataPointsBuffer();
+    chartRef.current?.update();
+  };
+
+  props.registerResetCallback(reset);
+
   useEffect(() => {
     chartRef.current = new TimeChart(chartDivRef.current!, {
       series: [{ name: "Random", data: dataRef.current }],
-      xRange: { min: 0, max: 20 },
+      xRange: { min: 0, max: 50000 },
       realTime: true,
       plugins: {
         lineChart,
@@ -44,6 +60,8 @@ const ReactTimeChart = () => {
         }),
       },
     });
+
+    return () => chartRef.current?.dispose();
   }, []);
 
   return <div ref={chartDivRef} className="flex-fill"></div>;

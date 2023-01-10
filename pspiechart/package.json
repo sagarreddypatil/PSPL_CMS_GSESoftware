@@ -25,6 +25,7 @@
     "sass": "^1.57.1",
     "timechart": "^1.0.0-beta.9",
     "typescript": "4.9.4",
+    "uplot": "^1.6.23",
     "ws": "^8.11.0"
   },
   "devDependencies": {

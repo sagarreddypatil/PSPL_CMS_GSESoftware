@@ -15,3 +15,10 @@ div#__next,
 div#__next > div {
     height: 100%;
 }
+
+.btn-icon {
+  /* Since your button is a block button, otherwise use inline-flex */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

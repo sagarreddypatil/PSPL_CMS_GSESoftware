@@ -12,7 +12,7 @@ let counter = 0;
 
 const COLS = 25;
 const BASE_WIDTH = 5;
-const ROW_HEIGHT = 32;
+const ROW_HEIGHT = 40 - 6;
 
 export default function Grid() {
   const [editMode, setEditMode] = useState(false);
@@ -129,14 +129,12 @@ export default function Grid() {
         >
           {layout.map((item) => (
             <div key={item.i}>
-              <Panel title={item.i}>
-                {editMode ? (
-                  <div className="flex-fill bg-secondary text-center d-flex align-items-center">
-                    <h3 className="flex-fill">Panel Goes Here</h3>
-                  </div>
-                ) : (
-                  <TimePlot />
-                )}
+              <Panel
+                title={item.i}
+                editMode={editMode}
+                removeCallback={() => removePanel(item.i)}
+              >
+                <TimePlot />
               </Panel>
             </div>
           ))}
