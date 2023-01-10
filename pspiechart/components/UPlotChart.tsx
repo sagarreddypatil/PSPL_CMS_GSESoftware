@@ -4,10 +4,10 @@ import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";
 
 interface UPlotChartProps {
-  maxLen: number;
+  timeWidth: number; // seconds
   paused: boolean;
   registerTimeDataCallback?: (
-    callback: (points: TimeDataPoint[]) => void
+    callback: (points: TimeDataPoint) => void
   ) => void;
 }
 
@@ -15,19 +15,33 @@ export default function UPlotChart(props: UPlotChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const divRef = useRef<HTMLDivElement | null>(null);
   const plotRef = useRef<uPlot | null>(null);
-  const ppx = useRef(1); // points per pixel
+  const widthRef = useRef(1); // points per pixel
   const animationRef = useRef(0);
 
   const xRef = useRef<number[]>([]);
   const yRef = useRef<number[]>([]);
 
-  const addTimeData = (points: TimeDataPoint[]) => {
-    xRef.current = xRef.current.concat(points.map((point) => point.time));
-    yRef.current = yRef.current.concat(points.map((point) => point.value));
+  const addTimeData = (point: TimeDataPoint) => {
+    const dt = point.time - xRef.current[0];
+    const dtPoint = dt / (xRef.current.length + 1);
+    const freq = 1 / dtPoint;
+    console.log(freq);
 
-    if (xRef.current.length > props.maxLen) {
-      xRef.current = xRef.current.slice(-props.maxLen);
-      yRef.current = yRef.current.slice(-props.maxLen);
+    const desiredPts = Math.floor(widthRef.current);
+    const ppx = (props.timeWidth * freq) / desiredPts;
+    const desiredFreq = freq / ppx;
+
+    if (freq > desiredFreq) {
+      return;
+    }
+
+    xRef.current.push(point.time);
+    yRef.current.push(point.value);
+
+    if (dt > props.timeWidth) {
+      const pts = Math.ceil(props.timeWidth / dtPoint);
+      xRef.current = xRef.current.slice(xRef.current.length - pts);
+      yRef.current = yRef.current.slice(yRef.current.length - pts);
     }
   };
   props.registerTimeDataCallback?.(addTimeData);
@@ -50,6 +64,8 @@ export default function UPlotChart(props: UPlotChartProps) {
   useEffect(() => {
     const height = containerRef.current!.clientHeight;
     const width = containerRef.current!.clientWidth;
+
+    widthRef.current = width * window.devicePixelRatio;
 
     const opts: Options = {
       title: "",

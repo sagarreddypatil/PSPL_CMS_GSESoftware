@@ -11,7 +11,7 @@ interface TimePlotProps {
 }
 
 export default function TimePlot(props: TimePlotProps) {
-  const addCallback = useRef((points: TimeDataPoint[]) => {});
+  const addCallback = useRef((points: TimeDataPoint) => {});
   const divRef = useRef<HTMLDivElement | null>(null);
   const lastRef = useRef(Date.now());
 
@@ -24,9 +24,10 @@ export default function TimePlot(props: TimePlotProps) {
       while (i <= dt) {
         const actual = lastRef.current + i;
 
-        addCallback.current([
-          { time: actual / 1000, value: Math.sin(actual / 50) },
-        ]);
+        addCallback.current({
+          time: actual / 1000,
+          value: Math.sin(actual / 50),
+        });
         i++;
       }
 
@@ -40,7 +41,7 @@ export default function TimePlot(props: TimePlotProps) {
   return (
     <div ref={divRef} className="flex-fill d-flex">
       <UPlotChart
-        maxLen={2500}
+        timeWidth={5}
         paused={props.paused}
         registerTimeDataCallback={(callback) =>
           (addCallback.current = callback)
