@@ -25,7 +25,6 @@ export default function UPlotChart(props: UPlotChartProps) {
     const dt = point.time - xRef.current[0];
     const dtPoint = dt / (xRef.current.length + 1);
     const freq = 1 / dtPoint;
-    console.log(freq);
 
     const desiredPts = Math.floor(widthRef.current);
     const ppx = (props.timeWidth * freq) / desiredPts;
