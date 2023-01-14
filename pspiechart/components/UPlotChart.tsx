@@ -1,4 +1,9 @@
-import { FrequencyDataPoint, TimeDataPoint } from "@/types/DataInterfaces";
+import {
+  FrequencyDataPoint,
+  FrequencyDataSource,
+  TimeDataPoint,
+  TimeDataSource,
+} from "@/types/DataInterfaces";
 import { match } from "assert";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import uPlot, { Options } from "uplot";
@@ -7,12 +12,13 @@ import "uplot/dist/uPlot.min.css";
 interface UPlotChartProps {
   timeWidth: number; // seconds
   paused: boolean;
-  registerTimeDataCallback?: (
-    callback: (points: TimeDataPoint) => void
-  ) => void;
+
+  timeDataSource?: TimeDataSource;
+  frequencyDataSource?: FrequencyDataSource;
 }
 
 export default function UPlotChart(props: UPlotChartProps) {
+  // chart references
   const containerRef = useRef<HTMLDivElement | null>(null);
   const divRef = useRef<HTMLDivElement | null>(null);
   const plotRef = useRef<uPlot | null>(null);
@@ -26,57 +32,8 @@ export default function UPlotChart(props: UPlotChartProps) {
   const xRef = useRef<number[]>([]);
   const yRef = useRef<number[]>([]);
 
-  const addTimeData = (point: TimeDataPoint) => {
-    const totalDt = point.time - xRef.current[0];
-    const avgDt = totalDt / (xRef.current.length + 1);
-    const insDt = point.time - xRef.current[xRef.current.length - 1];
-    const avgFreq = 1 / avgDt;
-    const insFreq = 1 / insDt;
-
-    const desiredPts = Math.floor(size.width * window.devicePixelRatio);
-    const ppx = (props.timeWidth * insFreq) / desiredPts;
-    const desiredDt = insDt * ppx;
-
-    dsTimeQueueRef.current.push(point.time);
-    dsValueQueueRef.current.push(point.value);
-
-    if (insDt < desiredDt) {
-      return;
-    }
-
-    // console.log(dsTimeQueueRef.current.length);
-
-    const timeAvg =
-      dsTimeQueueRef.current.reduce((a, b) => a + b, 0) /
-      dsTimeQueueRef.current.length;
-    const valueAvg =
-      dsValueQueueRef.current.reduce((a, b) => a + b, 0) /
-      dsValueQueueRef.current.length;
-
-    // const timeAvg = dsTimeQueueRef.current[dsTimeQueueRef.current.length - 1];
-    // const valueAvg =
-    //   dsValueQueueRef.current[dsValueQueueRef.current.length - 1];
-
-    xRef.current.push(timeAvg);
-    yRef.current.push(valueAvg);
-
-    const emptyArray = (arr: Array<any>) => {
-      // js is stupid, this is the fastest way to empty an array
-      while (arr.length > 0) {
-        arr.pop();
-      }
-    };
-
-    emptyArray(dsTimeQueueRef.current);
-    emptyArray(dsValueQueueRef.current);
-
-    if (totalDt > props.timeWidth) {
-      const pts = Math.ceil(props.timeWidth / avgDt);
-      xRef.current = xRef.current.slice(xRef.current.length - pts);
-      yRef.current = yRef.current.slice(yRef.current.length - pts);
-    }
-  };
-  props.registerTimeDataCallback?.(addTimeData);
+  // container size
+  const [size, setSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     const updatePlot = () => {
@@ -155,8 +112,93 @@ export default function UPlotChart(props: UPlotChartProps) {
     };
   }, []);
 
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    const addTimeData = (point: TimeDataPoint, downsample = true) => {
+      const totalDt = point.time - xRef.current[0];
+      const avgDt = totalDt / (xRef.current.length + 1);
+      const insDt = point.time - xRef.current[xRef.current.length - 1];
+      const avgFreq = 1 / avgDt;
+      const insFreq = 1 / insDt;
+
+      const desiredPts = Math.floor(size.width * window.devicePixelRatio);
+      const ppx = (props.timeWidth * insFreq) / desiredPts;
+      const desiredDt = insDt * ppx;
+
+      if (!downsample) {
+        xRef.current.push(point.time);
+        yRef.current.push(point.value);
+        return;
+      }
+
+      dsTimeQueueRef.current.push(point.time);
+      dsValueQueueRef.current.push(point.value);
+
+      if (insDt < desiredDt) {
+        return;
+      }
+
+      // avg downsample
+      const timeAvg =
+        dsTimeQueueRef.current.reduce((a, b) => a + b, 0) /
+        dsTimeQueueRef.current.length;
+      const valueAvg =
+        dsValueQueueRef.current.reduce((a, b) => a + b, 0) /
+        dsValueQueueRef.current.length;
+
+      // last value downsample
+      // const timeAvg = dsTimeQueueRef.current[dsTimeQueueRef.current.length - 1];
+      // const valueAvg =
+      //   dsValueQueueRef.current[dsValueQueueRef.current.length - 1];
+
+      let lastTime = xRef.current[xRef.current.length - 1];
+      if (timeAvg - 0.01 <= lastTime) {
+        return;
+      }
+
+      xRef.current.push(timeAvg);
+      yRef.current.push(timeAvg - lastTime);
+
+      dsTimeQueueRef.current.length = 0;
+      dsValueQueueRef.current.length = 0;
+
+      if (totalDt > props.timeWidth) {
+        const pts = Math.ceil(props.timeWidth / avgDt);
+        xRef.current = xRef.current.slice(xRef.current.length - pts);
+        yRef.current = yRef.current.slice(yRef.current.length - pts);
+      }
+    };
+    props.timeDataSource?.subscribe(addTimeData);
+
+    if (props.timeDataSource) {
+      xRef.current.length = 0;
+      yRef.current.length = 0;
+
+      let now = Date.now();
+      let start = now - props.timeWidth * 1000;
+      let dt = props.timeWidth * 1000;
+      let dtAvg = dt / size.width;
+
+      let historicalData = props.timeDataSource.get(start, now, dtAvg);
+
+      historicalData.forEach((point) => {
+        addTimeData(point, false);
+      });
+    }
+
+    return () => {
+      props.timeDataSource?.unsubscribe(addTimeData);
+    };
+  }, [props.timeDataSource, props.timeWidth, size.width]);
+
   useLayoutEffect(() => {
+    function debounce(func: () => void, time = 100) {
+      let timer: any;
+      return function () {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(func, time);
+      };
+    }
+
     function updateSize() {
       const newSize = {
         width: containerRef.current?.clientWidth ?? 0,
@@ -166,10 +208,10 @@ export default function UPlotChart(props: UPlotChartProps) {
       setSize(newSize);
     }
 
-    window.addEventListener("resize", updateSize);
+    window.addEventListener("resize", debounce(updateSize));
     updateSize();
 
-    return () => window.removeEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", debounce(updateSize));
   }, []);
 
   useEffect(() => {

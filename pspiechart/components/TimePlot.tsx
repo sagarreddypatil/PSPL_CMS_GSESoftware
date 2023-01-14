@@ -1,4 +1,4 @@
-import { TimeDataPoint } from "@/types/DataInterfaces";
+import { TimeDataPoint, TimeDataSource } from "@/types/DataInterfaces";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import uPlot from "uplot";
@@ -11,41 +11,61 @@ interface TimePlotProps {
   paused: boolean;
 }
 
+const getDataPoint = (time: number) => {
+  return {
+    time: time / 1000,
+    value: Math.sin(time / 100),
+  } as TimeDataPoint;
+};
+
 export default function TimePlot(props: TimePlotProps) {
-  const addCallback = useRef((points: TimeDataPoint) => {});
-  const lastRef = useRef(Date.now());
+  const callbackRef = useRef<(point: TimeDataPoint) => void>();
+  const [dataSource, setDataSource] = useState<TimeDataSource>();
+  const lastRef = useRef(0);
+
+  const lastIntervalRef = useRef(0);
 
   useEffect(() => {
-    const addData = () => {
-      const time = Date.now();
-      const dt = time - lastRef.current;
-
-      let i = 1;
-      while (i <= dt) {
-        const actual = lastRef.current + i;
-
-        addCallback.current({
-          time: actual / 1000,
-          value: Math.sin(time / 100) + Math.random() * 0.5,
-          // value: Math.random(),
-        });
-        i++;
-      }
-
-      lastRef.current = time;
+    const dataSource: TimeDataSource = {
+      subscribe: (callback) => {
+        callbackRef.current = callback;
+      },
+      unsubscribe: () => {
+        callbackRef.current = undefined;
+      },
+      get: (a, b, dt) => {
+        const points = [];
+        for (let i = a; i < b; i += dt) {
+          points.push(getDataPoint(i));
+        }
+        return points;
+      },
     };
 
-    const interval = setInterval(addData, 1);
-    return () => clearInterval(interval);
+    lastRef.current = Date.now();
+    const interval = setInterval(() => {
+      if (callbackRef.current) {
+        const now = Date.now();
+        for (let i = lastRef.current + 1; i <= now; i++) {
+          callbackRef.current(getDataPoint(Date.now()));
+        }
+
+        lastRef.current = now;
+      }
+    }, 10);
+
+    setDataSource(dataSource);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   return (
-    // <div className="flex-fill d-flex">
     <UPlotChart
-      timeWidth={10}
+      timeWidth={5}
       paused={props.paused}
-      registerTimeDataCallback={(callback) => (addCallback.current = callback)}
+      timeDataSource={dataSource}
     />
-    // </div>
   );
 }
