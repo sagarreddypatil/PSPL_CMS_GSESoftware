@@ -10,7 +10,9 @@ import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";
 
 interface UPlotChartProps {
-  timeWidth: number; // seconds
+  pointsPerPixel?: number;
+
+  timespan: number; // seconds
   paused: boolean;
 
   timeDataSource?: TimeDataSource;
@@ -23,10 +25,6 @@ export default function UPlotChart(props: UPlotChartProps) {
   const divRef = useRef<HTMLDivElement | null>(null);
   const plotRef = useRef<uPlot | null>(null);
   const animationRef = useRef(0);
-
-  // Downsampling queues
-  const dsValueQueueRef = useRef(new Array<number>());
-  const dsTimeQueueRef = useRef(new Array<number>());
 
   // current chart data
   const xRef = useRef<number[]>([]);
@@ -114,55 +112,26 @@ export default function UPlotChart(props: UPlotChartProps) {
 
   useEffect(() => {
     const addTimeData = (point: TimeDataPoint, downsample = true) => {
-      const totalDt = point.time - xRef.current[0];
-      const avgDt = totalDt / (xRef.current.length + 1);
+      const currentTimespan = point.time - xRef.current[0];
+
+      const avgDt = currentTimespan / (xRef.current.length + 1);
       const insDt = point.time - xRef.current[xRef.current.length - 1];
+
       const avgFreq = 1 / avgDt;
       const insFreq = 1 / insDt;
 
-      const desiredPts = Math.floor(size.width * window.devicePixelRatio);
-      const ppx = (props.timeWidth * insFreq) / desiredPts;
+      const desiredPts = Math.floor(
+        size.width * window.devicePixelRatio * (props.pointsPerPixel ?? 1)
+      );
+
+      const ppx = (props.timespan * insFreq) / desiredPts;
       const desiredDt = insDt * ppx;
 
-      if (!downsample) {
-        xRef.current.push(point.time);
-        yRef.current.push(point.value);
-        return;
-      }
+      xRef.current.push(point.time);
+      yRef.current.push(point.value);
 
-      dsTimeQueueRef.current.push(point.time);
-      dsValueQueueRef.current.push(point.value);
-
-      if (insDt < desiredDt) {
-        return;
-      }
-
-      // avg downsample
-      const timeAvg =
-        dsTimeQueueRef.current.reduce((a, b) => a + b, 0) /
-        dsTimeQueueRef.current.length;
-      const valueAvg =
-        dsValueQueueRef.current.reduce((a, b) => a + b, 0) /
-        dsValueQueueRef.current.length;
-
-      // last value downsample
-      // const timeAvg = dsTimeQueueRef.current[dsTimeQueueRef.current.length - 1];
-      // const valueAvg =
-      //   dsValueQueueRef.current[dsValueQueueRef.current.length - 1];
-
-      let lastTime = xRef.current[xRef.current.length - 1];
-      if (timeAvg - 0.01 <= lastTime) {
-        return;
-      }
-
-      xRef.current.push(timeAvg);
-      yRef.current.push(timeAvg - lastTime);
-
-      dsTimeQueueRef.current.length = 0;
-      dsValueQueueRef.current.length = 0;
-
-      if (totalDt > props.timeWidth) {
-        const pts = Math.ceil(props.timeWidth / avgDt);
+      if (currentTimespan > props.timespan) {
+        const pts = Math.ceil(props.timespan / avgDt);
         xRef.current = xRef.current.slice(xRef.current.length - pts);
         yRef.current = yRef.current.slice(yRef.current.length - pts);
       }
@@ -174,11 +143,11 @@ export default function UPlotChart(props: UPlotChartProps) {
       yRef.current.length = 0;
 
       let now = Date.now();
-      let start = now - props.timeWidth * 1000;
-      let dt = props.timeWidth * 1000;
-      let dtAvg = dt / size.width;
+      let start = now - props.timespan * 1000;
+      // let dt = (now - start) / size.width;
+      let dt = 1;
 
-      let historicalData = props.timeDataSource.get(start, now, dtAvg);
+      let historicalData = props.timeDataSource.get(start, now, dt);
 
       historicalData.forEach((point) => {
         addTimeData(point, false);
@@ -188,7 +157,7 @@ export default function UPlotChart(props: UPlotChartProps) {
     return () => {
       props.timeDataSource?.unsubscribe(addTimeData);
     };
-  }, [props.timeDataSource, props.timeWidth, size.width]);
+  }, [props.timeDataSource, props.timespan, size.width, props.pointsPerPixel]);
 
   useLayoutEffect(() => {
     function debounce(func: () => void, time = 100) {
