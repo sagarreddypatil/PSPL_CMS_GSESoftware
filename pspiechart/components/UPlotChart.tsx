@@ -30,6 +30,10 @@ export default function UPlotChart(props: UPlotChartProps) {
   const xRef = useRef<number[]>([]);
   const yRef = useRef<number[]>([]);
 
+  // Downsample buffers
+  const xDownsampleBufferRef = useRef<number[]>([]);
+  const yDownsampleBufferRef = useRef<number[]>([]);
+
   // container size
   const [size, setSize] = useState({ width: 0, height: 0 });
 
@@ -111,29 +115,45 @@ export default function UPlotChart(props: UPlotChartProps) {
   }, []);
 
   useEffect(() => {
-    const addTimeData = (point: TimeDataPoint, downsample = true) => {
-      const currentTimespan = point.time - xRef.current[0];
-
-      const avgDt = currentTimespan / (xRef.current.length + 1);
-      const insDt = point.time - xRef.current[xRef.current.length - 1];
-
-      const avgFreq = 1 / avgDt;
-      const insFreq = 1 / insDt;
+    const addTimeData = (point: TimeDataPoint, downsample? = true) => {
+      // push to the downsample buffer no matter what
+      xDownsampleBufferRef.current.push(point.time);
+      yDownsampleBufferRef.current.push(point.value);
 
       const desiredPts = Math.floor(
         size.width * window.devicePixelRatio * (props.pointsPerPixel ?? 1)
       );
+      const desiredDt = props.timespan / desiredPts;
+      const lastDt =
+        point.time -
+        (xRef.current.length != 0 ? xRef.current[xRef.current.length - 1] : 0);
 
-      const ppx = (props.timespan * insFreq) / desiredPts;
-      const desiredDt = insDt * ppx;
+      const avgDownsample = (list: number[]) => {
+        const avg = list.reduce((a, b) => a + b, 0) / list.length;
+        return avg;
+      };
 
-      xRef.current.push(point.time);
-      yRef.current.push(point.value);
+      const lastDownsample = (list: number[]) => {
+        return list[list.length - 1];
+      };
 
-      if (currentTimespan > props.timespan) {
+      if (!downsample || lastDt >= desiredDt) {
+        // if enough time has passed since the last point, add it
+        xRef.current.push(avgDownsample(xDownsampleBufferRef.current));
+        yRef.current.push(avgDownsample(yDownsampleBufferRef.current));
+
+        xDownsampleBufferRef.current.length = 0;
+        yDownsampleBufferRef.current.length = 0;
+
+        // Remove old points
+        const currentTimespan =
+          xRef.current[xRef.current.length - 1] - xRef.current[0];
+        const avgDt = currentTimespan / (xRef.current.length + 1);
         const pts = Math.ceil(props.timespan / avgDt);
-        xRef.current = xRef.current.slice(xRef.current.length - pts);
-        yRef.current = yRef.current.slice(yRef.current.length - pts);
+
+        // remove old points
+        xRef.current = xRef.current.slice(-pts);
+        yRef.current = yRef.current.slice(-pts);
       }
     };
     props.timeDataSource?.subscribe(addTimeData);
@@ -144,8 +164,7 @@ export default function UPlotChart(props: UPlotChartProps) {
 
       let now = Date.now();
       let start = now - props.timespan * 1000;
-      // let dt = (now - start) / size.width;
-      let dt = 1;
+      let dt = (now - start) / size.width;
 
       let historicalData = props.timeDataSource.get(start, now, dt);
 
