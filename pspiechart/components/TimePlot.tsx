@@ -11,19 +11,24 @@ interface TimePlotProps {
   paused: boolean;
 }
 
-const getDataPoint = (time: number) => {
-  return {
-    time: time / 1000,
-    value: Math.sin((2 * 3.14159 * time) / 1000),
-  } as TimeDataPoint;
-};
-
 export default function TimePlot(props: TimePlotProps) {
   const callbackRef = useRef<(point: TimeDataPoint) => void>();
   const [dataSource, setDataSource] = useState<TimeDataSource>();
   const lastRef = useRef(0);
 
   const lastIntervalRef = useRef(0);
+  const accRef = useRef(0);
+
+  const start = Date.now();
+  const getDataPoint = (time: number) => {
+    accRef.current += (Math.random() - 0.5) * 0.1;
+    return {
+      time: time / 1000,
+      // value: Math.sin((2 * 3.14159 * time) / 1000),
+      value: accRef.current,
+      // value: (time - start) / 1000,
+    } as TimeDataPoint;
+  };
 
   useEffect(() => {
     const dataSource: TimeDataSource = {

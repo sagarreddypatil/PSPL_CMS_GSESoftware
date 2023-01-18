@@ -50,6 +50,10 @@ export default function UPlotChart(props: UPlotChartProps) {
         const numPoints = Math.ceil(Math.max(dt / avgBufferDt, 1));
         while (buffer.length >= numPoints) {
           const section = buffer.splice(0, numPoints);
+
+          // const downsampledTime = section.at(-1)!.time;
+          // const downsampledValue = section.at(-1)!.value;
+
           const downsampledTime =
             section.reduce((a, b) => a + b.time, 0) / numPoints;
           const downsampledValue =
