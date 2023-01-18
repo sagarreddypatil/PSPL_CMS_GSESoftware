@@ -38,6 +38,28 @@ export default function UPlotChart(props: UPlotChartProps) {
 
   useEffect(() => {
     const updatePlot = () => {
+      const desiredPoints =
+        size.width * window.devicePixelRatio * (props.pointsPerPixel ?? 1);
+      const dt = props.timespan / desiredPoints;
+
+      // downsample time data
+      const buffer = timeDownsampleBuffer.current;
+      if (buffer.length > 0) {
+        const avgBufferDt =
+          (buffer.at(-1)!.time - buffer[0].time) / buffer.length;
+        const numPoints = Math.ceil(Math.max(dt / avgBufferDt, 1));
+        while (buffer.length >= numPoints) {
+          const section = buffer.splice(0, numPoints);
+          const downsampledTime =
+            section.reduce((a, b) => a + b.time, 0) / numPoints;
+          const downsampledValue =
+            section.reduce((a, b) => a + b.value, 0) / numPoints;
+
+          xRef.current.push(downsampledTime);
+          yRef.current.push(downsampledValue);
+        }
+      }
+
       // remove old data
       const currentTimespan =
         xRef.current[xRef.current.length - 1] - xRef.current[0];
@@ -128,34 +150,7 @@ export default function UPlotChart(props: UPlotChartProps) {
 
   useEffect(() => {
     const addTimeData = (point: TimeDataPoint) => {
-      const desiredPoints =
-        size.width * window.devicePixelRatio * (props.pointsPerPixel ?? 1);
-      const dt = props.timespan / desiredPoints;
-
-      const tLast = xRef.current[xRef.current.length - 1] ?? 0;
-
-      if (point.time >= tLast + dt) {
-        xRef.current.push(point.time);
-        yRef.current.push(point.value);
-      }
-
-      // timeDownsampleBuffer.current.push(point);
-      // const buffer = timeDownsampleBuffer.current;
-      // const lastInsertedTime = xRef.current[xRef.current.length - 1] ?? 0;
-      // const lastBufferTime = buffer[buffer.length - 1].time;
-      // // const margin = 0.999999;
-      // const margin = 0.9999999999999999;
-      // if (lastBufferTime - lastInsertedTime - dt > 0) {
-      //   // const downsampledTime =
-      //   //   buffer.reduce((a, b) => a + b.time, 0) / buffer.length;
-      //   // const downsampledValue =
-      //   //   buffer.reduce((a, b) => a + b.value, 0) / buffer.length;
-      //   const downsampledTime = buffer[buffer.length - 1].time;
-      //   const downsampledValue = buffer[buffer.length - 1].value;
-      //   xRef.current.push(downsampledTime);
-      //   yRef.current.push(downsampledValue);
-      //   timeDownsampleBuffer.current.length = 0;
-      // }
+      timeDownsampleBuffer.current.push(point);
     };
 
     if (props.timeDataSource) {
@@ -171,7 +166,8 @@ export default function UPlotChart(props: UPlotChartProps) {
       let historicalData = props.timeDataSource.get(start, now, dt);
 
       historicalData.forEach((point) => {
-        addTimeData(point);
+        xRef.current.push(point.time);
+        yRef.current.push(point.value);
       });
     }
 
