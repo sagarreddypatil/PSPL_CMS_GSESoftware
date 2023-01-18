@@ -14,7 +14,7 @@ interface TimePlotProps {
 const getDataPoint = (time: number) => {
   return {
     time: time / 1000,
-    value: Math.sin(time / 100),
+    value: Math.sin((2 * 3.14159 * time) / 1000),
   } as TimeDataPoint;
 };
 
@@ -46,8 +46,9 @@ export default function TimePlot(props: TimePlotProps) {
     const interval = setInterval(() => {
       if (callbackRef.current) {
         const now = Date.now();
+
         for (let i = lastRef.current + 1; i <= now; i++) {
-          callbackRef.current(getDataPoint(Date.now()));
+          callbackRef.current(getDataPoint(i));
         }
 
         lastRef.current = now;
