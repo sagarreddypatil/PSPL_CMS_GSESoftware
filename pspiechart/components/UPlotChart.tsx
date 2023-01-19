@@ -74,7 +74,7 @@ export default function UPlotChart(props: UPlotChartProps) {
       yRef.current = yRef.current.slice(-cutoff);
 
       // print num data points vs num pixels
-      console.log("data points: ", xRef.current.length, "pixels: ", size.width);
+      // console.log("data points: ", xRef.current.length, "pixels: ", size.width);
 
       plotRef.current?.setData([xRef.current, yRef.current]);
 
@@ -135,8 +135,13 @@ export default function UPlotChart(props: UPlotChartProps) {
         {
           label: "Value",
           stroke: "#daaa00",
+          // stroke: "#ff0",
+          // stroke: "#0ff",
+          // stroke: "#f00",
+          // stroke: "#0f0",
+          // stroke: "#00f",
           width: 2,
-          fill: "rgba(218,170,0,0.1)",
+          // fill: "rgba(218,170,0,0.1)",
         },
       ],
     };
@@ -153,6 +158,10 @@ export default function UPlotChart(props: UPlotChartProps) {
   }, []);
 
   useEffect(() => {
+    if (props.paused) {
+      return;
+    }
+
     const addTimeData = (point: TimeDataPoint) => {
       timeDownsampleBuffer.current.push(point);
     };
@@ -168,6 +177,7 @@ export default function UPlotChart(props: UPlotChartProps) {
         (size.width * window.devicePixelRatio * (props.pointsPerPixel ?? 1));
 
       let historicalData = props.timeDataSource.get(start, now, dt);
+      console.log("yess");
 
       historicalData.forEach((point) => {
         xRef.current.push(point.time);
@@ -179,7 +189,13 @@ export default function UPlotChart(props: UPlotChartProps) {
     return () => {
       props.timeDataSource?.unsubscribe(addTimeData);
     };
-  }, [props.timeDataSource, props.timespan, size.width, props.pointsPerPixel]);
+  }, [
+    props.timeDataSource,
+    props.timespan,
+    size.width,
+    props.pointsPerPixel,
+    props.paused,
+  ]);
 
   useLayoutEffect(() => {
     function debounce(func: () => void, time = 100) {

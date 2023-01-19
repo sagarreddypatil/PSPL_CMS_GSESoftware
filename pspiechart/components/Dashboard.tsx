@@ -16,7 +16,9 @@ const BASE_HEIGHT = 10;
 const BASE_WIDTH = 6;
 const ROW_HEIGHT = 40 - 6;
 
-export default function Grid() {
+interface DashboardProps {}
+
+export default function Dashboard(props: DashboardProps) {
   const [editMode, setEditMode] = useState(false);
   const [paused, setPaused] = useState(false);
   const [layout, setLayout] = useState<ReactGridLayout.Layout[]>([]);
@@ -136,7 +138,10 @@ export default function Grid() {
                 editMode={editMode}
                 removeCallback={() => removePanel(item.i)}
               >
-                <TimePlot paused={paused} />
+                {/* <TimePlot paused={paused} /> */}
+                <button className="btn btn-danger flex-fill m-2">
+                  <h1 className="mb-0">Test</h1>
+                </button>
               </Panel>
             </div>
           ))}

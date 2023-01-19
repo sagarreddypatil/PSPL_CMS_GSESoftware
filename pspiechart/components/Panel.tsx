@@ -10,31 +10,37 @@ interface WidgetProps {
 export default function Panel(props: WidgetProps) {
   return (
     <div
-      className={`card bg-dark align-items-stretch ${
+      className={`card bg-black align-items-stretch ${
         props.editMode ? "draggable" : ""
       }`}
       style={{ height: "100%" }}
     >
-      <div
-        className="card-header d-flex align-items-center py-0 ps-2 pe-1"
-        style={{ height: "40px" }}
-      >
-        <h5 className="card-title my-1 me-auto">{props.title}</h5>
-        {props.editMode ? (
+      {props.editMode ? (
+        <div
+          className="card-header d-flex align-items-center py-0 ps-2 pe-1"
+          style={{ height: "40px" }}
+        >
+          <h5 className="card-title my-1 me-auto">{props.title}</h5>
           <button
-            className="btn btn-danger btn-icon p-1 me-0 ms-auto my-0"
+            className="btn btn-primary btn-icon p-1 mx-1 my-0"
+            // onClick={}
+          >
+            <Icon.Wrench />
+          </button>
+          <button
+            className="btn btn-danger btn-icon p-1 mx-1 my-0"
             onClick={props.removeCallback}
           >
             <Icon.XLg />
           </button>
-        ) : (
-          <></>
-        )}
-      </div>
-      <div className="card-body p-0 overflow-hidden">
+        </div>
+      ) : (
+        <></>
+      )}
+      <div className="card-body p-0 overflow-hidden d-flex">
         {props.editMode ? (
-          <div className="bg-secondary text-center h-100 w-100 align-items-center justify-content-center d-flex">
-            <h3 className="">Panel Goes Here</h3>
+          <div className="bg-secondary h-100 w-100 align-items-center justify-content-center d-flex">
+            <h4 className="">Panel Goes Here</h4>
           </div>
         ) : (
           props.children
