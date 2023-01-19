@@ -177,7 +177,6 @@ export default function UPlotChart(props: UPlotChartProps) {
         (size.width * window.devicePixelRatio * (props.pointsPerPixel ?? 1));
 
       let historicalData = props.timeDataSource.get(start, now, dt);
-      console.log("yess");
 
       historicalData.forEach((point) => {
         xRef.current.push(point.time);

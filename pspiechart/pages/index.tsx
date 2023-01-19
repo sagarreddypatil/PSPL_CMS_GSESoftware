@@ -28,7 +28,7 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
         <Sidebar />
-        <Dashboard />
+        <Dashboard title="Wow" id="bruh" />
       </main>
     </>
   );

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "../styles/Dashboard.module.scss";
 import ReactGridLayout from "react-grid-layout";
 import { Responsive, WidthProvider } from "react-grid-layout";
@@ -16,12 +16,32 @@ const BASE_HEIGHT = 10;
 const BASE_WIDTH = 6;
 const ROW_HEIGHT = 40 - 6;
 
-interface DashboardProps {}
+interface DashboardProps {
+  title: string;
+  id: string;
+}
 
 export default function Dashboard(props: DashboardProps) {
   const [editMode, setEditMode] = useState(false);
   const [paused, setPaused] = useState(false);
   const [layout, setLayout] = useState<ReactGridLayout.Layout[]>([]);
+
+  const loadLayout = useCallback(() => {
+    const savedLayout = localStorage.getItem(props.id);
+    if (savedLayout) {
+      setLayout(JSON.parse(savedLayout));
+    }
+  }, [props.id]);
+
+  // save and load layout
+  useEffect(() => {
+    loadLayout();
+  }, [loadLayout]);
+
+  useEffect(() => {
+    localStorage.setItem(props.id, JSON.stringify(layout));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layout]);
 
   const addPanel = () => {
     let widthSum = layout.reduce((acc, item) => acc + item.w, 0);
@@ -106,6 +126,15 @@ export default function Dashboard(props: DashboardProps) {
               </ToggleButton>
             </li>
             <li className="nav-item">
+              <Button
+                variant="outline-primary"
+                className="p-1 px-2 m-1 ms-2"
+                onClick={() => loadLayout()}
+              >
+                <Icon.ArrowClockwise /> Reload Layout
+              </Button>
+            </li>
+            <li className="nav-item">
               <button className="btn btn-outline-primary p-1 px-2 m-1 ms-2">
                 <Icon.Fullscreen />
               </button>
@@ -134,15 +163,11 @@ export default function Dashboard(props: DashboardProps) {
           {layout.map((item) => (
             <div key={item.i}>
               <Panel
+                paused={paused}
                 title={item.i}
                 editMode={editMode}
                 removeCallback={() => removePanel(item.i)}
-              >
-                {/* <TimePlot paused={paused} /> */}
-                <button className="btn btn-danger flex-fill m-2">
-                  <h1 className="mb-0">Test</h1>
-                </button>
-              </Panel>
+              />
             </div>
           ))}
         </ResponsiveGridLayout>

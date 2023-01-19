@@ -25,11 +25,17 @@ export default function Sidebar() {
         <li className="nav-item">
           <a
             href="#"
-            className="nav-link active text-white"
+            className="nav-link m-1 active text-white"
             aria-current="page"
           >
-            {" "}
-            Home{" "}
+            Panel Library
+          </a>
+          <a
+            href="#"
+            className="nav-link m-1 active text-white"
+            aria-current="page"
+          >
+            Home
           </a>
         </li>
       </ul>

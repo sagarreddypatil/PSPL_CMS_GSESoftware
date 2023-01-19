@@ -1,9 +1,10 @@
 import * as Icon from "react-bootstrap-icons";
+import TimePlot from "./TimePlot";
 
 interface WidgetProps {
   title: string;
-  children?: React.ReactNode;
   editMode: boolean;
+  paused: boolean;
   removeCallback: () => void;
 }
 
@@ -40,10 +41,13 @@ export default function Panel(props: WidgetProps) {
       <div className="card-body p-0 overflow-hidden d-flex">
         {props.editMode ? (
           <div className="bg-secondary h-100 w-100 align-items-center justify-content-center d-flex">
-            <h4 className="">Panel Goes Here</h4>
+            <h6 className="my-0">Panel Goes Here</h6>
           </div>
         ) : (
-          props.children
+          <TimePlot paused={props.paused} />
+          // <button className="btn btn-danger flex-fill m-2">
+          //   <h1 className="mb-0">Test</h1>
+          // </button>
         )}
       </div>
     </div>
