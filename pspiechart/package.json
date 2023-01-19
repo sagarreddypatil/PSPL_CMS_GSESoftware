@@ -5,13 +5,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 8080",
     "lint": "next lint"
   },
   "type": "module",
   "dependencies": {
     "@fontsource/libre-franklin": "^4.5.10",
     "@fontsource/saira": "^4.5.11",
+    "@msgpack/msgpack": "^2.8.0",
     "@next/font": "13.1.1",
     "bootstrap": "^5.2.3",
     "eslint": "8.31.0",
