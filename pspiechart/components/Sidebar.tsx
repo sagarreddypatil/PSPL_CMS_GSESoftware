@@ -1,10 +1,32 @@
-// hey copilot can you import an image for me and call it pspColor, do it nextjs style
-
+import { Dashboard /*, getDashboards */ } from "../lib/dashboard-store";
 import Image from "next/image";
 import pspColor from "../public/PSP-2Color-Reversed.svg";
 import styles from "../styles/Sidebar.module.scss";
 
-export default function Sidebar() {
+// get list of dashbaords from api
+export async function getServerSideProps() {
+  // const dashboards = getDashboards();
+  // const dashboards: Dashboard[] = [];
+  let bruh: Dashboard[] = JSON.parse(
+    '[{"name":"your mom","layout":[],"panels":[],"id":1,"dateCreated":"2023-01-25T10:34:00.222Z","dateModified":"2023-01-25T10:34:00.222Z"},{"name":"hello","layout":[],"panels":[],"id":2,"dateCreated":"2023-01-25T10:34:09.622Z","dateModified":"2023-01-25T10:34:09.622Z"}]'
+  );
+
+  console.log("what the fuck");
+
+  return {
+    props: {
+      dashboards: bruh,
+    },
+  };
+}
+
+interface SidebarProps {
+  dashboards: Dashboard[];
+}
+
+export default function Sidebar(props: SidebarProps) {
+  console.log(props);
+
   return (
     <div className="d-flex flex-column flex-shrink-0 p-3 bg-black">
       <a
@@ -22,6 +44,19 @@ export default function Sidebar() {
       </a>
       <hr />
       <ul className="nav nav-pills flex-column mb-auto">
+        {/* {props.dashboards.map((dashboard) => {
+          return (
+            <li key={dashboard.id} className="nav-item">
+              <a
+                href="#"
+                className="nav-link m-1 text-white"
+                aria-current="page"
+              >
+                {dashboard.name}
+              </a>
+            </li>
+          );
+        })} */}
         <li className="nav-item">
           <a
             href="#"
@@ -30,11 +65,9 @@ export default function Sidebar() {
           >
             Panel Library
           </a>
-          <a
-            href="#"
-            className="nav-link m-1 active text-white"
-            aria-current="page"
-          >
+        </li>
+        <li className="nav-item">
+          <a href="#" className="nav-link m-1 text-white" aria-current="page">
             Home
           </a>
         </li>

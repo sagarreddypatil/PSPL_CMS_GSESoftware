@@ -1,7 +1,6 @@
 import fs from "fs";
-import { userAgentFromString } from "next/server";
 
-interface Dashboard {
+export interface Dashboard {
   id?: number;
   name: string;
   dateCreated?: Date;
@@ -11,8 +10,17 @@ interface Dashboard {
 }
 
 const filename = "data/dashboards.json";
+// create file if doesn't exist else read file
+if (!fs.existsSync("data")) {
+  fs.mkdirSync("data");
+}
 
-let dashboards: Dashboard[] = require(filename);
+if (!fs.existsSync(filename)) {
+  fs.writeFileSync(filename, "[]");
+}
+
+// read file and parse JSON
+let dashboards: Dashboard[] = JSON.parse(fs.readFileSync(filename, "utf-8"));
 
 export function createDashboard(dashboard: Dashboard) {
   dashboard.id = dashboards.length
