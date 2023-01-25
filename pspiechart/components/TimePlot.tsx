@@ -70,7 +70,7 @@ export default function TimePlot(props: TimePlotProps) {
   return (
     <UPlotChart
       pointsPerPixel={1}
-      timespan={30}
+      timespan={60}
       paused={props.paused}
       timeDataSource={dataSource}
     />
