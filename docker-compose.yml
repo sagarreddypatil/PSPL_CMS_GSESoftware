@@ -1,17 +1,17 @@
 version: "3"
 
 services:
-  influxdb:
-    image: influxdb:latest
-    ports:
-      - 8086:8086
-    volumes:
-      - /data/influxdb:/var/lib/influxdb
-    restart: always
+  # influxdb:
+  #   image: influxdb:latest
+  #   ports:
+  #     - 8086:8086
+  #   volumes:
+  #     - ./data/influxdb:/var/lib/influxdb
+  #   restart: always
 
-  telegraf:
-    image: telegraf:latest
-    volumes: ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
-    depends_on:
-      - influxdb
-    restart: always
+  # telegraf:
+  #   image: telegraf:latest
+  #   volumes: ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
+  #   depends_on:
+  #     - influxdb
+  #   restart: always

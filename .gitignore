@@ -14,3 +14,9 @@ __pycache__/
 
 # influxdb config
 */influxconf.ini
+
+# server data
+data/
+
+# env passwords
+*/.env
