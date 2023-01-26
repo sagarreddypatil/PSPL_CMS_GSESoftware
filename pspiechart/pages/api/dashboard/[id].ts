@@ -6,8 +6,9 @@ import {
 } from "@/lib/dashboard-store";
 
 export default function handle(req: NextApiRequest, res: NextApiResponse) {
-  // throw if req.query.id is not a number
   const id = parseInt(req.query.id as string);
+
+  res.setHeader("Cache-Control", "no-store");
 
   if (isNaN(id)) {
     res.status(400).end();

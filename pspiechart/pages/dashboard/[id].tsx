@@ -3,6 +3,8 @@ import Sidebar from "@/components/Sidebar";
 import Dashboard from "@/components/Dashboard";
 import { useRouter } from "next/router";
 import { getDashboards, DashboardStore } from "@/lib/dashboard-store";
+import Banner from "@/components/Banner";
+import { useState } from "react";
 
 // let ws: WebSocket;
 
@@ -19,41 +21,25 @@ import { getDashboards, DashboardStore } from "@/lib/dashboard-store";
 //   // })
 // }
 
-export function getServerSideProps() {
-  const dashboards = getDashboards();
-  return {
-    props: {
-      dashboards,
-    },
-  };
-}
-
-interface DashboardProps {
-  dashboards: DashboardStore[];
-}
-export default function Home(props: DashboardProps) {
+export default function Home() {
   const router = useRouter();
   const { id } = router.query;
 
-  const selected = props.dashboards.find((dashboard) => dashboard.id == id);
+  const [jank, setJank] = useState(0);
+
+  const idInt = parseInt(id as string);
+  const editEnd = () => {
+    setJank(jank + 1);
+  };
 
   return (
     <Layout>
-      <Sidebar dashboards={props.dashboards} selectedDashboard={selected} />
-      {selected?.id ? (
-        <Dashboard id={selected.id} />
-      ) : (
-        <div className="bg-dark text-primary m-auto px-4 py-5 text-center">
-          <div className="py-5">
-            <h1 className="display-5 fw-bold text-primary">
-              Dashboard does not exist
-            </h1>
-            <div className="mx-auto">
-              <p className="fs-5 mb-4 text-white">Check the URL</p>
-            </div>
-          </div>
-        </div>
-      )}
+      <Sidebar selectedId={idInt} jank={jank} />
+      {/* {selected?.id ? ( */}
+      <Dashboard id={idInt} editEnd={editEnd} />
+      {/* ) : (
+        <Banner title="Dashboard does not exist" text="Check the URL" />
+      )} */}
     </Layout>
   );
 }

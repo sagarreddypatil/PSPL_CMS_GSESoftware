@@ -2,6 +2,7 @@ import Layout from "@/components/Layout";
 import Sidebar from "@/components/Sidebar";
 import Dashboard from "@/components/Dashboard";
 import { getDashboards, DashboardStore } from "@/lib/dashboard-store";
+import Banner from "@/components/Banner";
 
 // let ws: WebSocket;
 
@@ -33,20 +34,11 @@ interface DashboardProps {
 export default function Home(props: DashboardProps) {
   return (
     <Layout>
-      <Sidebar dashboards={props.dashboards} />
-      {/* <Dashboard title="Wow" id="bruh" /> */}
-      <div className="bg-dark text-primary m-auto px-4 py-5 text-center">
-        <div className="py-5">
-          <h1 className="display-5 fw-bold text-primary">
-            No Dashboard Selected
-          </h1>
-          <div className="mx-auto">
-            <p className="fs-5 mb-4 text-white">
-              Select one from the sidebar to get started
-            </p>
-          </div>
-        </div>
-      </div>
+      <Sidebar />
+      <Banner
+        title="No Dashboard Selected"
+        text="Select one from the sidebar to get started"
+      />
     </Layout>
   );
 }

@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "../styles/Dashboard.module.scss";
 import ReactGridLayout from "react-grid-layout";
 import { Responsive, WidthProvider } from "react-grid-layout";
-import { Form, Nav, ToggleButton, Button } from "react-bootstrap";
+import { Form, Nav, ToggleButton, Button, FormText } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
 import Panel from "./Panel";
 import { DashboardStore } from "@/lib/dashboard-store";
+import { useRouter } from "next/router";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 let counter = 0;
@@ -17,9 +18,13 @@ const ROW_HEIGHT = 40 - 6;
 
 interface DashboardProps {
   id: number;
+  editEnd: () => void;
 }
 
-export default function Dashboard({ id }: DashboardProps) {
+export default function Dashboard({ id, editEnd }: DashboardProps) {
+  const router = useRouter();
+
+  const nameText = useRef<string>(null);
   const [editMode, setEditMode] = useState(false);
   const [paused, setPaused] = useState(false);
 
@@ -29,28 +34,34 @@ export default function Dashboard({ id }: DashboardProps) {
   useEffect(() => {
     // load data on id change
 
+    if (!id) return;
+
     fetch(`/api/dashboard/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setData(data);
-        setLayout(data.layout);
+        setLayout(data.layout ?? []);
       });
   }, [id]);
 
   useEffect(() => {
     // save data once exit edit mode
 
-    if (editMode == true) {
+    if (editMode == true || !data) {
       return;
     }
 
-    const newData = { ...data, layout };
+    const newName = nameText.current ?? data.name;
+    const newData = { ...data, name: newName, layout: layout };
+
+    setData(newData);
+    editEnd();
 
     fetch(`/api/dashboard/${id}`, {
       method: "POST",
       body: JSON.stringify(newData),
     });
-  }, [editMode]);
+  }, [editMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const addPanel = () => {
     let widthSum = layout.reduce((acc, item) => acc + item.w, 0);
@@ -71,6 +82,14 @@ export default function Dashboard({ id }: DashboardProps) {
 
   const removePanel = (i: string) => {
     setLayout(layout.filter((item) => item.i !== i));
+  };
+
+  const deleteDashboard = () => {
+    fetch(`/api/dashboard/${id}`, {
+      method: "DELETE",
+    }).then(() => {
+      router.push("/dashboard");
+    });
   };
 
   const genSmallLayout = (layout: ReactGridLayout.Layout[]) => {
@@ -100,10 +119,27 @@ export default function Dashboard({ id }: DashboardProps) {
         <div className="container-fluid">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <h3 className="mb-0">{data.name}</h3>
+              {editMode ? (
+                <Form.Control
+                  defaultValue={data.name}
+                  // @ts-ignore
+                  onChange={(e) => (nameText.current = e.target.value)}
+                />
+              ) : (
+                <h3 className="mb-0">{data.name}</h3>
+              )}
             </li>
           </ul>
           <ul className="navbar-nav">
+            <li className="nav-item">
+              <Button
+                variant="outline-danger"
+                className="p-1 px-2 m-1 ms-2"
+                onClick={deleteDashboard}
+              >
+                <Icon.Trash /> Delete Dashboard
+              </Button>
+            </li>
             <li className="nav-item">
               <ToggleButton
                 variant="outline-primary"
