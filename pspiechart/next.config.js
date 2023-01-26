@@ -1,10 +1,15 @@
-// /** @type {import('next').NextConfig} */
-// const nextConfig = {
-//   reactStrictMode: false,
-// }
-
-// export default nextConfig
-
-export default {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   reactStrictMode: false,
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/dashboard',
+        permanent: true,
+      }
+    ]
+  }
 }
+
+export default nextConfig;

@@ -16,6 +16,9 @@
     "incremental": true,
     "paths": {
       "@/types/*": ["./types/*"],
+      "@/components/*": ["./components/*"],
+      "@/styles/*": ["./styles/*"],
+      "@/lib/*": ["./lib/*"],
     }
 
   },

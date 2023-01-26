@@ -3,7 +3,7 @@ import {
   getDashboard,
   updateDashboard,
   deleteDashboard,
-} from "../../../lib/dashboard-store";
+} from "@/lib/dashboard-store";
 
 export default function handle(req: NextApiRequest, res: NextApiResponse) {
   // throw if req.query.id is not a number
@@ -17,7 +17,7 @@ export default function handle(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     res.status(200).json(getDashboard(parseInt(req.query.id as string)));
   } else if (req.method === "POST") {
-    res.status(200).json(updateDashboard(req.body));
+    res.status(200).json(updateDashboard(JSON.parse(req.body)));
   } else if (req.method === "DELETE") {
     res.status(200).json(deleteDashboard(parseInt(req.query.id as string)));
   }

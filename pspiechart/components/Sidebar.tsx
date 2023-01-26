@@ -1,32 +1,15 @@
-import { Dashboard /*, getDashboards */ } from "../lib/dashboard-store";
+import { DashboardStore } from "../lib/dashboard-store";
 import Image from "next/image";
+import Link from "next/link";
 import pspColor from "../public/PSP-2Color-Reversed.svg";
 import styles from "../styles/Sidebar.module.scss";
 
-// get list of dashbaords from api
-export async function getServerSideProps() {
-  // const dashboards = getDashboards();
-  // const dashboards: Dashboard[] = [];
-  let bruh: Dashboard[] = JSON.parse(
-    '[{"name":"your mom","layout":[],"panels":[],"id":1,"dateCreated":"2023-01-25T10:34:00.222Z","dateModified":"2023-01-25T10:34:00.222Z"},{"name":"hello","layout":[],"panels":[],"id":2,"dateCreated":"2023-01-25T10:34:09.622Z","dateModified":"2023-01-25T10:34:09.622Z"}]'
-  );
-
-  console.log("what the fuck");
-
-  return {
-    props: {
-      dashboards: bruh,
-    },
-  };
-}
-
 interface SidebarProps {
-  dashboards: Dashboard[];
+  dashboards: DashboardStore[];
+  selectedDashboard?: DashboardStore;
 }
 
 export default function Sidebar(props: SidebarProps) {
-  console.log(props);
-
   return (
     <div className="d-flex flex-column flex-shrink-0 p-3 bg-black">
       <a
@@ -44,33 +27,28 @@ export default function Sidebar(props: SidebarProps) {
       </a>
       <hr />
       <ul className="nav nav-pills flex-column mb-auto">
-        {/* {props.dashboards.map((dashboard) => {
+        {props.dashboards.map((dashboard) => {
+          const selected = props.selectedDashboard
+            ? dashboard.id === props.selectedDashboard.id
+            : null;
+          const activeClass = selected ? "active" : "";
+
           return (
             <li key={dashboard.id} className="nav-item">
-              <a
-                href="#"
-                className="nav-link m-1 text-white"
-                aria-current="page"
+              <Link
+                href={`/dashboard/${dashboard.id}`}
+                className={`nav-link m-1 text-white ${activeClass}`}
               >
+                {/* <a
+                  className={`nav-link m-1 text-white ${activeClass}`}
+                  aria-current="page"
+                > */}
                 {dashboard.name}
-              </a>
+                {/* </a> */}
+              </Link>
             </li>
           );
-        })} */}
-        <li className="nav-item">
-          <a
-            href="#"
-            className="nav-link m-1 active text-white"
-            aria-current="page"
-          >
-            Panel Library
-          </a>
-        </li>
-        <li className="nav-item">
-          <a href="#" className="nav-link m-1 text-white" aria-current="page">
-            Home
-          </a>
-        </li>
+        })}
       </ul>
     </div>
   );

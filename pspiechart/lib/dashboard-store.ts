@@ -1,6 +1,6 @@
 import fs from "fs";
 
-export interface Dashboard {
+export interface DashboardStore {
   id?: number;
   name: string;
   dateCreated?: Date;
@@ -20,9 +20,11 @@ if (!fs.existsSync(filename)) {
 }
 
 // read file and parse JSON
-let dashboards: Dashboard[] = JSON.parse(fs.readFileSync(filename, "utf-8"));
+let dashboards: DashboardStore[] = JSON.parse(
+  fs.readFileSync(filename, "utf-8")
+);
 
-export function createDashboard(dashboard: Dashboard) {
+export function createDashboard(dashboard: DashboardStore) {
   dashboard.id = dashboards.length
     ? Math.max(...dashboards.map((dashboard) => dashboard.id ?? -1)) + 1
     : 1;
@@ -37,16 +39,18 @@ export function createDashboard(dashboard: Dashboard) {
 }
 
 export function getDashboard(id: number) {
-  return dashboards.find((dashboard) => dashboard.id === id);
+  return dashboards.find((dashboard) => dashboard.id == id);
 }
 
 export function getDashboards() {
   return dashboards;
 }
 
-export function updateDashboard(dashboard: Dashboard) {
-  const original = dashboards.find((original) => original.id === dashboard.id);
+export function updateDashboard(dashboard: DashboardStore) {
+  const original = dashboards.find((original) => original.id == dashboard.id);
   if (!original) {
+    console.log(dashboards);
+    console.log(typeof dashboard);
     return;
   }
 
@@ -56,6 +60,8 @@ export function updateDashboard(dashboard: Dashboard) {
   Object.assign(original, dashboard);
 
   saveDashboards();
+
+  return dashboard;
 }
 
 export function deleteDashboard(id: number) {

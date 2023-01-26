@@ -5,8 +5,7 @@ import { Responsive, WidthProvider } from "react-grid-layout";
 import { Form, Nav, ToggleButton, Button } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
 import Panel from "./Panel";
-import TimePlot from "./TimePlot";
-import uPlot from "uplot";
+import { DashboardStore } from "@/lib/dashboard-store";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 let counter = 0;
@@ -17,31 +16,41 @@ const BASE_WIDTH = 6;
 const ROW_HEIGHT = 40 - 6;
 
 interface DashboardProps {
-  title: string;
-  id: string;
+  id: number;
 }
 
-export default function Dashboard(props: DashboardProps) {
+export default function Dashboard({ id }: DashboardProps) {
   const [editMode, setEditMode] = useState(false);
   const [paused, setPaused] = useState(false);
+
+  const [data, setData] = useState<DashboardStore>();
   const [layout, setLayout] = useState<ReactGridLayout.Layout[]>([]);
 
-  const loadLayout = useCallback(() => {
-    const savedLayout = localStorage.getItem(props.id);
-    if (savedLayout) {
-      setLayout(JSON.parse(savedLayout));
+  useEffect(() => {
+    // load data on id change
+
+    fetch(`/api/dashboard/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setData(data);
+        setLayout(data.layout);
+      });
+  }, [id]);
+
+  useEffect(() => {
+    // save data once exit edit mode
+
+    if (editMode == true) {
+      return;
     }
-  }, [props.id]);
 
-  // save and load layout
-  useEffect(() => {
-    loadLayout();
-  }, [loadLayout]);
+    const newData = { ...data, layout };
 
-  useEffect(() => {
-    localStorage.setItem(props.id, JSON.stringify(layout));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [layout]);
+    fetch(`/api/dashboard/${id}`, {
+      method: "POST",
+      body: JSON.stringify(newData),
+    });
+  }, [editMode]);
 
   const addPanel = () => {
     let widthSum = layout.reduce((acc, item) => acc + item.w, 0);
@@ -83,10 +92,17 @@ export default function Dashboard(props: DashboardProps) {
     xxs: genSmallLayout(layout),
   };
 
+  if (!data) return <div>Loading...</div>;
+
   return (
     <div className={`${styles["dashboard-container"]} flex-fill pt-2`}>
       <nav className="navbar navbar-expand-lg sticky-top mx-2 navbar-dark bg-black">
         <div className="container-fluid">
+          <ul className="navbar-nav">
+            <li className="nav-item">
+              <h3 className="mb-0">{data.name}</h3>
+            </li>
+          </ul>
           <ul className="navbar-nav">
             <li className="nav-item">
               <ToggleButton
@@ -125,15 +141,11 @@ export default function Dashboard(props: DashboardProps) {
                 <Icon.PauseFill /> Pause Plots
               </ToggleButton>
             </li>
-            <li className="nav-item">
-              <Button
-                variant="outline-primary"
-                className="p-1 px-2 m-1 ms-2"
-                onClick={() => loadLayout()}
-              >
+            {/* <li className="nav-item">
+              <Button variant="outline-primary" className="p-1 px-2 m-1 ms-2">
                 <Icon.ArrowClockwise /> Reload Layout
               </Button>
-            </li>
+            </li> */}
             <li className="nav-item">
               <button className="btn btn-outline-primary p-1 px-2 m-1 ms-2">
                 <Icon.Fullscreen />
