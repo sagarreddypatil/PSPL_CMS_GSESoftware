@@ -7,6 +7,7 @@ import * as Icon from "react-bootstrap-icons";
 import Panel from "./Panel";
 import { DashboardStore } from "@/lib/dashboard-store";
 import { useRouter } from "next/router";
+import Banner from "./Banner";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 let counter = 0;
@@ -30,6 +31,12 @@ export default function Dashboard({ id, editEnd }: DashboardProps) {
 
   const [data, setData] = useState<DashboardStore>();
   const [layout, setLayout] = useState<ReactGridLayout.Layout[]>([]);
+
+  useEffect(() => {
+    if (data?.name == "New Dashboard" && layout.length == 0 && !editMode) {
+      setEditMode(true);
+    }
+  }, [data]);
 
   useEffect(() => {
     // load data on id change
@@ -111,7 +118,7 @@ export default function Dashboard({ id, editEnd }: DashboardProps) {
     xxs: genSmallLayout(layout),
   };
 
-  if (!data) return <div>Loading...</div>;
+  if (!data) return <Banner title="Loading" />;
 
   return (
     <div className={`${styles["dashboard-container"]} flex-fill pt-2`}>

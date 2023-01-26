@@ -18,12 +18,19 @@ export default function Sidebar(props: SidebarProps) {
   const [dashboards, setDashboards] = useState<DashboardStore[]>([]);
 
   useEffect(() => {
-    console.log("yeet");
+    // load localstorage cache
+    const cache = localStorage.getItem("sidebarcache");
+    if (cache) {
+      setDashboards(JSON.parse(cache));
+    }
 
     fetch("/api/dashboard")
       .then((res) => res.json())
       .then((data) => {
         setDashboards(data);
+
+        // cache data to localstorage because nextjs is dumb
+        localStorage.setItem("sidebarcache", JSON.stringify(data));
       });
   }, [props.selectedId, props.jank]);
 

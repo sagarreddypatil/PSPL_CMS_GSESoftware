@@ -1,6 +1,6 @@
 interface BannerProps {
   title: string;
-  text: string;
+  text?: string;
 }
 
 export default function Banner(props: BannerProps) {
