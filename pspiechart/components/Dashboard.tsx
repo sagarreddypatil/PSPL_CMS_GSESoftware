@@ -32,8 +32,12 @@ export default function Dashboard({ id, editEnd }: DashboardProps) {
   const [data, setData] = useState<DashboardStore>();
   const [layout, setLayout] = useState<ReactGridLayout.Layout[]>([]);
 
+  const [exists, setExists] = useState<boolean>(true);
+
   useEffect(() => {
-    if (data?.name == "New Dashboard" && layout.length == 0 && !editMode) {
+    if (editMode) {
+      setEditMode(false);
+    } else if (data?.name == "New Dashboard" && layout.length == 0) {
       setEditMode(true);
     }
   }, [data]);
@@ -48,6 +52,10 @@ export default function Dashboard({ id, editEnd }: DashboardProps) {
       .then((data) => {
         setData(data);
         setLayout(data.layout ?? []);
+        setExists(true);
+      })
+      .catch(() => {
+        setExists(false);
       });
   }, [id]);
 
@@ -118,6 +126,8 @@ export default function Dashboard({ id, editEnd }: DashboardProps) {
     xxs: genSmallLayout(layout),
   };
 
+  if (!exists)
+    return <Banner title="Dashboard not found" text="Check your URL" />;
   if (!data) return <Banner title="Loading" />;
 
   return (

@@ -16,7 +16,12 @@ export default function handle(req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (req.method === "GET") {
-    res.status(200).json(getDashboard(parseInt(req.query.id as string)));
+    const dashboard = getDashboard(parseInt(req.query.id as string));
+    if (dashboard) {
+      res.status(200).json(dashboard);
+    } else {
+      res.status(404).end();
+    }
   } else if (req.method === "POST") {
     res.status(200).json(updateDashboard(JSON.parse(req.body)));
   } else if (req.method === "DELETE") {
