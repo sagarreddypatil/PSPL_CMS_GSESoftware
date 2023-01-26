@@ -74,9 +74,6 @@ export default function UPlotChart(props: UPlotChartProps) {
       xRef.current = xRef.current.slice(-cutoff);
       yRef.current = yRef.current.slice(-cutoff);
 
-      // print num data points vs num pixels
-      // console.log("data points: ", xRef.current.length, "pixels: ", size.width);
-
       plotRef.current?.setData([xRef.current, yRef.current]);
 
       animationRef.current = window.requestAnimationFrame(updatePlot);
@@ -157,36 +154,33 @@ export default function UPlotChart(props: UPlotChartProps) {
   }, []);
 
   useEffect(() => {
-    if (props.paused) {
-      return;
-    }
-
-    const addTimeData = (point: TimeDataPoint) => {
-      if (!props.paused) timeDownsampleBuffer.current.push(point);
-    };
-
     if (props.timeDataSource) {
       xRef.current.length = 0;
       yRef.current.length = 0;
+      timeDownsampleBuffer.current.length = 0;
 
+      const addTimeData = (point: TimeDataPoint) => {
+        timeDownsampleBuffer.current.push(point);
+      };
+
+      xRef.current.length = 0;
+      yRef.current.length = 0;
       let now = Date.now();
       let start = now - props.timespan * 1000;
       let dt =
         (now - start) /
         (size.width * window.devicePixelRatio * (props.pointsPerPixel ?? 1));
-
       let historicalData = props.timeDataSource.get(start, now, dt);
-
       historicalData.forEach((point) => {
         xRef.current.push(point.time);
         yRef.current.push(point.value);
       });
-    }
 
-    props.timeDataSource?.subscribe(addTimeData);
-    return () => {
-      props.timeDataSource?.unsubscribe(addTimeData);
-    };
+      props.timeDataSource?.subscribe(addTimeData);
+      return () => {
+        props.timeDataSource?.unsubscribe(addTimeData);
+      };
+    }
   }, [
     props.timeDataSource,
     props.timespan,
