@@ -10,6 +10,7 @@ import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";
 
 interface UPlotChartProps {
+  title?: string;
   pointsPerPixel?: number;
 
   timespan: number; // seconds
@@ -78,12 +79,10 @@ export default function UPlotChart(props: UPlotChartProps) {
 
       plotRef.current?.setData([xRef.current, yRef.current]);
 
-      if (!props.paused) {
-        animationRef.current = window.requestAnimationFrame(updatePlot);
-      }
+      animationRef.current = window.requestAnimationFrame(updatePlot);
     };
 
-    updatePlot();
+    if (!props.paused) updatePlot();
 
     return () => {
       window.cancelAnimationFrame(animationRef.current);
@@ -95,7 +94,7 @@ export default function UPlotChart(props: UPlotChartProps) {
     const height = containerRef.current!.clientHeight;
 
     const opts: Options = {
-      title: "",
+      title: props.title ? props.title : "",
       width: 1,
       height: 1,
       pxAlign: false,
@@ -163,7 +162,7 @@ export default function UPlotChart(props: UPlotChartProps) {
     }
 
     const addTimeData = (point: TimeDataPoint) => {
-      timeDownsampleBuffer.current.push(point);
+      if (!props.paused) timeDownsampleBuffer.current.push(point);
     };
 
     if (props.timeDataSource) {
@@ -228,7 +227,7 @@ export default function UPlotChart(props: UPlotChartProps) {
   }, [size]);
 
   return (
-    <div ref={containerRef} className="h-100 w-100 min-vw-0 min-vh-0">
+    <div ref={containerRef} className="h-100 w-100 min-vw-0 min-vh-0 pt-1">
       <div ref={divRef}></div>
     </div>
   );

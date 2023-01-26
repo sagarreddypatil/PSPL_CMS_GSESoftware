@@ -10,7 +10,6 @@ import { useRouter } from "next/router";
 import Banner from "./Banner";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
-let counter = 0;
 
 const COLS = 24;
 const BASE_HEIGHT = 10;
@@ -25,7 +24,7 @@ interface DashboardProps {
 export default function Dashboard({ id, editEnd }: DashboardProps) {
   const router = useRouter();
 
-  const nameText = useRef<string>(null);
+  const nameTextRef = useRef<string>(null);
   const [editMode, setEditMode] = useState(false);
   const [paused, setPaused] = useState(false);
 
@@ -36,6 +35,8 @@ export default function Dashboard({ id, editEnd }: DashboardProps) {
 
   useEffect(() => {
     if (editMode) {
+      // @ts-ignore
+      nameTextRef.current = data?.name;
       setEditMode(false);
     } else if (data?.name == "New Dashboard" && layout.length == 0) {
       setEditMode(true);
@@ -66,7 +67,7 @@ export default function Dashboard({ id, editEnd }: DashboardProps) {
       return;
     }
 
-    const newName = nameText.current ?? data.name;
+    const newName = nameTextRef.current ?? data.name;
     const newData = { ...data, name: newName, layout: layout };
 
     setData(newData);
@@ -80,9 +81,10 @@ export default function Dashboard({ id, editEnd }: DashboardProps) {
 
   const addPanel = () => {
     let widthSum = layout.reduce((acc, item) => acc + item.w, 0);
+    const panelId = Math.random().toString(36).substring(2);
 
     let newPanel: ReactGridLayout.Layout = {
-      i: counter.toString(),
+      i: panelId,
       x: widthSum % COLS,
       y: Infinity,
       h: BASE_HEIGHT,
@@ -90,7 +92,6 @@ export default function Dashboard({ id, editEnd }: DashboardProps) {
     };
 
     let newLayout = [...layout, newPanel];
-    counter++;
 
     setLayout(newLayout);
   };
@@ -140,7 +141,7 @@ export default function Dashboard({ id, editEnd }: DashboardProps) {
                 <Form.Control
                   defaultValue={data.name}
                   // @ts-ignore
-                  onChange={(e) => (nameText.current = e.target.value)}
+                  onChange={(e) => (nameTextRef.current = e.target.value)}
                 />
               ) : (
                 <h3 className="mb-0">{data.name}</h3>

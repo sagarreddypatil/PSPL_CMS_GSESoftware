@@ -44,7 +44,7 @@ export default function Panel(props: WidgetProps) {
             <h6 className="my-0">Panel Goes Here</h6>
           </div>
         ) : (
-          <TimePlot paused={props.paused} />
+          <TimePlot paused={props.paused} title={props.title} />
           // <button className="btn btn-danger flex-fill m-2">
           //   <h1 className="mb-0">Test</h1>
           // </button>

@@ -8,6 +8,7 @@ const UPlotChart = dynamic(() => import("./UPlotChart"), {
 });
 
 interface TimePlotProps {
+  title: string;
   paused: boolean;
 }
 
@@ -69,8 +70,9 @@ export default function TimePlot(props: TimePlotProps) {
 
   return (
     <UPlotChart
+      title={props.title}
       pointsPerPixel={1}
-      timespan={60}
+      timespan={10}
       paused={props.paused}
       timeDataSource={dataSource}
     />
