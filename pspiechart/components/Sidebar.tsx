@@ -7,7 +7,6 @@ import { Button } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
-import { DashboardContext } from "./Contexts";
 
 export default function Sidebar() {
   const router = useRouter();
