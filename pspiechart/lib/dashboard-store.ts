@@ -49,8 +49,6 @@ export function getDashboards() {
 export function updateDashboard(dashboard: DashboardStore) {
   const original = dashboards.find((original) => original.id == dashboard.id);
   if (!original) {
-    console.log(dashboards);
-    console.log(typeof dashboard);
     return;
   }
 

@@ -24,13 +24,9 @@ import { DashboardContext } from "@/components/Contexts";
 
 export default function Home() {
   const router = useRouter();
-  const { id } = router.query;
-  const { setId: setDashboardId } = useContext(DashboardContext);
+  const { dashboardId } = router.query;
 
-  const idInt = parseInt(id as string);
-  useEffect(() => {
-    setDashboardId?.(idInt);
-  });
+  const idInt = parseInt(dashboardId as string);
 
   return <Dashboard id={idInt} />;
 }

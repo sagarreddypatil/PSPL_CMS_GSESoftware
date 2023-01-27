@@ -11,27 +11,20 @@ import { DashboardContext } from "./Contexts";
 
 export default function Sidebar() {
   const router = useRouter();
-  const { id: selectedId } = useContext(DashboardContext);
   const [dashboards, setDashboards] = useState<DashboardStore[]>([]);
 
-  console.log(selectedId);
+  const dashboardId: number = parseInt(router.query.dashboardId as string);
+  console.log("render", dashboardId);
 
   useEffect(() => {
-    // load localstorage cache
-    const cache = localStorage.getItem("sidebarcache");
-    if (cache) {
-      setDashboards(JSON.parse(cache));
-    }
+    if (dashboardId) return;
 
     fetch("/api/dashboard")
       .then((res) => res.json())
       .then((data) => {
         setDashboards(data);
-
-        // cache data to localstorage because nextjs is dumb
-        localStorage.setItem("sidebarcache", JSON.stringify(data));
       });
-  }, [selectedId]);
+  }, [dashboardId]);
 
   const addDashboard = () => {
     fetch("/api/dashboard", {
@@ -41,6 +34,11 @@ export default function Sidebar() {
       .then((res) => res.json())
       .then((data) => {
         router.push(`/dashboard/${data.id}`);
+      })
+      .then(() => fetch("/api/dashboard"))
+      .then((res) => res.json())
+      .then((data) => {
+        setDashboards(data);
       });
   };
 
@@ -62,7 +60,7 @@ export default function Sidebar() {
       <hr />
       <ul className="nav nav-pills flex-column mb-auto">
         {dashboards.map((dashboard) => {
-          const selected = selectedId ? selectedId == dashboard.id : false;
+          const selected = dashboardId ? dashboardId == dashboard.id : false;
           const activeClass = selected ? "active" : "";
 
           return (
