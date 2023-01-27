@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import { getDashboards, DashboardStore } from "@/lib/dashboard-store";
 import Banner from "@/components/Banner";
 import { useContext, useEffect, useState } from "react";
-import { DashboardContext } from "@/components/Contexts";
 
 // let ws: WebSocket;
 

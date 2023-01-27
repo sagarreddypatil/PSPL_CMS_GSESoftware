@@ -4,7 +4,6 @@ import Dashboard from "@/components/Dashboard";
 import { getDashboards, DashboardStore } from "@/lib/dashboard-store";
 import Banner from "@/components/Banner";
 import { useContext, useEffect } from "react";
-import { DashboardContext } from "@/components/Contexts";
 
 // let ws: WebSocket;
 
@@ -34,12 +33,6 @@ interface DashboardProps {
   dashboards: DashboardStore[];
 }
 export default function Home(props: DashboardProps) {
-  const { setId: setDashboardId } = useContext(DashboardContext);
-
-  useEffect(() => {
-    setDashboardId?.(undefined);
-  });
-
   return (
     <Banner
       title="No Dashboard Selected"
