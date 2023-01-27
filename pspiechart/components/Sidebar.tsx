@@ -6,16 +6,15 @@ import styles from "../styles/Sidebar.module.scss";
 import { Button } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { DashboardContext } from "./Contexts";
 
-interface SidebarProps {
-  selectedId?: number;
-  jank?: number;
-}
-
-export default function Sidebar(props: SidebarProps) {
+export default function Sidebar() {
   const router = useRouter();
+  const { id: selectedId } = useContext(DashboardContext);
   const [dashboards, setDashboards] = useState<DashboardStore[]>([]);
+
+  console.log(selectedId);
 
   useEffect(() => {
     // load localstorage cache
@@ -32,7 +31,7 @@ export default function Sidebar(props: SidebarProps) {
         // cache data to localstorage because nextjs is dumb
         localStorage.setItem("sidebarcache", JSON.stringify(data));
       });
-  }, [props.selectedId, props.jank]);
+  }, [selectedId]);
 
   const addDashboard = () => {
     fetch("/api/dashboard", {
@@ -63,9 +62,7 @@ export default function Sidebar(props: SidebarProps) {
       <hr />
       <ul className="nav nav-pills flex-column mb-auto">
         {dashboards.map((dashboard) => {
-          const selected = props.selectedId
-            ? props.selectedId == dashboard.id
-            : false;
+          const selected = selectedId ? selectedId == dashboard.id : false;
           const activeClass = selected ? "active" : "";
 
           return (

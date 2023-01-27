@@ -18,7 +18,7 @@ function psora(k: number, n: number) {
   return r - Math.floor(r);
 }
 
-function rng(x) {
+function rng(x: number) {
   return psora(x, 10) * 2 - 1;
 }
 

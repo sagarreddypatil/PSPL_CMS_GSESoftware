@@ -151,7 +151,7 @@ export default function UPlotChart(props: UPlotChartProps) {
     return () => {
       plotRef.current?.destroy();
     };
-  }, []);
+  }, [props.title]);
 
   useEffect(() => {
     if (props.timeDataSource) {

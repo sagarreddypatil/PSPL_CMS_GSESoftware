@@ -4,7 +4,8 @@ import Dashboard from "@/components/Dashboard";
 import { useRouter } from "next/router";
 import { getDashboards, DashboardStore } from "@/lib/dashboard-store";
 import Banner from "@/components/Banner";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { DashboardContext } from "@/components/Contexts";
 
 // let ws: WebSocket;
 
@@ -24,22 +25,12 @@ import { useState } from "react";
 export default function Home() {
   const router = useRouter();
   const { id } = router.query;
-
-  const [jank, setJank] = useState(0);
+  const { setId: setDashboardId } = useContext(DashboardContext);
 
   const idInt = parseInt(id as string);
-  const editEnd = () => {
-    setJank(jank + 1);
-  };
+  useEffect(() => {
+    setDashboardId?.(idInt);
+  });
 
-  return (
-    <Layout>
-      <Sidebar selectedId={idInt} jank={jank} />
-      {/* {selected?.id ? ( */}
-      <Dashboard id={idInt} editEnd={editEnd} />
-      {/* ) : (
-        <Banner title="Dashboard does not exist" text="Check the URL" />
-      )} */}
-    </Layout>
-  );
+  return <Dashboard id={idInt} />;
 }

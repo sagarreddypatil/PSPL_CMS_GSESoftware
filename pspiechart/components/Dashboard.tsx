@@ -18,10 +18,9 @@ const ROW_HEIGHT = 40 - 6;
 
 interface DashboardProps {
   id: number;
-  editEnd: () => void;
 }
 
-export default function Dashboard({ id, editEnd }: DashboardProps) {
+export default function Dashboard({ id }: DashboardProps) {
   const router = useRouter();
 
   const nameTextRef = useRef<string>(null);
@@ -71,7 +70,6 @@ export default function Dashboard({ id, editEnd }: DashboardProps) {
     const newData = { ...data, name: newName, layout: layout };
 
     setData(newData);
-    editEnd();
 
     fetch(`/api/dashboard/${id}`, {
       method: "POST",
