@@ -13,17 +13,18 @@ export default function Sidebar() {
   const [dashboards, setDashboards] = useState<DashboardStore[]>([]);
 
   const dashboardId: number = parseInt(router.query.dashboardId as string);
-  console.log("render", dashboardId);
-
+  const edited = router.query.edited as string;
   useEffect(() => {
-    if (dashboardId) return;
-
     fetch("/api/dashboard")
       .then((res) => res.json())
       .then((data) => {
         setDashboards(data);
       });
-  }, [dashboardId]);
+
+    if (edited != undefined) {
+      router.push(`/dashboard/${dashboardId}`);
+    }
+  }, [dashboardId, edited]);
 
   const addDashboard = () => {
     fetch("/api/dashboard", {

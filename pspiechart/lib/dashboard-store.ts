@@ -1,13 +1,5 @@
 import fs from "fs";
-
-export interface DashboardStore {
-  id?: number;
-  name: string;
-  dateCreated?: Date;
-  dateModified?: Date;
-  layout: any;
-  panels: any;
-}
+import { DashboardStore } from "@/types/DashboardInterfaces";
 
 const filename = "data/dashboards.json";
 // create file if doesn't exist else read file

@@ -53,6 +53,12 @@ $custom-colors: (
 );
 $theme-colors: map-merge($theme-colors, $custom-colors);
 
+$modal-header-border-color: $psp-steel;
+$modal-footer-border-color: $psp-steel;
+
+$input-border-color: $psp-steel;
+$form-select-border-color: $psp-steel;
+
 @import 'bootstrap/scss/maps';
 @import 'bootstrap/scss/mixins';
 @import 'bootstrap/scss/utilities';
