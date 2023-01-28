@@ -17,19 +17,7 @@ import { useContext, useEffect } from "react";
 //   // })
 // }
 
-export function getServerSideProps() {
-  const dashboards = getDashboards();
-  return {
-    props: {
-      dashboards,
-    },
-  };
-}
-
-interface DashboardProps {
-  dashboards: DashboardStore[];
-}
-export default function Home(props: DashboardProps) {
+export default function Home() {
   return (
     <Banner
       title="No Dashboard Selected"
