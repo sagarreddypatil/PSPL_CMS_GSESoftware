@@ -54,7 +54,7 @@ export default function Dashboard({ id }: DashboardProps) {
     } else if (data?.name == "New Dashboard" && layout.length == 0) {
       setEditMode(true);
     }
-  }, [data]);
+  }, [data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     // load data on id change

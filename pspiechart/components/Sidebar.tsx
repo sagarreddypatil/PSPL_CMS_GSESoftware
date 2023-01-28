@@ -1,4 +1,4 @@
-import { DashboardStore } from "../lib/dashboard-store";
+import { DashboardStore } from "@/types/DashboardInterfaces";
 import Image from "next/image";
 import Link from "next/link";
 import pspColor from "../public/PSP-2Color-Reversed.svg";
@@ -7,6 +7,25 @@ import { Button } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
+
+function NavItem({
+  href,
+  active,
+  text,
+}: {
+  href: string;
+  active: boolean;
+  text: string;
+}) {
+  const activeClass = active ? "active" : "";
+  return (
+    <li className="nav-item">
+      <Link href={href} className={`nav-link m-1 ${activeClass}`}>
+        {text}
+      </Link>
+    </li>
+  );
+}
 
 export default function Sidebar() {
   const router = useRouter();
@@ -24,7 +43,7 @@ export default function Sidebar() {
     if (edited != undefined) {
       router.push(`/dashboard/${dashboardId}`);
     }
-  }, [dashboardId, edited]);
+  }, [dashboardId, edited]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const addDashboard = () => {
     fetch("/api/dashboard", {
@@ -60,18 +79,14 @@ export default function Sidebar() {
       <hr />
       <ul className="nav nav-pills flex-column mb-auto">
         {dashboards.map((dashboard) => {
-          const selected = dashboardId ? dashboardId == dashboard.id : false;
-          const activeClass = selected ? "active" : "";
-
+          const selected = dashboardId == dashboard.id;
           return (
-            <li key={dashboard.id} className="nav-item">
-              <Link
-                href={`/dashboard/${dashboard.id}`}
-                className={`nav-link m-1 ${activeClass}`}
-              >
-                {dashboard.name}
-              </Link>
-            </li>
+            <NavItem
+              key={dashboard.id}
+              href={`/dashboard/${dashboard.id}`}
+              active={selected}
+              text={dashboard.name}
+            />
           );
         })}
         <li className="nav-item d-grid">
