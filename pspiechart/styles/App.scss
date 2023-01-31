@@ -1,11 +1,11 @@
-@import 'Bootstrap';
+@import "Bootstrap";
 
 @import "react-grid-layout/css/styles.css";
 @import "react-resizable/css/styles.css";
 
 .react-grid-item.react-grid-placeholder {
-    @extend .card;
-    @extend .bg-primary;
+  @extend .card;
+  @extend .bg-primary;
 }
 
 html,
@@ -13,7 +13,7 @@ body,
 body > div:first-child,
 div#__next,
 div#__next > div {
-    height: 100%;
+  height: 100%;
 }
 
 .btn-icon {
@@ -34,7 +34,7 @@ div#__next > div {
   margin: 0.25rem;
 }
 
-[contenteditable="true"]{
+[contenteditable="true"] {
   outline: 1px dashed #fff;
 }
 
@@ -49,4 +49,21 @@ div#__next > div {
 hr {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
+}
+
+.rdg-psp {
+  --rdg-color-scheme: dark;
+  --rdg-color: #fff;
+  --rdg-border-color: #{$psp-steel};
+  // --rdg-summary-border-color: #555;
+  --rdg-background-color: #{$dark};
+  --rdg-header-background-color: #{$black};
+  --rdg-row-hover-background-color: #{darken($psp-aged, 15%)};
+  --rdg-row-selected-background-color: #{$primary};
+  --rdg-row-selected-hover-background-color: #{$primary};
+  --rdg-selection-color: #{$primary};
+  // --rdg-checkbox-color: hsl(207deg 100% 79%);
+  // --rdg-checkbox-focus-color: hsl(207deg 100% 89%);
+  // --rdg-checkbox-disabled-border-color: #000;
+  // --rdg-checkbox-disabled-background-color: #333;
 }

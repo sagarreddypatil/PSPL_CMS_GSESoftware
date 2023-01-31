@@ -6,7 +6,7 @@ import styles from "../styles/Sidebar.module.scss";
 import { Button } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
 import { useRouter } from "next/router";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 function NavItem({
   href,
@@ -105,7 +105,7 @@ export default function Sidebar() {
         <li className="nav-item d-grid">
           <Button
             variant="outline-primary"
-            className="m-1"
+            className="my-1 p-2"
             onClick={addDashboard}
           >
             <Icon.PlusLg /> Add Dashboard

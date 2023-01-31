@@ -10,17 +10,16 @@ $psp-white: #fff;
 // Secondary Palette
 $psp-boilermaker-gold: #cfb991;
 $psp-aged: #8e6f3e;
-$psp-field: #8E6F3E;
-$psp-dust: #EBD99F;
+$psp-field: #8e6f3e;
+$psp-dust: #ebd99f;
 $psp-steel: #555960;
-$psp-cool-gray: #6F727B;
-$psp-railway-gray: #9D9795;
-$psp-steam: #C4BFC0;
+$psp-cool-gray: #6f727b;
+$psp-railway-gray: #9d9795;
+$psp-steam: #c4bfc0;
 
-$border-radius: 0.0rem;
+$border-radius: 0rem;
 
-
-@import 'bootstrap/scss/functions';
+@import "bootstrap/scss/functions";
 
 $primary: $psp-rush;
 $secondary: $psp-aged;
@@ -32,14 +31,12 @@ $light: $psp-white;
 $body-bg: $psp-night-sky;
 $body-color: $psp-white;
 
-$font-family-sans-serif:
-    "Libre Franklin",
-    sans-serif;
+$font-family-sans-serif: "Libre Franklin", sans-serif;
 
 $headings-font-family: "Saira";
 $headings-font-weight: bold;
 
-@import 'bootstrap/scss/variables';
+@import "bootstrap/scss/variables";
 
 $custom-colors: (
   "boilermaker-gold": $psp-boilermaker-gold,
@@ -59,17 +56,17 @@ $modal-footer-border-color: $psp-steel;
 $input-border-color: $psp-steel;
 $form-select-border-color: $psp-steel;
 
-@import 'bootstrap/scss/maps';
-@import 'bootstrap/scss/mixins';
-@import 'bootstrap/scss/utilities';
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
 
-.btn-primary{
-    --bs-btn-color: #fff !important;
-    --bs-btn-hover-color: #fff !important;
-    --bs-btn-active-color: #fff !important;
+.btn-primary {
+  --bs-btn-color: #fff !important;
+  --bs-btn-hover-color: #fff !important;
+  --bs-btn-active-color: #fff !important;
 }
 
-.btn-outline-primary{
-    --bs-btn-hover-color: #fff !important;
-    --bs-btn-active-color: #fff !important;
+.btn-outline-primary {
+  --bs-btn-hover-color: #fff !important;
+  --bs-btn-active-color: #fff !important;
 }

@@ -87,9 +87,6 @@ export default function UPlotChart(props: UPlotChartProps) {
   });
 
   useEffect(() => {
-    const width = containerRef.current!.clientWidth;
-    const height = containerRef.current!.clientHeight;
-
     const opts: Options = {
       title: props.title ? props.title : "",
       width: 1,

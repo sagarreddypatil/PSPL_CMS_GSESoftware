@@ -1,4 +1,11 @@
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import {
+  FormEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import styles from "@/styles/Dashboard.module.scss";
 import ReactGridLayout from "react-grid-layout";
 import { Responsive, WidthProvider } from "react-grid-layout";
@@ -21,8 +28,10 @@ import { useRouter } from "next/router";
 import Banner from "../Hero";
 import Navbar, { NavTitle, NavSegment } from "@/components/Navbar";
 import { setConstantValue } from "typescript";
+import { FullscreenContext } from "../../contexts/FullscreenContext";
+import { SizeMe } from "react-sizeme";
 
-const ResponsiveGridLayout = WidthProvider(Responsive);
+// const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const COLS = 24;
 const BASE_HEIGHT = 10;
@@ -46,6 +55,30 @@ export default function Dashboard({ id }: DashboardProps) {
   const [panels, setPanels] = useState<PanelStore[]>([]);
 
   const [exists, setExists] = useState<boolean>(true);
+
+  const { fullscreen, setFullscreen } = useContext(FullscreenContext);
+
+  useEffect(() => {
+    const handleKeypress = (e: KeyboardEvent) => {
+      if (e.key == "Escape") {
+        // setEditMode(false);
+        setFullscreen(false);
+      }
+
+      if (e.key == "Enter") {
+        setEditMode(false);
+      }
+
+      if (e.key == "e") {
+        setEditMode(true);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeypress, false);
+    return () => {
+      document.removeEventListener("keydown", handleKeypress, false);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (editMode) {
@@ -208,93 +241,109 @@ export default function Dashboard({ id }: DashboardProps) {
         </Form>
       </Modal>
       <div className={`${styles["dashboard-container"]} flex-fill p-2`}>
-        <Navbar>
-          <NavTitle>
-            {/* {editMode ? (
+        {fullscreen ? null : (
+          <Navbar>
+            <NavTitle>
+              {/* {editMode ? (
               <Form.Control
                 defaultValue={data.name}
                 // @ts-ignore
                 onChange={(e) => (nameTextRef.current = e.target.value)}
               />
             ) : ( */}
-            <h3
-              className="mb-0 px-2"
-              spellCheck={false}
-              contentEditable={editMode}
-              suppressContentEditableWarning={true}
-              //@ts-ignore
-              onInput={(e) => (nameTextRef.current = e.currentTarget.innerText)}
-            >
-              {data.name}
-            </h3>
-            {/* )} */}
-          </NavTitle>
-          <NavSegment>
-            <Button variant="outline-danger" onClick={deleteDashboard}>
-              <Icon.Trash /> Delete Dashboard
-            </Button>
-            <ToggleButton
-              variant="outline-primary"
-              type="checkbox"
-              checked={editMode}
-              value="1"
-              onClick={(e) => setEditMode(!editMode)}
-            >
-              <Icon.PencilSquare />
-              {"  "} Edit Mode
-            </ToggleButton>
-            <Button
-              variant="outline-primary"
-              disabled={!editMode}
-              onClick={() => setShowAdd(true)}
-            >
-              <Icon.Plus /> Add Panel
-            </Button>
-          </NavSegment>
-          <NavSegment>
-            <ToggleButton
-              variant="outline-primary"
-              type="checkbox"
-              checked={paused}
-              value="1"
-              onClick={(e) => setPaused(!paused)}
-            >
-              <Icon.PauseFill /> Pause Plots
-            </ToggleButton>
-            <Button variant="outline-primary">
-              <Icon.Fullscreen />
-            </Button>
-          </NavSegment>
-        </Navbar>
-        <div className={editMode ? " user-select-none" : ""}>
-          <ResponsiveGridLayout
-            isDraggable={editMode}
-            isResizable={editMode}
-            containerPadding={[0, 0]}
-            useCSSTransforms={false}
-            margin={[8, 8]}
-            breakpoints={{ lg: 480, xxs: 0 }}
-            cols={{ lg: COLS, xxs: BASE_WIDTH }}
-            rowHeight={ROW_HEIGHT}
-            layouts={layouts}
-            onLayoutChange={(layout, layouts) => setLayout(layouts.lg)}
-            resizeHandle={
-              <Icon.ArrowDownRight
-                className={`react-resizable-handle react-resizable-handle-se m-1 user-select-none`}
-              />
-            }
-          >
-            {layout.map((item) => (
-              <div key={item.i}>
-                <Panel
-                  paused={paused}
-                  panel={panels.find((p) => p.id === item.i)}
-                  editMode={editMode}
-                  removeCallback={() => removePanel(item.i)}
-                />
-              </div>
-            ))}
-          </ResponsiveGridLayout>
+              <h3
+                className="mb-0 px-2"
+                spellCheck={false}
+                contentEditable={editMode}
+                suppressContentEditableWarning={true}
+                onInput={(e) =>
+                  //@ts-ignore
+                  (nameTextRef.current = e.currentTarget.innerText)
+                }
+              >
+                {data.name}
+              </h3>
+              {/* )} */}
+            </NavTitle>
+            <NavSegment>
+              <Button variant="outline-danger" onClick={deleteDashboard}>
+                <Icon.Trash /> Delete Dashboard
+              </Button>
+              <ToggleButton
+                variant="outline-primary"
+                type="checkbox"
+                checked={editMode}
+                value="1"
+                onClick={(e) => setEditMode(!editMode)}
+              >
+                <Icon.PencilSquare />
+                {"  "} Edit Mode
+              </ToggleButton>
+              <Button
+                variant="outline-primary"
+                disabled={!editMode}
+                onClick={() => setShowAdd(true)}
+              >
+                <Icon.Plus /> Add Panel
+              </Button>
+            </NavSegment>
+            <NavSegment>
+              <ToggleButton
+                variant="outline-primary"
+                type="checkbox"
+                checked={paused}
+                value="1"
+                onClick={(e) => setPaused(!paused)}
+              >
+                <Icon.PauseFill /> Pause Plots
+              </ToggleButton>
+              <Button
+                variant="outline-primary"
+                onClick={() => {
+                  setFullscreen(!fullscreen);
+                  setEditMode(true);
+                  setEditMode(false);
+                }}
+              >
+                <Icon.Fullscreen />
+              </Button>
+            </NavSegment>
+          </Navbar>
+        )}
+        <div className={"flex-fill " + editMode ? " user-select-none" : ""}>
+          <SizeMe>
+            {({ size }) => (
+              <Responsive
+                isDraggable={editMode}
+                isResizable={editMode}
+                containerPadding={[0, 0]}
+                useCSSTransforms={false}
+                width={size.width ?? undefined}
+                margin={[8, 8]}
+                breakpoints={{ lg: 480, xxs: 0 }}
+                cols={{ lg: COLS, xxs: BASE_WIDTH }}
+                rowHeight={ROW_HEIGHT}
+                layouts={layouts}
+                onLayoutChange={(layout, layouts) => setLayout(layouts.lg)}
+                resizeHandle={
+                  <Icon.ArrowDownRight
+                    className={`react-resizable-handle react-resizable-handle-se m-1 user-select-none`}
+                  />
+                }
+              >
+                {layout.map((item) => (
+                  <div key={item.i}>
+                    <Panel
+                      paused={paused}
+                      panel={panels.find((p) => p.id === item.i)}
+                      editMode={editMode}
+                      removeCallback={() => removePanel(item.i)}
+                    />
+                  </div>
+                ))}
+              </Responsive>
+            )}
+          </SizeMe>
         </div>
       </div>
     </>
