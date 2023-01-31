@@ -25,7 +25,7 @@ import {
   PanelType,
 } from "@/types/DashboardInterfaces";
 import { useRouter } from "next/router";
-import Banner from "../Hero";
+import Hero from "../Hero";
 import Navbar, { NavTitle, NavSegment } from "@/components/Navbar";
 import { setConstantValue } from "typescript";
 import { FullscreenContext } from "../../contexts/FullscreenContext";
@@ -71,6 +71,10 @@ export default function Dashboard({ id }: DashboardProps) {
 
       if (e.key == "e") {
         setEditMode(true);
+      }
+
+      if (e.key == "f") {
+        setFullscreen(true);
       }
     };
 
@@ -203,8 +207,8 @@ export default function Dashboard({ id }: DashboardProps) {
   };
 
   if (!exists)
-    return <Banner title="Dashboard not found" text="Check your URL" />;
-  if (!data) return <Banner title="Loading..." />;
+    return <Hero title="Dashboard not found" text="Check your URL" />;
+  if (!data) return <Hero title="Loading..." />;
 
   return (
     <>
@@ -312,37 +316,41 @@ export default function Dashboard({ id }: DashboardProps) {
         )}
         <div className={"flex-fill " + editMode ? " user-select-none" : ""}>
           <SizeMe>
-            {({ size }) => (
-              <Responsive
-                isDraggable={editMode}
-                isResizable={editMode}
-                containerPadding={[0, 0]}
-                useCSSTransforms={false}
-                width={size.width ?? undefined}
-                margin={[8, 8]}
-                breakpoints={{ lg: 480, xxs: 0 }}
-                cols={{ lg: COLS, xxs: BASE_WIDTH }}
-                rowHeight={ROW_HEIGHT}
-                layouts={layouts}
-                onLayoutChange={(layout, layouts) => setLayout(layouts.lg)}
-                resizeHandle={
-                  <Icon.ArrowDownRight
-                    className={`react-resizable-handle react-resizable-handle-se m-1 user-select-none`}
-                  />
-                }
-              >
-                {layout.map((item) => (
-                  <div key={item.i}>
-                    <Panel
-                      paused={paused}
-                      panel={panels.find((p) => p.id === item.i)}
-                      editMode={editMode}
-                      removeCallback={() => removePanel(item.i)}
-                    />
-                  </div>
-                ))}
-              </Responsive>
-            )}
+            {({ size }) => {
+              if (!size.width) return <Hero title="Loading..." />;
+              else
+                return (
+                  <Responsive
+                    isDraggable={editMode}
+                    isResizable={editMode}
+                    containerPadding={[0, 0]}
+                    useCSSTransforms={false}
+                    width={size.width ?? undefined}
+                    margin={[8, 8]}
+                    breakpoints={{ lg: 480, xxs: 0 }}
+                    cols={{ lg: COLS, xxs: BASE_WIDTH }}
+                    rowHeight={ROW_HEIGHT}
+                    layouts={layouts}
+                    onLayoutChange={(layout, layouts) => setLayout(layouts.lg)}
+                    resizeHandle={
+                      <Icon.ArrowDownRight
+                        className={`react-resizable-handle react-resizable-handle-se m-1 user-select-none`}
+                      />
+                    }
+                  >
+                    {layout.map((item) => (
+                      <div key={item.i}>
+                        <Panel
+                          paused={paused}
+                          panel={panels.find((p) => p.id === item.i)}
+                          editMode={editMode}
+                          removeCallback={() => removePanel(item.i)}
+                        />
+                      </div>
+                    ))}
+                  </Responsive>
+                );
+            }}
           </SizeMe>
         </div>
       </div>

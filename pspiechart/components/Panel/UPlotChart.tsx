@@ -6,6 +6,7 @@ import {
 } from "@/types/DataInterfaces";
 import { match } from "assert";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import sizeMe from "react-sizeme";
 import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";
 
@@ -18,9 +19,11 @@ interface UPlotChartProps {
 
   timeDataSource?: TimeDataSource;
   frequencyDataSource?: FrequencyDataSource;
+
+  size: { width: number; height: number };
 }
 
-export default function UPlotChart(props: UPlotChartProps) {
+function UPlotChart(props: UPlotChartProps) {
   // chart references
   const containerRef = useRef<HTMLDivElement | null>(null);
   const divRef = useRef<HTMLDivElement | null>(null);
@@ -35,7 +38,8 @@ export default function UPlotChart(props: UPlotChartProps) {
   const timeDownsampleBuffer = useRef<TimeDataPoint[]>([]);
 
   // container size
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  // const [size, setSize] = useState({ width: 0, height: 0 });
+  const size = props.size;
 
   useEffect(() => {
     const updatePlot = () => {
@@ -186,30 +190,6 @@ export default function UPlotChart(props: UPlotChartProps) {
     props.paused,
   ]);
 
-  useLayoutEffect(() => {
-    function debounce(func: () => void, time = 100) {
-      let timer: any;
-      return function () {
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(func, time);
-      };
-    }
-
-    function updateSize() {
-      const newSize = {
-        width: containerRef.current?.clientWidth ?? 0,
-        height: containerRef.current?.clientHeight ?? 0,
-      };
-
-      setSize(newSize);
-    }
-
-    window.addEventListener("resize", debounce(updateSize));
-    updateSize();
-
-    return () => window.removeEventListener("resize", debounce(updateSize));
-  }, []);
-
   useEffect(() => {
     plotRef.current?.setSize({
       width: size.width,
@@ -223,3 +203,5 @@ export default function UPlotChart(props: UPlotChartProps) {
     </div>
   );
 }
+
+export default sizeMe({ monitorHeight: true })(UPlotChart);

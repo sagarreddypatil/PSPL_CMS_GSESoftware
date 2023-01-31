@@ -6,6 +6,9 @@ import Layout from "@/components/Layout";
 import Sidebar from "@/components/Sidebar";
 import { FullscreenContext } from "../contexts/FullscreenContext";
 import { useState } from "react";
+import sizeMe from "react-sizeme";
+
+sizeMe.noPlaceholders = true;
 
 export default function App({ Component, pageProps }: AppProps) {
   const [fullscreen, setFullscreen] = useState(false);

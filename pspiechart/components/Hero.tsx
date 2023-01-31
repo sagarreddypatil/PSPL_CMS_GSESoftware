@@ -1,9 +1,9 @@
-interface BannerProps {
+interface HeroProps {
   title: string;
   text?: string;
 }
 
-export default function Banner(props: BannerProps) {
+export default function Hero(props: HeroProps) {
   return (
     <div className="bg-dark text-primary m-auto px-4 py-5 text-center">
       <div className="py-5">
