@@ -20,7 +20,7 @@ function NavItem({
   const activeClass = active ? "active" : "";
   return (
     <li className="nav-item">
-      <Link href={href} className={`nav-link my-1 ${activeClass}`}>
+      <Link href={href} className={`nav-link my-1 px-2 py-2 ${activeClass}`}>
         {text}
       </Link>
     </li>
@@ -79,7 +79,7 @@ export default function Sidebar() {
       <div className="mx-auto my-2" />
       {/* <hr style={{ opacity: "100%" }} /> */}
       <ul className="nav nav-pills flex-column mb-4">
-        <li className="nav-item fs-5 fw-bold">Configs</li>
+        <li className="nav-item fs-5 fw-bold px-2">Configs</li>
         <hr />
         <NavItem
           href={`/config/sensornet`}
@@ -89,7 +89,7 @@ export default function Sidebar() {
       </ul>
 
       <ul className="nav nav-pills flex-column mb-4">
-        <li className="nav-item fs-5 fw-bold">Dashboards</li>
+        <li className="nav-item fs-5 fw-bold px-2">Dashboards</li>
         <hr />
         {dashboards.map((dashboard) => {
           const selected = dashboardId == dashboard.id;
