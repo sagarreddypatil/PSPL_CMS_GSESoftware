@@ -1,6 +1,6 @@
 import { PanelStore, PanelType } from "@/types/DashboardInterfaces";
 import * as Icon from "react-bootstrap-icons";
-import Banner from "../Banner";
+import Banner from "../Hero";
 import Button from "./Button";
 import TimePlot from "./TimePlot";
 

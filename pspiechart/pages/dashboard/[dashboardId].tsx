@@ -3,7 +3,7 @@ import Sidebar from "@/components/Sidebar";
 import Dashboard from "@/components/Dashboard/Dashboard";
 import { useRouter } from "next/router";
 import { getDashboards, DashboardStore } from "@/lib/dashboard-store";
-import Banner from "@/components/Banner";
+import Banner from "@/components/Hero";
 import { useContext, useEffect, useState } from "react";
 
 // let ws: WebSocket;

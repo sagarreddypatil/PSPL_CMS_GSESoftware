@@ -18,7 +18,7 @@ import {
   PanelType,
 } from "@/types/DashboardInterfaces";
 import { useRouter } from "next/router";
-import Banner from "../Banner";
+import Banner from "../Hero";
 import { setConstantValue } from "typescript";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);

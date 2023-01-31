@@ -1,5 +1,5 @@
 import { getDashboards, DashboardStore } from "@/lib/dashboard-store";
-import Banner from "@/components/Banner";
+import Banner from "@/components/Hero";
 import { useContext, useEffect } from "react";
 
 // let ws: WebSocket;
