@@ -76,8 +76,20 @@ export default function Sidebar() {
           <h3 className="m-0">Mission Control</h3>
         </div>
       </Link>
-      <hr />
-      <ul className="nav nav-pills flex-column mb-auto">
+      <hr style={{ opacity: "100%" }} />
+      <ul className="nav nav-pills flex-column mb-4">
+        <li className="nav-item fs-5 fw-bold">Configs</li>
+        <hr />
+        <NavItem
+          href={`/config/sensornet`}
+          text={"SensorNet"}
+          active={router.route === "/config/sensornet"}
+        />
+      </ul>
+
+      <ul className="nav nav-pills flex-column mb-4">
+        <li className="nav-item fs-5 fw-bold">Dashboards</li>
+        <hr />
         {dashboards.map((dashboard) => {
           const selected = dashboardId == dashboard.id;
           return (

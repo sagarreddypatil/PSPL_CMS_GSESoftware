@@ -171,7 +171,7 @@ export default function Dashboard({ id }: DashboardProps) {
 
   if (!exists)
     return <Banner title="Dashboard not found" text="Check your URL" />;
-  if (!data) return <Banner title="Loading" />;
+  if (!data) return <Banner title="Loading..." />;
 
   return (
     <>
