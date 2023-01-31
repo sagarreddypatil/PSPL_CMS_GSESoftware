@@ -26,3 +26,22 @@ div#__next > div {
 .draggable {
   cursor: move;
 }
+
+.nav-segment > * {
+  padding: 0.25rem;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+  margin: 0.25rem;
+}
+
+[contenteditable="true"]{
+  outline: 1px dashed #fff;
+}
+
+[contenteditable="true"]:hover {
+  outline: 1px solid #fff;
+}
+
+[contenteditable="true"]:focus {
+  outline: 1px solid #fff;
+}

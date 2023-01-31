@@ -19,6 +19,7 @@ import {
 } from "@/types/DashboardInterfaces";
 import { useRouter } from "next/router";
 import Banner from "../Hero";
+import Navbar, { NavTitle, NavSegment } from "@/components/Navbar";
 import { setConstantValue } from "typescript";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -200,88 +201,72 @@ export default function Dashboard({ id }: DashboardProps) {
             </select>
           </Modal.Body>
           <Modal.Footer>
-            <Button
-              type="submit"
-              variant="outline-primary"
-              className="p-1 px-2 m-1 ms-2"
-            >
+            <Button type="submit" variant="outline-primary">
               <Icon.Plus /> Add Panel
             </Button>
           </Modal.Footer>
         </Form>
       </Modal>
-      <div className={`${styles["dashboard-container"]} flex-fill pt-2`}>
-        <nav className="navbar navbar-expand-lg sticky-top mx-2 navbar-dark bg-black d-flex">
-          <div className="d-flex justify-content-between align-items-center px-2 flex-fill">
-            <div className="w-25">
-              <div className="">
-                {editMode ? (
-                  <Form.Control
-                    defaultValue={data.name}
-                    // @ts-ignore
-                    onChange={(e) => (nameTextRef.current = e.target.value)}
-                  />
-                ) : (
-                  <h3 className="mb-0">{data.name}</h3>
-                )}
-              </div>
-            </div>
-            <div className="d-flex">
-              <div className="">
-                <Button
-                  variant="outline-danger"
-                  className="p-1 px-2 m-1 ms-2"
-                  onClick={deleteDashboard}
-                >
-                  <Icon.Trash /> Delete Dashboard
-                </Button>
-              </div>
-              <div className="">
-                <ToggleButton
-                  variant="outline-primary"
-                  className="p-1 px-2 m-1 ms-2"
-                  type="checkbox"
-                  checked={editMode}
-                  value="1"
-                  onClick={(e) => setEditMode(!editMode)}
-                >
-                  <Icon.PencilSquare />
-                  {"  "} Edit Mode
-                </ToggleButton>
-              </div>
-              <div className="">
-                <Button
-                  variant="outline-primary"
-                  className="p-1 px-2 m-1 ms-2"
-                  disabled={!editMode}
-                  onClick={() => setShowAdd(true)}
-                >
-                  <Icon.Plus /> Add Panel
-                </Button>
-              </div>
-            </div>
-            <div className="d-flex">
-              <div className="">
-                <ToggleButton
-                  variant="outline-primary"
-                  className="p-1 px-2 m-1 ms-2"
-                  type="checkbox"
-                  checked={paused}
-                  value="1"
-                  onClick={(e) => setPaused(!paused)}
-                >
-                  <Icon.PauseFill /> Pause Plots
-                </ToggleButton>
-              </div>
-              <div className="">
-                <button className="btn btn-outline-primary p-1 px-2 m-1 ms-2">
-                  <Icon.Fullscreen />
-                </button>
-              </div>
-            </div>
-          </div>
-        </nav>
-        <div className={"p-2" + (editMode ? " user-select-none" : "")}>
+      <div className={`${styles["dashboard-container"]} flex-fill p-2`}>
+        <Navbar>
+          <NavTitle>
+            {/* {editMode ? (
+              <Form.Control
+                defaultValue={data.name}
+                // @ts-ignore
+                onChange={(e) => (nameTextRef.current = e.target.value)}
+              />
+            ) : ( */}
+            <h3
+              className="mb-0 px-2"
+              spellCheck={false}
+              contentEditable={editMode}
+              suppressContentEditableWarning={true}
+              //@ts-ignore
+              onInput={(e) => (nameTextRef.current = e.currentTarget.innerText)}
+            >
+              {data.name}
+            </h3>
+            {/* )} */}
+          </NavTitle>
+          <NavSegment>
+            <Button variant="outline-danger" onClick={deleteDashboard}>
+              <Icon.Trash /> Delete Dashboard
+            </Button>
+            <ToggleButton
+              variant="outline-primary"
+              type="checkbox"
+              checked={editMode}
+              value="1"
+              onClick={(e) => setEditMode(!editMode)}
+            >
+              <Icon.PencilSquare />
+              {"  "} Edit Mode
+            </ToggleButton>
+            <Button
+              variant="outline-primary"
+              disabled={!editMode}
+              onClick={() => setShowAdd(true)}
+            >
+              <Icon.Plus /> Add Panel
+            </Button>
+          </NavSegment>
+          <NavSegment>
+            <ToggleButton
+              variant="outline-primary"
+              type="checkbox"
+              checked={paused}
+              value="1"
+              onClick={(e) => setPaused(!paused)}
+            >
+              <Icon.PauseFill /> Pause Plots
+            </ToggleButton>
+            <Button variant="outline-primary">
+              <Icon.Fullscreen />
+            </Button>
+          </NavSegment>
+        </Navbar>
+        <div className={editMode ? " user-select-none" : ""}>
           <ResponsiveGridLayout
             isDraggable={editMode}
             isResizable={editMode}

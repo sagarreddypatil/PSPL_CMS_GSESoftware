@@ -1,5 +1,6 @@
 import "react-data-grid/lib/styles.css";
 import DataGrid from "react-data-grid";
+import Navbar, { NavTitle } from "@/components/Navbar";
 
 export default function SensorNet() {
   const columns = [
@@ -10,16 +11,21 @@ export default function SensorNet() {
   const rows = [
     {
       id: 0,
-      name: "Telemetry",
+      title: "Telemetry",
     },
     {
       id: 1,
-      name: "Tables",
+      title: "Tables",
     },
   ];
 
   return (
-    <div className="bg-dark text-primary p-2 text-center w-100 h-100">
+    <div className="bg-dark p-2 w-100 h-100">
+      <Navbar>
+        <NavTitle>
+          <h3 className="mb-0 px-2">SensorNet Config</h3>
+        </NavTitle>
+      </Navbar>
       <DataGrid columns={columns} rows={rows} />
     </div>
   );

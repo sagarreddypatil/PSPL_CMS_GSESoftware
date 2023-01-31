@@ -1,3 +1,7 @@
 export default function Landing() {
-  return <></>;
+  return (
+    <video autoPlay loop muted playsInline>
+      <source src="landing.mp4" />
+    </video>
+  );
 }
