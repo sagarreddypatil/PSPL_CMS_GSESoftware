@@ -63,8 +63,8 @@ export default function Sidebar() {
 
   return (
     <div className="d-flex flex-column flex-shrink-0 p-3 bg-black">
-      <a
-        href="#"
+      <Link
+        href="/"
         className="d-flex row align-items-center text-white text-decoration-none"
       >
         <div className="col pe-0">
@@ -75,7 +75,7 @@ export default function Sidebar() {
         <div className="col">
           <h3 className="m-0">Mission Control</h3>
         </div>
-      </a>
+      </Link>
       <hr />
       <ul className="nav nav-pills flex-column mb-auto">
         {dashboards.map((dashboard) => {

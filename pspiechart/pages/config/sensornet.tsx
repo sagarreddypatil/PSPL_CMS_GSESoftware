@@ -1,7 +1,7 @@
 import "react-data-grid/lib/styles.css";
 import DataGrid from "react-data-grid";
 
-export default function TelemTables() {
+export default function SensorNet() {
   const columns = [
     { key: "id", name: "ID", flex: 1 },
     { key: "title", name: "Title", flex: 1 },
