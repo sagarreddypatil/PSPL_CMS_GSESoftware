@@ -38,7 +38,6 @@ function UPlotChart(props: UPlotChartProps) {
   const timeDownsampleBuffer = useRef<TimeDataPoint[]>([]);
 
   // container size
-  // const [size, setSize] = useState({ width: 0, height: 0 });
   const size = props.size;
 
   useEffect(() => {
