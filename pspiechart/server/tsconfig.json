@@ -8,7 +8,7 @@
         "moduleResolution": "node",
         "allowSyntheticDefaultImports": true,
         "outDir": "../build",
-        "rootDir": "./",
+        "rootDirs": ["./", "../common"],
         "skipLibCheck": true
     }
 }
