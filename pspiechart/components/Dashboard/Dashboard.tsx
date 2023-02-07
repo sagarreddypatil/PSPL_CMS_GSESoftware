@@ -13,19 +13,17 @@ import { useRouter } from "next/router";
 import Hero from "../Hero";
 import Navbar, { NavTitle, NavSegment } from "@/components/Navbar";
 import { FullscreenContext } from "../../contexts/FullscreenContext";
-import sizeMe from "react-sizeme";
 
-const COLS = 24;
+const COLS = 12;
 const BASE_HEIGHT = 10;
-const BASE_WIDTH = 6;
+const BASE_WIDTH = 3;
 const ROW_HEIGHT = 34;
 
 interface DashboardProps {
   id: number;
-  size: { width: number; height: number };
 }
 
-function Dashboard({ id, size }: DashboardProps) {
+export default function Dashboard({ id }: DashboardProps) {
   const router = useRouter();
 
   const nameTextRef = useRef<string>(null);
@@ -332,5 +330,3 @@ function Dashboard({ id, size }: DashboardProps) {
     </div>
   );
 }
-
-export default sizeMe({ monitorHeight: true })(Dashboard);
