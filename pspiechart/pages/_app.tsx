@@ -5,20 +5,43 @@ import type { AppProps } from "next/app";
 import Layout from "@/components/Layout";
 import Sidebar from "@/components/Sidebar";
 import { FullscreenContext } from "../contexts/FullscreenContext";
-import { useState } from "react";
+import { WebSocketContext } from "../contexts/WebsocketContext";
+import { useEffect, useState, createContext } from "react";
 import sizeMe from "react-sizeme";
+import { WebsocketHandler } from "../handlers/WebsocketHandler";
 
 sizeMe.noPlaceholders = true;
 
 export default function App({ Component, pageProps }: AppProps) {
-  const [fullscreen, setFullscreen] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);    
+  const [websocketHandler, setWebSocketHandler] = useState(new WebsocketHandler());
+
+  websocketHandler.on("pressureTransducer", (data) => {
+    console.log("pressureTransducer", data);
+  });
+
+  useEffect(() => {
+    var loc = window.location, new_uri;
+    if (loc.protocol === "https:") {
+      new_uri = "wss:";
+    } else {
+        new_uri = "ws:";
+    }
+    new_uri += "//" + loc.host;
+    const ws = new WebSocket(new_uri + "/data");
+    ws.binaryType = "arraybuffer";
+    websocketHandler.connect(ws);
+
+  }, [websocketHandler]);
 
   return (
     <Layout>
+      <WebSocketContext.Provider value={{websocket: websocketHandler, setWebSocket: setWebSocketHandler}}>
       <FullscreenContext.Provider value={{ fullscreen, setFullscreen }}>
         {fullscreen ? null : <Sidebar />}
         <Component {...pageProps} />
       </FullscreenContext.Provider>
+      </WebSocketContext.Provider>
     </Layout>
   );
 

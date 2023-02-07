@@ -11,7 +11,7 @@ export type FrequencyDataPoint = {
 export interface TimeDataSource {
   subscribe(callback: (data: TimeDataPoint) => void): void;
   unsubscribe(callback: (data: TimeDataPoint) => void): void;
-  get(a: number, b: number, dt: number): TimeDataPoint[];
+  get(t1: number, t2: number, dt: number): TimeDataPoint[];
 }
 
 export interface FrequencyDataSource {

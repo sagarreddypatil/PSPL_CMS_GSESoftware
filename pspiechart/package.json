@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start -p 8080",
+    "build-server": "npx tsc --build server",
+    "server": "node build/server/server.js",
     "lint": "next lint"
   },
   "type": "module",
