@@ -1,14 +1,19 @@
 import "react-data-grid/lib/styles.css";
-import DataGrid, { DataGridHandle } from "react-data-grid";
+import DataGrid, {
+  DataGridHandle,
+  FillEvent,
+  textEditor,
+} from "react-data-grid";
 import Navbar, { NavTitle } from "@/components/Navbar";
 import { useRef } from "react";
+import handle from "../api/dashboard/[id]";
 
 const columnKeys = [
   "id",
   "name",
   "unit",
-  "adc-bitness",
-  "adc-gain",
+  "adcBitness",
+  "adcGain",
   "offset",
   "gain",
 ];
@@ -23,12 +28,23 @@ const columnNames = [
   "Gain",
 ];
 
+interface Row {
+  id: number;
+  name: string;
+  unit: string;
+  adcBitness: number;
+  adcGain: number;
+  offset: number;
+  gain: number;
+}
+
 export default function SensorNet() {
   const columns = columnKeys.map((column, index) => {
     return {
       key: column,
       name: columnNames[index],
       flex: 1,
+      editor: textEditor,
     };
   });
 
@@ -39,6 +55,14 @@ export default function SensorNet() {
     };
   });
 
+  function handleFill({
+    columnKey,
+    sourceRow,
+    targetRow,
+  }: FillEvent<Row>): Row {
+    return { ...targetRow, [columnKey]: sourceRow[columnKey as keyof Row] };
+  }
+
   return (
     <div className="bg-dark p-2 w-100 h-100 d-flex flex-column">
       <Navbar>
@@ -47,7 +71,12 @@ export default function SensorNet() {
         </NavTitle>
       </Navbar>
       <div className="flex-fill overflow-auto">
-        <DataGrid columns={columns} rows={rows} className="rdg-psp h-100" />
+        <DataGrid
+          columns={columns}
+          rows={rows}
+          onFill={handleFill}
+          className="rdg-psp h-100"
+        />
       </div>
     </div>
   );
