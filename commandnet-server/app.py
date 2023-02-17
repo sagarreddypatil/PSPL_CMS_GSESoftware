@@ -1,9 +1,30 @@
 from flask import Flask
-from cryptography.hazmat.primitives.asymmetric import rsa
+import os
+from cryptography.hazmat.primitives.ciphers.aead import AESSIV
 
-private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+# transfer str into bytes (so brandon does not have to search it up again): str.encode("UTF-8")
+def createNonce():
+    return(os.urandom(16))
+
+def createAESAuth():
+    return AESSIV.generate_key(bit_length=512)  
+
+def encryptdata(pwd, nonce, key, data):
+    aad = [pwd.encode("UTF-8"), nonce]
+    aessiv = AESSIV(key)
+    ct = aessiv.encrypt(data.encode("UTF-8"), aad)
+    return(ct)
+
+#idk why i wrote a decryption but here it is !!!!!
+
+def decryptdata(pwd, nonce, key, ct):
+    aad = [pwd.encode("UTF-8"), nonce]
+    aessiv = AESSIV(key)
+    return(aessiv.decrypt(ct, aad).decode("UTF-8"))
 
 app = Flask(__name__)
+
+
 
 @app.route("/hello")
 def hello_world():
@@ -29,4 +50,4 @@ def continue_countdown():
     pass
     return("<p>stop holding and continue the launch countdown<p>")
 
-print(private_key)
+print(2)
