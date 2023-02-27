@@ -90,6 +90,8 @@ function UPlotChart(props: UPlotChartProps) {
   });
 
   useEffect(() => {
+    const colors = ["#daaa00", "#ff0", "#0ff", "#f00", "#0f0"];
+
     const opts: Options = {
       title: props.title ? props.title : "",
       width: 1,
@@ -130,12 +132,14 @@ function UPlotChart(props: UPlotChartProps) {
         {},
         {
           label: "Value",
-          stroke: "#daaa00",
+          // stroke: "#daaa00",
           // stroke: "#ff0",
           // stroke: "#0ff",
           // stroke: "#f00",
           // stroke: "#0f0",
           // stroke: "#00f",
+          // random color
+          stroke: colors[Math.floor(Math.random() * colors.length)],
           width: 2,
           // fill: "rgba(218,170,0,0.1)",
         },
