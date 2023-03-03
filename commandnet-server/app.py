@@ -1,11 +1,13 @@
 from flask import Flask
 import os
+import time
 from cryptography.hazmat.primitives.ciphers.aead import AESSIV
 
 # transfer str into bytes (so brandon does not have to search it up again): str.encode("UTF-8")
 def createNonce():
     return(os.urandom(16))
-
+def getTime():
+    return str(int(time.time()))
 def createAESAuth():
     return AESSIV.generate_key(bit_length=512)  
 
@@ -24,11 +26,14 @@ def decryptdata(pwd, nonce, key, ct):
 
 app = Flask(__name__)
 
-
-
 @app.route("/hello")
 def hello_world():
     return "<p>Hello, World!</p>"
+
+@app.route("/nonce-test")
+def test_urandom():  # i can confirm it is random :))
+    nonce = createNonce()
+    return f"<p>{nonce}<p>"
 
 @app.route("/config")
 def send_config(name, value):
@@ -50,4 +55,4 @@ def continue_countdown():
     pass
     return("<p>stop holding and continue the launch countdown<p>")
 
-print(2)
+
