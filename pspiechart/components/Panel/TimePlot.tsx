@@ -62,8 +62,8 @@ export default function TimePlot(props: TimePlotProps) {
     return {
       time: time / 1000,
       // value: Math.sin((2 * 3.14159 * time) / 1000),
-      // value: accRef.current,
-      value: fractalNoise(time / 1000),
+      value: accRef.current,
+      // value: fractalNoise(time / 1000),
       // value: psora(time, 10),
       // value: Math.random(),
     } as TimeDataPoint;
