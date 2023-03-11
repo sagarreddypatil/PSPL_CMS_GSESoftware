@@ -1,0 +1,21 @@
+{
+  "name": "sensornet-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@types/node": "^18.15.0",
+    "binary-parser": "^2.2.1",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.20.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  }
+}
