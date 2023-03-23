@@ -1,58 +1,44 @@
-from flask import Flask
+from flask import Flask, jsonify
 import os
 import time
-from cryptography.hazmat.primitives.ciphers.aead import AESSIV
+import request, socket
 
-# transfer str into bytes (so brandon does not have to search it up again): str.encode("UTF-8")
-def createNonce():
-    return(os.urandom(16))
-def getTime():
-    return str(int(time.time()))
-def createAESAuth():
-    return AESSIV.generate_key(bit_length=512)  
-
-def encryptdata(pwd, nonce, key, data):
-    aad = [pwd.encode("UTF-8"), nonce]
-    aessiv = AESSIV(key)
-    ct = aessiv.encrypt(data.encode("UTF-8"), aad)
-    return(ct)
-
-#idk why i wrote a decryption but here it is !!!!!
-
-def decryptdata(pwd, nonce, key, ct):
-    aad = [pwd.encode("UTF-8"), nonce]
-    aessiv = AESSIV(key)
-    return(aessiv.decrypt(ct, aad).decode("UTF-8"))
+HOST = '127.0.0.1'
 
 app = Flask(__name__)
 
+def sendMsg(ciphertext, PORT):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((HOST, PORT))
+        s.listen(1)
+        print('waiting for connection')
+        conn, addr = s.accept()
+        print(f"connection established at {addr}")
+        totalsent = 0
+        while totalsent < len(ciphertext):
+            sent = conn.send(ciphertext[totalsent:])
+            if sent == 0:
+                print("socket connection broken")
+                return
+            totalsent = totalsent + sent
+    return
+
 @app.route("/hello")
 def hello_world():
-    return "<p>Hello, World!</p>"
+    return "Hello, World!"
+@app.route('/hello/<name>')
+def hello(name=None):
+    return f"<p>Hello, {name}!</p>"
 
-@app.route("/nonce-test")
-def test_urandom():  # i can confirm it is random :))
-    nonce = createNonce()
-    return f"<p>{nonce}<p>"
-
-@app.route("/config")
-def send_config(name, value):
-    pass
-    return("<p>send config/calibrations<p>")
-
-@app.route("/confirmation")
-def send_confirmation(name, value):
-    pass
-    return("<p>send launch confirmations<p>")
-
-@app.route("/hold")
-def hold_countdown():
-    pass
-    return("<p>hold the launch countdown<p>")
-
-@app.route("/continue")
-def continue_countdown():
-    pass
-    return("<p>stop holding and continue the launch countdown<p>")
+@app.route("/acceptmessage/<uuid>", methods = ["GET","POST"])
+def GetMsgSendMsg(uuid):
+    content = request.get_json()
+    print(f"encrypted data to send: {content['ciphertext']}")
+    
+    sendMsg(content['ciphertext'], content['port'])
+    return f"message sent: {uuid}"
 
 
+if __name__ == "__main__":
+    #context = ('local.crt', 'local.key')
+    app.run(host=HOST, port=5000, debug=True, ssl_context="adhoc")
