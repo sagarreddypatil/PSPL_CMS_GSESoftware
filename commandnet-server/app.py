@@ -3,13 +3,24 @@ import os
 import time
 import request, socket
 
-HOST = '127.0.0.1'
+# hardcoded locations - please change before launch
+EMU_IP = '127.0.0.1'
+UFC_IP = '127.0.0.1'
+LFC_IP = '127.0.0.1'
+PORT = 1234 # commandnet port
 
 app = Flask(__name__)
 
-def sendMsg(ciphertext, PORT):
+def sendMsg(ciphertext, device):
+    if device == "EMU":
+        host = EMU_IP
+    if device == "UFC":
+        host = UFC_IP
+    if device == "LFC":
+        host = LFC_IP
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((HOST, PORT))
+        s.bind((host, PORT))
         s.listen(1)
         print('waiting for connection')
         conn, addr = s.accept()
@@ -31,12 +42,12 @@ def hello(name=None):
     return f"<p>Hello, {name}!</p>"
 
 @app.route("/acceptmessage/<uuid>", methods = ["GET","POST"])
-def GetMsgSendMsg(uuid):
+def GetMsgSendMsg():
     content = request.get_json()
     print(f"encrypted data to send: {content['ciphertext']}")
     
-    sendMsg(content['ciphertext'], content['port'])
-    return f"message sent: {uuid}"
+    sendMsg(content['ciphertext'], content["device"])
+    return f"message sent!"
 
 
 if __name__ == "__main__":
