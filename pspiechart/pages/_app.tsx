@@ -20,18 +20,9 @@ export default function App({ Component, pageProps }: AppProps) {
     console.log("pressureTransducer", data);
   });
 
-  useEffect(() => {
-    var loc = window.location, new_uri;
-    if (loc.protocol === "https:") {
-      new_uri = "wss:";
-    } else {
-        new_uri = "ws:";
-    }
-    new_uri += "//" + loc.host;
-    const ws = new WebSocket(new_uri + "/data");
-    ws.binaryType = "arraybuffer";
+  useEffect(() => { // TODO: Make this url an environment variable
+    const ws = new WebSocket(process.env.SENSORNET_URL + "/data");
     websocketHandler.connect(ws);
-
   }, [websocketHandler]);
 
   return (

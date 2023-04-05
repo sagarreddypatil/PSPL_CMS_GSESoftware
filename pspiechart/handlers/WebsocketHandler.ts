@@ -1,5 +1,4 @@
-import { encode, decodeMulti } from "@msgpack/msgpack";
-import { Message } from "../common/Message";
+const reviver = (key:any, value:any) => (key === "timestamp" || key === "counter" ? BigInt(value) : value);
 
 export class WebsocketHandler {
     private ws: WebSocket | undefined;
@@ -14,12 +13,7 @@ export class WebsocketHandler {
     public connect(ws: WebSocket) {
         this.ws = ws;
         this.ws.onmessage = (event) => {
-            for (const msg of decodeMulti(event.data) as Iterable<Message>) {
-                console.log(msg);
-                if (this.callbacks[msg.channel]) {
-                    this.callbacks[msg.channel](msg.data);
-                }
-            }
+            console.log(JSON.parse(event.data,reviver));
         };
     }
 
