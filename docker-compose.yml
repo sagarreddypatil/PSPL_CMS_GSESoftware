@@ -1,17 +1,28 @@
 version: "3"
 
 services:
-  # influxdb:
-  #   image: influxdb:latest
-  #   ports:
-  #     - 8086:8086
-  #   volumes:
-  #     - ./data/influxdb:/var/lib/influxdb
-  #   restart: always
-
-  # telegraf:
-  #   image: telegraf:latest
-  #   volumes: ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
-  #   depends_on:
-  #     - influxdb
-  #   restart: always
+  influxdb:
+    image: influxdb:latest
+    ports:
+      - 8086:8086
+    volumes:
+      - ./data/influxdb:/var/lib/influxdb
+    restart: always
+  pspiechart:
+    volumes: 
+      - /tmp/pspiechart/:/tmp/
+    build:
+      context: pspiechart
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+  sensornet-server:
+    build:
+      context: pspiechart
+      dockerfile: Dockerfile
