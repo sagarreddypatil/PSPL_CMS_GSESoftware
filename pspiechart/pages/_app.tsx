@@ -13,26 +13,31 @@ import { WebsocketHandler } from "../handlers/WebsocketHandler";
 sizeMe.noPlaceholders = true;
 
 export default function App({ Component, pageProps }: AppProps) {
-  const [fullscreen, setFullscreen] = useState(false);    
-  const [websocketHandler, setWebSocketHandler] = useState(new WebsocketHandler());
+  const [fullscreen, setFullscreen] = useState(false);
+  // const [websocketHandler, setWebSocketHandler] = useState(new WebsocketHandler());
 
-  websocketHandler.on("pressureTransducer", (data) => {
-    console.log("pressureTransducer", data);
-  });
+  // websocketHandler.on("pressureTransducer", (data) => {
+  //   console.log("pressureTransducer", data);
+  // });
 
-  useEffect(() => { // TODO: Make this url an environment variable
-    const ws = new WebSocket(process.env.SENSORNET_URL + "/data");
-    websocketHandler.connect(ws);
-  }, [websocketHandler]);
+  // useEffect(() => { // TODO: Make this url an environment variable
+  //   const ws = new WebSocket(process.env.SENSORNET_URL + "/data");
+  //   websocketHandler.connect(ws);
+  // }, [websocketHandler]);
 
   return (
     <Layout>
-      <WebSocketContext.Provider value={{websocket: websocketHandler, setWebSocket: setWebSocketHandler}}>
+      {/* <WebSocketContext.Provider
+        value={{
+          websocket: websocketHandler,
+          setWebSocket: setWebSocketHandler,
+        }}
+      > */}
       <FullscreenContext.Provider value={{ fullscreen, setFullscreen }}>
         {fullscreen ? null : <Sidebar />}
         <Component {...pageProps} />
       </FullscreenContext.Provider>
-      </WebSocketContext.Provider>
+      {/* </WebSocketContext.Provider> */}
     </Layout>
   );
 
