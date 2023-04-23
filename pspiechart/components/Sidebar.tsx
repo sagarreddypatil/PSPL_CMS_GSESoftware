@@ -86,6 +86,11 @@ export default function Sidebar() {
           text={"SensorNet"}
           active={router.route === "/config/sensornet"}
         />
+        <NavItem
+          href={`/config/commandnet`}
+          text={"CommandNet"}
+          active={router.route === "/config/commandnet"}
+        />
       </ul>
 
       <ul className="nav nav-pills flex-column mb-4">
