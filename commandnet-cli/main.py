@@ -3,6 +3,7 @@ from lark import Lark, Transformer, v_args, UnexpectedInput
 from enum import Enum
 import msgpack
 import socket
+import readline
 
 
 class FirmwareError(Exception):
@@ -70,7 +71,10 @@ def cmdnet_send(cmd):
             break
         recvd += data
 
+    print(recvd)
+
     resp = msgpack.unpackb(recvd)
+    print(resp)
     sock.close()
 
     if resp[0] == ResponseType.CMD_NOTFOUND.value:
@@ -127,10 +131,12 @@ class Shell(Transformer):
             raise UnexpectedInput("Invalid expression")
 
 
+readline.parse_and_bind("tab: complete")
+
 parser = Lark(grammar, parser="lalr", transformer=Shell())
 while True:
     try:
-        cmd = input("cms>")
+        cmd = input("cmd>")
         resp = parser.parse(cmd)
         if resp is None:
             break
