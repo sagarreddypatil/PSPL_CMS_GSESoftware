@@ -28,10 +28,12 @@ class ResponseType(Enum):
 # Shell grammar
 grammar = """?start: cmd
 ?cmd: "exec" WORD -> exec
-    | "all" "cmds" -> all_cmds
+    | "lscmd" -> all_cmds
     | "set" WORD eval -> set_var
     | "get" WORD -> get_var
-    | "all" "vars" -> all_vars
+    | "lsvar" -> all_vars
+    | "clear" -> clear
+    | "ls" -> ls
     | "exit" -> exit
 eval: NUMBER
     | "`" /[^`]+/ "`" -> eval
@@ -117,6 +119,12 @@ class Shell(Transformer):
 
         ret = "\n".join([f"{i[0]}:\t\t{i[1]}" for i in resp[1]])
         return ret
+
+    def ls(self):
+        return "\t".join(["exec", "all cmds", "set", "get", "all", "clear", "all vars", "exit"])
+
+    def clear(self):
+        return "\x1b[2J\x1b[H"
 
     def exit(self):
         return None
