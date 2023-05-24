@@ -1,60 +1,189 @@
-from .internal import RequestType, cmdnet_send
+from .internal import RequestType, ResponseType, cmdnet_send
 
-class Command:
-    def __init__(self, name: str):
-        self.name = name
-    
-    def call(self):
-        resp = cmdnet_send([RequestType.EXEC_CMD.value, self.name])
 
-    def __call__(self):
-        return self.call()
+class DeviceContext:
+    """
+    Represents a CommandNet device. Main object to be created for each device
 
-class Variable:
-    def __init__(self, name: str, default_value: int):
-        self.name = name
-        self.old: int = None
-        self.default_value = default_value
-    
-    def get(self) -> int:
-        resp = cmdnet_send([RequestType.GET_VAR.value, self.name])
-        return resp[1]
-    
-    def set(self, value: int):
-        resp = cmdnet_send([RequestType.SET_VAR.value, self.name, value])
-        self.old = resp[1]
+    Attributes
+    ----------
+    host : str
+        Hostname or IP address of the device
+    port : str
+        Port of the device
+    instructions : dict[str, Instruction]
+        Dictionary of instructions, indexed by name
+    variables : dict[str, Variable]
+        Dictionary of variables, indexed by name
+    """
 
-    def reset(self):
-        self.set(self.default_value)
-
-    @property
-    def value(self) -> int:
-        return self.get()
-    
-    @value.setter
-    def value(self, value: int):
-        self.set(value)
-
-class CommandNet:
     def __init__(self, host: str, port: str):
+        """
+        Initializes the device context given host and port
+
+        Parameters
+        ----------
+        host : str
+            Hostname or IP address of the device
+        port : str
+            Port of the device
+        """
         self.host = host
         self.port = port
 
-        self.commands: Dict[str, Command] = {}
-        self.variables: Dict[str, Variable] = {}
+        self.instructions: dict[str, Instruction] = {}
+        self.variables: dict[str, Variable] = {}
 
     def connect(self):
         """
-        Connect to the host and populate commands and variables
+        Connect to the host and populate instructions and variables
         """
 
-        resp = cmdnet_send([RequestType.ALL_CMDS.value])
+        resp = self.send([RequestType.ALL_CMDS.value])
         for cmd in resp[1]:
-            self.commands[cmd] = Command(cmd)
+            self.instructions[cmd] = Instruction(self, cmd)
 
-        resp = cmdnet_send([RequestType.ALL_VARS.value])
+        resp = self.send([RequestType.ALL_VARS.value])
         for var in resp[1]:
             name = var[0]
             value = var[1]
 
-            self.variables[name] = newvar = Variable(name, value)
+            self.variables[name] = Variable(self, name, value)
+
+    def send(self, req: list) -> list:
+        """
+        Send an arbitrary msgpack list to the device.
+        Does not perform any validation on the request.
+        Exception is thrown for failed responses.
+
+        Not to be used directly, use functions on instructions and variables instead
+
+        Parameters
+        ----------
+        req : list
+            Request to send. Serialized to msgpack
+        """
+        return cmdnet_send(self.host, self.port, req)
+
+
+class Instruction:
+    """
+    Represents a CommandNet instruction. Constructor should never be called directly,
+    access through DeviceContext.instructions instead.
+
+    Attributes
+    ----------
+    name : str
+        Instruction name, used to call the instruction on the device
+    """
+
+    def __init__(self, context: DeviceContext, name: str):
+        """
+        Initializes the instruction given device context and name
+
+        Parameters
+        ----------
+        deviceContext : DeviceContext
+            Device context
+        name : str
+            Instruction name
+        """
+        self.context = context
+        self.name = name
+
+    def call(self) -> ResponseType:
+        """
+        Calls the instruction on the device
+
+        Returns
+        -------
+        ResponseType
+            Enum response code
+        """
+
+        resp = self.context.send([RequestType.EXEC_CMD.value, self.name])
+        return resp[0]
+
+    def __call__(self) -> ResponseType:
+        """
+        Calls the instruction on the device
+
+        Returns
+        -------
+        ResponseType
+            Enum response code
+        """
+        return self.call()
+
+
+class Variable:
+    """
+    Represents a CommandNet variable. Constructor should never be called directly,
+    access through DeviceContext.variables instead.
+
+    Attributes
+    ----------
+    name : str
+        Variable name, same as internally on the device
+    old: int
+        Previous value of the variable after a set. None if not set yet
+    init_value: int
+        Initial value of the variable, used for reset
+    """
+
+    def __init__(self, context: DeviceContext, name: str, init_value: int):
+        self.context = context
+        self.name = name
+        self.old: int = None
+        self.init_value = init_value
+
+    def get(self) -> int:
+        """
+        Gets the value of the variable from the device
+
+        Returns
+        -------
+        int
+            Value of the variable
+        """
+        resp = cmdnet_send([RequestType.GET_VAR.value, self.name])
+        return resp[1]
+
+    def set(self, value: int):
+        """
+        Sets the value of the variable on the device
+
+        Parameters
+        ----------
+        value : int
+            Value to set the variable to
+        """
+        resp = cmdnet_send([RequestType.SET_VAR.value, self.name, value])
+        self.old = resp[1]
+
+    def reset(self):
+        """
+        Resets the variable to its initial value
+        """
+        self.set(self.init_value)
+
+    @property
+    def value(self) -> int:
+        """
+        Gets the value of the variable from the device, assignment sets the value
+
+        Parameters
+        ----------
+        value : int
+            Value to set the variable to
+
+        Returns
+        -------
+        int
+            Value of the variable
+        """
+        return self.get()
+
+    @value.setter
+    def value(self, value: int):
+        self.set(value)

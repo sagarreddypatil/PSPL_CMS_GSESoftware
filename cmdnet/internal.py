@@ -1,14 +1,26 @@
+from enum import Enum
+import msgpack
+import socket
+import time
+
+TIMEOUT = 1
+
+
 class FirmwareError(Exception):
     pass
 
-class NotFoundError(FirmwarweError):
+
+class NotFoundError(FirmwareError):
     pass
+
 
 class InvalidError(FirmwareError):
     pass
 
+
 class InternalError(FirmwareError):
     pass
+
 
 class RequestType(Enum):
     EXEC_CMD = 1
@@ -24,18 +36,19 @@ class ResponseType(Enum):
     CMD_INVALID = -2
     CMD_ERROR = -3
 
-def cmdnet_send(cmd):
+
+def cmdnet_send(host: str, port: int, cmd: list) -> list:
     start = time.time()
     while True:
-        if time.time() - start > timeout:
+        if time.time() - start > TIMEOUT:
             raise Exception("Timeout")
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(timeout)
+            sock.settimeout(TIMEOUT)
             sock.connect((host, port))
             sock.settimeout(None)
             break
-        except:
+        except:  # noqa: E722
             continue
 
     message = msgpack.packb(cmd)
