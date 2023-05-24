@@ -38,7 +38,7 @@ def get_instructions(device):
         return "Device not found", 404
 
 
-@app.route("/devices/<device>/instructions/<instruction>")
+@app.route("/devices/<device>/instructions/<instruction>/call")
 def call_instruction(device, instruction):
     try:
         device_obj = devices[device]
