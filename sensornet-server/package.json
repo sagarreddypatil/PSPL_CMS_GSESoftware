@@ -18,7 +18,7 @@
         "better-sqlite3": "^8.2.0",
         "binary-parser": "^2.2.1",
         "dotenv": "^16.0.3",
-        "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.20.0"
+        "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.25.0"
     },
     "devDependencies": {
         "nodemon": "^2.0.21",

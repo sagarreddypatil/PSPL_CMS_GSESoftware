@@ -70,11 +70,7 @@ const webServer = App()
         console.log("Websocket listening on port 5000");
     });
 
-let count = 0;
-setInterval(() => {
-    console.log(Intl.NumberFormat('en-US').format(count) + " packets per second");
-    count = 0;
-}, 1000);
+
 
 const arrayParser = new Parser().array("packets", {
     type: packetParser,
@@ -94,7 +90,6 @@ server.on("message", (msg) => {
                     .intField("data", packet.data)
                     .timestamp(packet.timestamp);
                 writer.writePoint(point);
-                count++;
             })
         );
     } catch (e) {

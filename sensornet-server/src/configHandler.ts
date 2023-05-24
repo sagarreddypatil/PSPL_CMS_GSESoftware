@@ -18,7 +18,7 @@ const getConfig = (res: HttpResponse, req: HttpRequest) => {
         res.write("id,name,unit,slope,gain\n");
         res.end(
             rows
-                .map((row) => {
+                .map((row: any) => {
                     return `${row.id},${row.name},${row.unit},${row.slope},${row.gain}`;
                 })
                 .join("\n")
@@ -31,9 +31,10 @@ const getConfig = (res: HttpResponse, req: HttpRequest) => {
 
 const postConfig = (res: HttpResponse, req: HttpRequest) => {
     if (req.getHeader("content-type") !== "application/json") {
-        return res
-            .writeStatus("400 Bad Request")
-            .end(JSON.stringify({ error: "Body must be JSON" }));
+        res.writeStatus("400 Bad Request").end(
+            JSON.stringify({ error: "Body must be JSON" })
+        );
+        return;
     }
     let buffers: Buffer[] = [];
     res.onData((ab, isLast) => {
@@ -50,9 +51,10 @@ const postConfig = (res: HttpResponse, req: HttpRequest) => {
                 config.slope === undefined ||
                 config.gain === undefined
             ) {
-                return res
-                    .writeStatus("400 Bad Request")
-                    .end(JSON.stringify({ error: "Invalid config" }));
+                res.writeStatus("400 Bad Request").end(
+                    JSON.stringify({ error: "Invalid config" })
+                );
+                return;
             }
             try {
                 const stmt = configDB.prepare(
@@ -88,9 +90,10 @@ const postConfig = (res: HttpResponse, req: HttpRequest) => {
 
 const putConfig = (res: HttpResponse, req: HttpRequest) => {
     if (req.getHeader("content-type") !== "application/json") {
-        return res
-            .writeStatus("400 Bad Request")
-            .end(JSON.stringify({ error: "Body must be JSON" }));
+        res.writeStatus("400 Bad Request").end(
+            JSON.stringify({ error: "Body must be JSON" })
+        );
+        return;
     }
     let buffers: Buffer[] = [];
     res.onData((ab, isLast) => {
@@ -107,9 +110,10 @@ const putConfig = (res: HttpResponse, req: HttpRequest) => {
                 config.slope === undefined ||
                 config.gain === undefined
             ) {
-                return res
-                    .writeStatus("400 Bad Request")
-                    .end(JSON.stringify({ error: "Invalid config" }));
+                res.writeStatus("400 Bad Request").end(
+                    JSON.stringify({ error: "Invalid config" })
+                );
+                return;
             }
             try {
                 const stmt = configDB.prepare(
@@ -141,9 +145,10 @@ const putConfig = (res: HttpResponse, req: HttpRequest) => {
 
 const deleteConfig = (res: HttpResponse, req: HttpRequest) => {
     if (req.getHeader("content-type") !== "application/json") {
-        return res
-            .writeStatus("400 Bad Request")
-            .end(JSON.stringify({ error: "Body must be JSON" }));
+        res.writeStatus("400 Bad Request").end(
+            JSON.stringify({ error: "Body must be JSON" })
+        );
+        return;
     }
     let buffers: Buffer[] = [];
     res.onData((ab, isLast) => {
@@ -154,9 +159,10 @@ const deleteConfig = (res: HttpResponse, req: HttpRequest) => {
             const body = Buffer.concat(buffers).toString();
             const config = JSON.parse(body);
             if (config.id === undefined) {
-                return res
-                    .writeStatus("400 Bad Request")
-                    .end(JSON.stringify({ error: "Invalid config" }));
+                res.writeStatus("400 Bad Request").end(
+                    JSON.stringify({ error: "Invalid config" })
+                );
+                return;
             }
             try {
                 const stmt = configDB.prepare(
@@ -183,9 +189,10 @@ const deleteConfig = (res: HttpResponse, req: HttpRequest) => {
 const uploadConfig = (res: HttpResponse, req: HttpRequest) => {
     const contentType = req.getHeader("content-type");
     if (!contentType.startsWith("multipart/form-data")) {
-        return res
-            .writeStatus("400 Bad Request")
-            .end(JSON.stringify({ error: "Expected File Upload" }));
+        res.writeStatus("400 Bad Request").end(
+            JSON.stringify({ error: "Expected File Upload" })
+        );
+        return;
     }
     let boundary = "--";
 
@@ -210,7 +217,8 @@ const uploadConfig = (res: HttpResponse, req: HttpRequest) => {
             const boundaryIndex = data.indexOf(boundary);
             if (boundaryIndex === -1) {
                 console.log("No boundary found");
-                return res.writeStatus("400 Bad Request").end();
+                res.writeStatus("400 Bad Request").end();
+                return;
             }
             const header = data.subarray(boundaryIndex);
             const headerEnd = header.indexOf("\r\n\r\n");
@@ -221,11 +229,13 @@ const uploadConfig = (res: HttpResponse, req: HttpRequest) => {
 
             if (!parts[0].startsWith(boundary)) {
                 console.log("No boundary found");
-                return res.writeStatus("400 Bad Request").end();
+                res.writeStatus("400 Bad Request").end();
+                return;
             }
             if (!parts[1].startsWith("Content-Disposition: form-data")) {
                 console.log("No content-disposition found");
-                return res.writeStatus("400 Bad Request").end();
+                res.writeStatus("400 Bad Request").end();
+                return;
             }
             parts[1].split("; ").forEach((part) => {
                 const [key, value] = part.split("=");
@@ -238,7 +248,8 @@ const uploadConfig = (res: HttpResponse, req: HttpRequest) => {
             });
             if (!parts[2].startsWith("Content-Type: text/csv")) {
                 console.log("No content-type found");
-                return res.writeStatus("400 Bad Request").end();
+                res.writeStatus("400 Bad Request").end();
+                return;
             }
             parsedForm = true;
             fileStart = boundaryIndex + headerEnd + 4;
@@ -247,7 +258,7 @@ const uploadConfig = (res: HttpResponse, req: HttpRequest) => {
                 fileEnd = data.length;
             }
             console.log(fileStart, fileEnd);
-        }        
+        }
 
         if (isLast) {
             res.writeStatus("200 OK").end();
