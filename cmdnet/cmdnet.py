@@ -146,7 +146,7 @@ class Variable:
         int
             Value of the variable
         """
-        resp = cmdnet_send([RequestType.GET_VAR.value, self.name])
+        resp = self.context.send([RequestType.GET_VAR.value, self.name])
         return resp[1]
 
     def set(self, value: int):
@@ -158,7 +158,7 @@ class Variable:
         value : int
             Value to set the variable to
         """
-        resp = cmdnet_send([RequestType.SET_VAR.value, self.name, value])
+        resp = self.context.send([RequestType.SET_VAR.value, self.name, value])
         self.old = resp[1]
 
     def reset(self):
