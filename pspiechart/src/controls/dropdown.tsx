@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 interface DropdownProps {
+  name: React.ReactNode;
   children: React.ReactNode;
   right?: boolean;
 }
@@ -19,7 +20,7 @@ export function Dropdown(props: DropdownProps) {
           onFocus={() => setOpen(true)}
           onBlur={() => setOpen(false)}
         >
-          Create
+          {props.name}
         </button>
       </div>
       <div
