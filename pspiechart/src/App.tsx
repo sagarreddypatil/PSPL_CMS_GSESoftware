@@ -8,7 +8,8 @@ import { useWindowWidth } from "@react-hook/window-size";
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
-  const [rigthPanelWidthPercent, setRightPanelWidthPercent] = useState(0);
+
+  const [rigthPanelWidthPercent, setRightPanelWidthPercent] = useState(0.8);
   const windowWidth = useWindowWidth({ wait: 0 });
   const [rigthPanelWidth, setRightPanelWidth] = useState(0);
 
@@ -22,11 +23,7 @@ function App() {
 
   return (
     <>
-      <VertLayout
-        id="main-layout"
-        onCollapse={setCollapsed}
-        onResize={onResize}
-      >
+      <VertLayout onCollapse={setCollapsed} onResize={onResize}>
         <Sidebar />
         <div className="h-full flex flex-col">
           <nav className="bg-moondust dark:bg-night-sky h-14">
@@ -48,7 +45,7 @@ function App() {
               </div>
             </div>
           </nav>
-          <div className="flex-1">
+          <div className="flex-1 overflow-auto">
             <GridLayout width={rigthPanelWidth} />
           </div>
         </div>
