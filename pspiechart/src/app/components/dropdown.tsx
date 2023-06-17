@@ -4,6 +4,7 @@ import { useState } from "react";
 
 interface DropdownProps {
   children: React.ReactNode;
+  right?: boolean;
 }
 
 export function Dropdown(props: DropdownProps) {
@@ -14,7 +15,7 @@ export function Dropdown(props: DropdownProps) {
       <div>
         <button
           type="button"
-          className="rounded-md bg-rush px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-rush-dark"
+          className="rounded-sm bg-rush px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-rush-dark"
           onFocus={() => setOpen(true)}
           onBlur={() => setOpen(false)}
         >
@@ -22,7 +23,9 @@ export function Dropdown(props: DropdownProps) {
         </button>
       </div>
       <div
-        className="absolute z-10 mt-2 w-44 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+        className={`absolute ${
+          props.right ? "right-0" : ""
+        } z-10 mt-2 w-44 origin-top-left rounded-sm bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none`}
         hidden={!open}
         role="menu"
         aria-orientation="vertical"
@@ -37,14 +40,20 @@ export function Dropdown(props: DropdownProps) {
   );
 }
 
-export function DropdownItem() {
+interface DropdownItemProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+
+export function DropdownItem(props: DropdownItemProps) {
   return (
     <button
-      className="text-gray-700 block w-full text-left px-2 py-1 text-sm hover:bg-gray-100 focus:bg-gray-200"
+      className="text-gray-700 block w-full text-left px-2 py-1 text-sm hover:bg-rush-light hover:font-bold focus:bg-gray-200"
       role="menuitem"
+      onClick={props.onClick}
       tabIndex={-1}
     >
-      Account settings
+      {props.children}
     </button>
   );
 }

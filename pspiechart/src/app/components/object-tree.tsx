@@ -1,8 +1,9 @@
 "use client";
 
-import SortableTree, { TreeItem } from "react-sortable-tree";
-import FileExplorerTheme from "react-sortable-tree-theme-file-explorer";
 import { useState } from "react";
+import SortableTree, { TreeItem } from "@nosferatu500/react-sortable-tree";
+// @ts-ignore
+import FileExplorerTheme from "@nosferatu500/theme-file-explorer"; // no types for this lib
 
 export default function ObjectTree() {
   const [treeData, setTreeData] = useState<Array<TreeItem>>([
