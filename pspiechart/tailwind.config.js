@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+
 const Color = require("color");
 
 let pspColors = {
@@ -24,18 +25,19 @@ Object.keys(pspColors).forEach((color) => {
   };
 });
 
-module.exports = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+export default {
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
   darkMode: "class",
   theme: {
+    fontFamily: {
+      sans: ["IBM Plex Mono", "sans-serif"],
+      mono: ["IBM Plex Mono", "monospace"],
+    },
     extend: {
       colors: {
         ...pspColors,
       },
     },
   },
+  plugins: [],
 };
