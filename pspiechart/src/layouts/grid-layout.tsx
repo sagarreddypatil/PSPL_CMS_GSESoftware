@@ -1,18 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Responsive, Layout, WidthProvider } from "react-grid-layout";
+import { Responsive, Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { FiArrowDownRight } from "react-icons/fi";
-
-const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const COLS = 12;
 const BASE_WIDTH = 3;
 const ROW_HEIGHT = 34;
 
-export default function GridLayout() {
+interface GridLayoutProps {
+  width: number;
+}
+
+export default function GridLayout(props: GridLayoutProps) {
   const [layout, setLayout] = useState<Layout[]>([]);
 
   const genSmallLayout = () => {
@@ -35,7 +37,7 @@ export default function GridLayout() {
   };
 
   return (
-    <ResponsiveGridLayout
+    <Responsive
       className="layout"
       layouts={layouts}
       isResizable={true}
@@ -43,6 +45,7 @@ export default function GridLayout() {
       cols={{ lg: COLS, xxs: BASE_WIDTH }}
       rowHeight={ROW_HEIGHT}
       onLayoutChange={(layout, layouts) => setLayout(layouts.lg)}
+      width={props.width}
     >
       <div key="1" className="border-2 border-pink-500 ">
         1
@@ -53,6 +56,6 @@ export default function GridLayout() {
       <div key="3" className="border-2 border-pink-500">
         3
       </div>
-    </ResponsiveGridLayout>
+    </Responsive>
   );
 }

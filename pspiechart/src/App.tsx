@@ -4,16 +4,29 @@ import { FiMoon } from "react-icons/fi";
 import GridLayout from "./layouts/grid-layout";
 import Sidebar from "./components/sidebar";
 import { useEffect, useState } from "react";
+import { useWindowWidth } from "@react-hook/window-size";
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
+  const [rigthPanelWidthPercent, setRightPanelWidthPercent] = useState(0);
+  const windowWidth = useWindowWidth({ wait: 0 });
+  const [rigthPanelWidth, setRightPanelWidth] = useState(0);
+
   useEffect(() => {
-    console.log(collapsed);
-  }, [collapsed]);
+    setRightPanelWidth(windowWidth * rigthPanelWidthPercent);
+  }, [windowWidth, rigthPanelWidthPercent]);
+
+  const onResize = (size: number) => {
+    setRightPanelWidthPercent(size * 0.01);
+  };
 
   return (
     <>
-      <VertLayout onCollapse={setCollapsed}>
+      <VertLayout
+        id="main-layout"
+        onCollapse={setCollapsed}
+        onResize={onResize}
+      >
         <Sidebar />
         <div className="h-full flex flex-col">
           <nav className="bg-moondust dark:bg-night-sky h-14">
@@ -36,7 +49,7 @@ function App() {
             </div>
           </nav>
           <div className="flex-1">
-            <GridLayout />
+            <GridLayout width={rigthPanelWidth} />
           </div>
         </div>
       </VertLayout>
