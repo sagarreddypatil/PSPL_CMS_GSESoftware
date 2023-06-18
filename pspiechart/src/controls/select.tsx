@@ -11,7 +11,7 @@ export default function Select(props: SelectProps) {
   const id = useId();
 
   return (
-    <>
+    <div className="flex">
       <input type="checkbox" className="peer hidden" id={id} />
       <label
         htmlFor={id}
@@ -19,6 +19,6 @@ export default function Select(props: SelectProps) {
       >
         {props.children}
       </label>
-    </>
+    </div>
   );
 }

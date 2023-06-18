@@ -5,7 +5,7 @@ export default function Sidebar() {
   return (
     <div className="h-full flex flex-col">
       <nav className="bg-moondust dark:bg-night-sky h-14">
-        <div className="w-full p-2 flex flex-row justify-between">
+        <div className="h-full px-2 flex flex-row justify-between">
           <div className="flex items-center">
             <img src="/PSP-2Color.svg" className="h-10" alt="Logo" />
           </div>

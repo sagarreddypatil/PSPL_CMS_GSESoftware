@@ -1,3 +1,4 @@
+import GlobalContextProvider, { GlobalContext } from "./global-context";
 import VertLayout from "./layouts/vert-layout";
 import Select from "./controls/select";
 import { FiMoon } from "react-icons/fi";
@@ -5,6 +6,7 @@ import GridLayout from "./layouts/grid-layout";
 import Sidebar from "./components/sidebar";
 import { useEffect, useState } from "react";
 import { useWindowWidth } from "@react-hook/window-size";
+import SensorNetPlugin from "./plugins/sensornet";
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
@@ -22,12 +24,14 @@ function App() {
   };
 
   return (
-    <>
+    <GlobalContextProvider>
+      <SensorNetPlugin />
+
       <VertLayout onCollapse={setCollapsed} onResize={onResize}>
         <Sidebar />
         <div className="h-full flex flex-col">
           <nav className="bg-moondust dark:bg-night-sky h-14">
-            <div className="w-full p-2 flex flex-row justify-end">
+            <div className="px-2 flex h-full flex-wrap justify-end items-center">
               {collapsed ? (
                 <div className="flex items-center me-auto">
                   <img src="/PSP-2Color.svg" className="h-10" alt="Logo" />
@@ -35,14 +39,10 @@ function App() {
               ) : (
                 <></>
               )}
-              <div className="flex items-center">
-                <Select>Edit Mode</Select>
-              </div>
-              <div className="flex items-center ml-2">
-                <Select>
-                  <FiMoon />
-                </Select>
-              </div>
+              <Select className="mr-2">Edit Mode</Select>
+              <Select>
+                <FiMoon />
+              </Select>
             </div>
           </nav>
           <div className="flex-1 overflow-auto">
@@ -50,7 +50,7 @@ function App() {
           </div>
         </div>
       </VertLayout>
-    </>
+    </GlobalContextProvider>
   );
 }
 

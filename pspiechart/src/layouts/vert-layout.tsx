@@ -1,12 +1,7 @@
 "use client";
 
-import { Children, useEffect, useId, useRef } from "react";
-import {
-  ImperativePanelHandle,
-  Panel,
-  PanelGroup,
-  PanelResizeHandle,
-} from "react-resizable-panels";
+import { Children } from "react";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 interface VertLayoutProps {
   children: React.ReactNode;

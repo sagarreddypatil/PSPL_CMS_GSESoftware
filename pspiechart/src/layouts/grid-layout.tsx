@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Responsive, Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -8,7 +8,7 @@ import { FiArrowDownRight } from "react-icons/fi";
 
 const COLS = 12;
 const BASE_WIDTH = 3;
-const ROW_HEIGHT = 34;
+const ROW_HEIGHT = 33;
 
 interface GridLayoutProps {
   width: number;
@@ -35,6 +35,10 @@ export default function GridLayout(props: GridLayoutProps) {
     lg: layout,
     xxs: genSmallLayout(),
   };
+
+  useEffect(() => {
+    console.log(layout);
+  }, [layout]);
 
   return (
     <Responsive
