@@ -1,5 +1,5 @@
 import { Dropdown, DropdownItem } from "../controls/dropdown";
-import ObjectTree from "../controls/object-tree";
+import ObjectTree from "./object-tree";
 
 export default function Sidebar() {
   return (

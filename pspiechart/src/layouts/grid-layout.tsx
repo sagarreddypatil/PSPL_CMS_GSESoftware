@@ -36,10 +36,6 @@ export default function GridLayout(props: GridLayoutProps) {
     xxs: genSmallLayout(),
   };
 
-  useEffect(() => {
-    console.log(layout);
-  }, [layout]);
-
   return (
     <Responsive
       className="layout"

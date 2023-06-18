@@ -1,4 +1,4 @@
-import { GlobalContext, IDataPoint, genSubId } from "../global-context";
+import { IOContext, IDataPoint, genSubId } from "../io-context";
 import { useContext, useEffect, useRef } from "react";
 import useWebSocket from "react-use-websocket";
 
@@ -17,9 +17,9 @@ interface IServerPoint {
 }
 
 export default function SensorNetPlugin() {
-  const { addDataSource } = useContext(GlobalContext);
+  const { addDataSource } = useContext(IOContext);
   const { sendJsonMessage, lastJsonMessage } = useWebSocket(
-    `ws://${SENSORNET_SERVER}/ws`
+    `ws://${SENSORNET_SERVER}/data`
   );
 
   const listenersRef = useRef<any>({});
@@ -30,7 +30,7 @@ export default function SensorNetPlugin() {
       .then((sources: IServerSource[]) => {
         sources.forEach((source) => {
           const identifier = {
-            namespace: "sensornet",
+            namespace: "SensorNet",
             id: source.id,
             name: source.name,
           };

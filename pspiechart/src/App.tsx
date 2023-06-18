@@ -1,4 +1,4 @@
-import GlobalContextProvider, { GlobalContext } from "./global-context";
+import IOContextProvider, { IOContext } from "./io-context";
 import VertLayout from "./layouts/vert-layout";
 import Select from "./controls/select";
 import { FiMoon } from "react-icons/fi";
@@ -24,7 +24,7 @@ function App() {
   };
 
   return (
-    <GlobalContextProvider>
+    <IOContextProvider>
       <SensorNetPlugin />
 
       <VertLayout onCollapse={setCollapsed} onResize={onResize}>
@@ -50,7 +50,7 @@ function App() {
           </div>
         </div>
       </VertLayout>
-    </GlobalContextProvider>
+    </IOContextProvider>
   );
 }
 

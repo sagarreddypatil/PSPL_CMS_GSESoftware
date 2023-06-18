@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 
 let nextSubId = 0;
 export function genSubId() {
@@ -9,6 +9,17 @@ export interface Identifier {
   namespace: string;
   id: string;
   name: string;
+}
+
+export function filterObjectList<T extends { identifier: Identifier }>(
+  objs: T[],
+  filter: Identifier
+) {
+  return objs.filter(
+    (obj) =>
+      obj.identifier.id !== filter.id ||
+      obj.identifier.namespace !== filter.namespace
+  );
 }
 
 export interface IDataPoint {
@@ -34,74 +45,66 @@ interface IRemoteCall {
   call: () => Promise<boolean>; // returns success
 }
 
-export interface IGlobalContext {
+export interface IIOContext {
   dataSources: IDataSource[];
   addDataSource: (dataSource: IDataSource) => void;
-  removeDataSource: (identifier: Identifier) => void;
 
   configOptions: IConfigOption<any>[];
   addConfigOption: (configOption: IConfigOption<any>) => void;
-  removeConfigOption: (identifier: Identifier) => void;
 
   remoteCalls: IRemoteCall[];
   addRemoteCall: (remoteCall: IRemoteCall) => void;
-  removeRemoteCall: (identifier: Identifier) => void;
 }
 
-export const GlobalContext = createContext<IGlobalContext>({
+export const IOContext = createContext<IIOContext>({
   dataSources: [],
   addDataSource: () => {},
-  removeDataSource: () => {},
   configOptions: [],
   addConfigOption: () => {},
-  removeConfigOption: () => {},
   remoteCalls: [],
   addRemoteCall: () => {},
-  removeRemoteCall: () => {},
 });
 
-interface GlobalContextProviderProps {
+interface IOContextProviderProps {
   children: React.ReactNode;
 }
 
-export default function GlobalContextProvider({
+export default function IOContextProvider({
   children,
-}: GlobalContextProviderProps) {
+}: IOContextProviderProps) {
   const [dataSources, setDataSources] = useState<IDataSource[]>([]);
-  const addDataSource = (dataSource: IDataSource) =>
-    setDataSources([...dataSources, dataSource]);
-  const removeDataSource = (identifier: Identifier) =>
-    setDataSources(dataSources.filter((ds) => ds.identifier !== identifier));
+  const addDataSource = (newSource: IDataSource) =>
+    setDataSources((dataSources) => {
+      const filtered = filterObjectList(dataSources, newSource.identifier);
+      return [...filtered, newSource];
+    });
 
   const [configOptions, setConfigOptions] = useState<IConfigOption<any>[]>([]);
   const addConfigOption = (configOption: IConfigOption<any>) =>
-    setConfigOptions([...configOptions, configOption]);
-  const removeConfigOption = (identifier: Identifier) =>
-    setConfigOptions(
-      configOptions.filter((co) => co.identifier !== identifier)
-    );
+    setConfigOptions((configOptions) => {
+      const filtered = filterObjectList(configOptions, configOption.identifier);
+      return [...filtered, configOption];
+    });
 
   const [remoteCalls, setRemoteCalls] = useState<IRemoteCall[]>([]);
   const addRemoteCall = (remoteCall: IRemoteCall) =>
-    setRemoteCalls([...remoteCalls, remoteCall]);
-  const removeRemoteCall = (identifier: Identifier) =>
-    setRemoteCalls(remoteCalls.filter((rc) => rc.identifier !== identifier));
+    setRemoteCalls((remoteCalls) => {
+      const filtered = filterObjectList(remoteCalls, remoteCall.identifier);
+      return [...filtered, remoteCall];
+    });
 
   return (
-    <GlobalContext.Provider
+    <IOContext.Provider
       value={{
         dataSources,
         addDataSource,
-        removeDataSource,
         configOptions,
         addConfigOption,
-        removeConfigOption,
         remoteCalls,
         addRemoteCall,
-        removeRemoteCall,
       }}
     >
       {children}
-    </GlobalContext.Provider>
+    </IOContext.Provider>
   );
 }
