@@ -30,11 +30,14 @@ export default function UPlotChart(props: UPlotChartProps) {
 
   // container size
   const size = props.size;
+  const actualSize = {
+    width: size.width * window.devicePixelRatio,
+    height: size.height * window.devicePixelRatio,
+  };
 
   useEffect(() => {
     const updatePlot = () => {
-      const desiredPoints =
-        size.width * window.devicePixelRatio * (props.pointsPerPixel ?? 1);
+      const desiredPoints = actualSize.width * (props.pointsPerPixel ?? 1);
       const dt = props.timespan / desiredPoints;
 
       // downsample time data
@@ -45,29 +48,30 @@ export default function UPlotChart(props: UPlotChartProps) {
           buffer.length;
         const numPoints = Math.ceil(Math.max(dt / avgBufferDt, 1));
         while (buffer.length >= numPoints) {
+          console.log(numPoints);
           const section = buffer.splice(0, numPoints);
-
-          // const downsampledTime = section.at(-1)!.time;
+          // const downsampledTime = section.at(-1)!.timestamp.getTime() / 1000;
           // const downsampledValue = section.at(-1)!.value;
-
           const downsampledTime =
-            section.reduce((a, b) => a + b.timestamp.getTime(), 0) / numPoints;
+            section.reduce((a, b) => a + b.timestamp.getTime() / 1000, 0) /
+            numPoints;
           const downsampledValue =
             section.reduce((a, b) => a + b.value, 0) / numPoints;
-
           xRef.current.push(downsampledTime);
           yRef.current.push(downsampledValue);
         }
       }
 
-      // remove old data
-      const currentTimespan =
-        xRef.current[xRef.current.length - 1] - xRef.current[0];
-      const avgDt = currentTimespan / (xRef.current.length + 1);
-      const cutoff = Math.ceil(props.timespan / avgDt);
-
-      xRef.current = xRef.current.slice(-cutoff);
-      yRef.current = yRef.current.slice(-cutoff);
+      // // remove old data
+      let filteredIdx = 0;
+      const latest = xRef.current[xRef.current.length - 1];
+      const startTime = latest - props.timespan;
+      for (const x of xRef.current) {
+        if (x >= startTime) break;
+        filteredIdx++;
+      }
+      xRef.current = xRef.current.slice(filteredIdx);
+      yRef.current = yRef.current.slice(filteredIdx);
 
       plotRef.current?.setData([xRef.current, yRef.current]);
 
@@ -82,8 +86,6 @@ export default function UPlotChart(props: UPlotChartProps) {
   });
 
   useEffect(() => {
-    const colors = ["#daaa00", "#ff0", "#0ff", "#f00", "#0f0"];
-
     const opts: Options = {
       title: props.title ? props.title : "",
       width: 1,
@@ -124,14 +126,7 @@ export default function UPlotChart(props: UPlotChartProps) {
         {},
         {
           label: "Value",
-          // stroke: "#daaa00",
-          // stroke: "#ff0",
-          // stroke: "#0ff",
-          // stroke: "#f00",
-          // stroke: "#0f0",
-          // stroke: "#00f",
-          // random color
-          stroke: colors[Math.floor(Math.random() * colors.length)],
+          stroke: "#daaa00",
           width: 2,
           // fill: "rgba(218,170,0,0.1)",
         },
@@ -149,13 +144,16 @@ export default function UPlotChart(props: UPlotChartProps) {
     };
   }, [props.title]);
 
+  const readyRef = useRef(false);
   useEffect(() => {
+    readyRef.current = false;
     if (props.dataSource) {
       xRef.current.length = 0;
       yRef.current.length = 0;
       timeDownsampleBuffer.current.length = 0;
 
       const addTimeData = (point: IDataPoint) => {
+        if (!readyRef.current) return;
         timeDownsampleBuffer.current.push(point);
       };
 
@@ -163,14 +161,20 @@ export default function UPlotChart(props: UPlotChartProps) {
       yRef.current.length = 0;
       let now = new Date();
       let start = new Date(now.getTime() - props.timespan * 1000);
-      let historicalData = props.dataSource
-        .historical(start, now)
+      let dt =
+        (now.getTime() - start.getTime()) /
+        (1000 * actualSize.width * (props.pointsPerPixel ?? 1));
+      props.dataSource
+        .historical(start, now, dt)
         .then((hist) =>
           hist.forEach((point: IDataPoint) => {
-            xRef.current.push(point.timestamp.getTime());
+            xRef.current.push(point.timestamp.getTime() / 1000);
             yRef.current.push(point.value);
           })
-        );
+        )
+        .then(() => {
+          readyRef.current = true;
+        });
 
       const subId = props.dataSource?.subscribe(addTimeData);
       return () => {

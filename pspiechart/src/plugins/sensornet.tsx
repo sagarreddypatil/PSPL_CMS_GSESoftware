@@ -55,20 +55,20 @@ export default function SensorNetPlugin() {
             delete listenersRef.current[identifier.id][subId];
           };
 
-          const historical = (from: Date, to: Date) => {
+          const historical = (from: Date, to: Date, dt: number) => {
             const fromSeconds = from.getTime() / 1000;
             const toSeconds = to.getTime() / 1000;
 
-            const queryString = `?start=${fromSeconds}&end=${toSeconds}`;
+            const queryString = `?start=${fromSeconds}&end=${toSeconds}&dt=${dt}`;
             return fetch(
-              `http://${SENSORNET_SERVER}/data/${source.id}${queryString}`
+              `http://${SENSORNET_SERVER}/historical/${source.id}${queryString}`
             )
               .then((res) => res.json())
               .then((data) =>
                 data.map(
                   (d: any): IDataPoint => ({
                     timestamp: new Date(d.timestamp / 1000), // us to ms
-                    value: data.value,
+                    value: d.value,
                   })
                 )
               );

@@ -82,6 +82,7 @@ webServer.ws("/data", (ws) => {
 interface HistoricalReq {
   start: number; // seconds
   end: number; // seconds
+  dt: number; // seconds
 }
 
 webServer.get("/historical/:id", async (req, res) => {
@@ -99,7 +100,7 @@ webServer.get("/historical/:id", async (req, res) => {
   const end_ns = BigInt(end_us) * 1000n;
 
   // return at most 10000 points bruh
-  const aggregateWindow_ms = ((options.end - options.start) * 1000) / 10000;
+  const aggregateWindow_ms = options.dt * 1000;
   const aggregateWindow_ns = // nanoseconds because InfluxDB is weird
     BigInt(Math.round(aggregateWindow_ms * 1000)) * 1000n;
 

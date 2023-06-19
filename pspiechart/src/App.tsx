@@ -2,7 +2,7 @@ import IOContextProvider, { IOContext } from "./io-context";
 import VertLayout from "./layouts/vert-layout";
 import Select from "./controls/select";
 import { FiMoon } from "react-icons/fi";
-import GridLayout from "./layouts/grid-layout";
+import { Link, Outlet } from "react-router-dom";
 import Sidebar from "./components/sidebar";
 import { useEffect, useState } from "react";
 import { useWindowWidth } from "@react-hook/window-size";
@@ -46,7 +46,7 @@ function App() {
             </div>
           </nav>
           <div className="flex-1 overflow-auto">
-            <GridLayout width={rigthPanelWidth} />
+            <Outlet />
           </div>
         </div>
       </VertLayout>

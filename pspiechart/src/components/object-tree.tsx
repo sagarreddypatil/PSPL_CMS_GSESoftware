@@ -8,12 +8,15 @@ import {
   ControlledTreeEnvironment,
   TreeItem,
 } from "react-complex-tree";
-import "react-complex-tree/lib/style-modern.css";
+import { useNavigate } from "react-router-dom";
+import "react-complex-tree/lib/style.css";
+import "./object-tree.css";
 
 export default function ObjectTree() {
   const [focusedItem, setFocusedItem] = useState<TreeItemIndex>();
   const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>([]);
   const [selectedItems, setSelectedItems] = useState<TreeItemIndex[]>([]);
+  const navigate = useNavigate();
 
   const { dataSources } = useContext(IOContext);
   let groupedSources: { [namespace: string]: IDataSource[] } = {};
@@ -51,6 +54,13 @@ export default function ObjectTree() {
     }
   );
 
+  const openItem = (item: TreeItem<any>) => {
+    const identifier = (item.index as string).split(":");
+    if (!identifier[1]) return;
+    const route = `/${identifier[0]}/${identifier[1]}`;
+    navigate(route);
+  };
+
   return (
     <ControlledTreeEnvironment
       items={items}
@@ -62,6 +72,7 @@ export default function ObjectTree() {
           selectedItems,
         },
       }}
+      onPrimaryAction={openItem}
       onFocusItem={(item) => setFocusedItem(item.index)}
       onExpandItem={(item) => setExpandedItems([...expandedItems, item.index])}
       onCollapseItem={(item) =>

@@ -5,15 +5,15 @@ export function genSubId() {
   return (nextSubId++).toString();
 }
 
-export interface Identifier {
+export type IdentifierType = {
   namespace: string;
   id: string;
-  name: string;
-}
+  name?: string;
+};
 
-export function filterObjectList<T extends { identifier: Identifier }>(
+export function filterObjectList<T extends { identifier: IdentifierType }>(
   objs: T[],
-  filter: Identifier
+  filter: IdentifierType
 ) {
   return objs.filter(
     (obj) =>
@@ -28,24 +28,24 @@ export interface IDataPoint {
 }
 
 export interface IDataSource {
-  identifier: Identifier;
+  identifier: IdentifierType;
   subscribe: (callback: (data: IDataPoint) => void) => string; // returns subscription id
   unsubscribe: (subId: string) => void;
-  historical: (from: Date, to: Date) => Promise<IDataPoint[]>;
+  historical: (from: Date, to: Date, dt: number) => Promise<IDataPoint[]>;
 }
 
 interface IConfigOption<T> {
-  identifier: Identifier;
+  identifier: IdentifierType;
   getValue: () => Promise<T>;
   setValue: (value: T) => Promise<boolean>; // returns success
 }
 
 interface IRemoteCall {
-  identifier: Identifier;
+  identifier: IdentifierType;
   call: () => Promise<boolean>; // returns success
 }
 
-export interface IIOContext {
+export type IOContextType = {
   dataSources: IDataSource[];
   addDataSource: (dataSource: IDataSource) => void;
 
@@ -54,9 +54,9 @@ export interface IIOContext {
 
   remoteCalls: IRemoteCall[];
   addRemoteCall: (remoteCall: IRemoteCall) => void;
-}
+};
 
-export const IOContext = createContext<IIOContext>({
+export const IOContext = createContext<IOContextType>({
   dataSources: [],
   addDataSource: () => {},
   configOptions: [],
