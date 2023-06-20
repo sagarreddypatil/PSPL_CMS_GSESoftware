@@ -19,6 +19,10 @@ interface UPlotChartProps {
   dataSource?: IDataSource;
 }
 
+function dateToSec(date: Date) {
+  return date.getTime() / 1000;
+}
+
 export default function UPlotChart(props: UPlotChartProps) {
   // chart references
   const divRef = useRef<HTMLDivElement | null>(null);
@@ -39,10 +43,10 @@ export default function UPlotChart(props: UPlotChartProps) {
   const timeDownsampleBuffer = useRef<IDataPoint[]>([]);
 
   // container size
-  const [containerSize, setSize] = useDebounce({ width: 0, height: 0 }, 0);
+  const [containerSize, setSize] = useDebounce({ width: 800, height: 600 }, 0);
   const size = {
     width: containerSize.width,
-    height: containerSize.height - 27,
+    height: containerSize.height - 60,
   };
   const actualSize = {
     width: size.width * window.devicePixelRatio,
@@ -71,16 +75,15 @@ export default function UPlotChart(props: UPlotChartProps) {
       const buffer = timeDownsampleBuffer.current;
       if (buffer.length <= 1) return;
 
-      const bufStart = buffer[0].timestamp.getTime() / 1000;
-      const bufEnd = buffer.at(-1)!.timestamp.getTime() / 1000;
+      const bufStart = dateToSec(buffer[0].timestamp);
+      const bufEnd = dateToSec(buffer.at(-1)!.timestamp);
       const bufDt = (bufEnd - bufStart) / buffer.length;
       const batchSize = Math.ceil(desiredDt / bufDt); // how many points are there in the buffer per downsampled point
 
       while (buffer.length > batchSize) {
         const section = buffer.splice(0, batchSize);
         const downsampledTime =
-          section.reduce((a, b) => a + b.timestamp.getTime() / 1000, 0) /
-          batchSize;
+          section.reduce((a, b) => a + dateToSec(b.timestamp), 0) / batchSize;
         const downsampledValue =
           section.reduce((a, b) => a + b.value, 0) / batchSize;
         xRef.current.push(downsampledTime);
@@ -120,15 +123,17 @@ export default function UPlotChart(props: UPlotChartProps) {
         lock: true,
       },
       scales: {
-        y: {
-          auto: true,
-        },
         x: {
           auto: false,
+        },
+        y: {
+          auto: true,
         },
       },
       axes: [
         {
+          font: "12px IBM Plex Mono",
+          labelFont: "bold 12px IBM Plex Mono",
           stroke: "#000",
           grid: {
             stroke: "#80808050",
@@ -139,6 +144,10 @@ export default function UPlotChart(props: UPlotChartProps) {
           },
         },
         {
+          font: "12px IBM Plex Mono",
+          labelFont: "bold 12px IBM Plex Mono",
+          gap: 5,
+          size: 65,
           stroke: "#000",
           grid: {
             stroke: "#80808050",
@@ -175,51 +184,47 @@ export default function UPlotChart(props: UPlotChartProps) {
   useEffect(() => {
     readyRef.current = false;
     if (props.dataSource) {
-      xRef.current.length = 0;
-      yRef.current.length = 0;
-      timeDownsampleBuffer.current.length = 0;
-
       const addTimeData = (point: IDataPoint) => {
         if (!readyRef.current) return;
         timeDownsampleBuffer.current.push(point);
       };
 
-      xRef.current.length = 0;
-      yRef.current.length = 0;
       let now = new Date();
       let start = new Date(now.getTime() - timespan * 1000);
       let dt =
         (now.getTime() - start.getTime()) /
         (1000 * actualSize.width * (props.pointsPerPixel ?? 1));
-      props.dataSource
-        .historical(start, now, dt)
-        .then((hist) =>
-          hist.forEach((point: IDataPoint) => {
-            xRef.current.push(point.timestamp.getTime() / 1000);
-            yRef.current.push(point.value);
-          })
-        )
-        .then(() => {
-          readyRef.current = true;
-        });
+      props.dataSource.historical(start, now, dt).then((hist) => {
+        timeDownsampleBuffer.current.length = 0;
+
+        xRef.current = hist.map((point: IDataPoint) =>
+          dateToSec(point.timestamp)
+        );
+        yRef.current = hist.map((point: IDataPoint) => point.value);
+
+        readyRef.current = true;
+      });
 
       const subId = props.dataSource?.subscribe(addTimeData);
       return () => {
         props.dataSource?.unsubscribe(subId);
       };
     }
-  }, [props.dataSource, timespan, props.pointsPerPixel]);
+  }, [props.dataSource, timespan, props.pointsPerPixel, timeConductor.paused]);
 
   useEffect(() => {
     plotRef.current?.setSize({
       width: size.width,
-      height: size.height - 30.6,
+      height: size.height,
     });
   }, [size]);
 
   return (
     <SizedDiv onResize={(width, height) => setSize({ width, height })}>
-      <div ref={divRef}></div>
+      <div
+        ref={divRef}
+        className="h-full flex items-center justify-center"
+      ></div>
     </SizedDiv>
   );
 }

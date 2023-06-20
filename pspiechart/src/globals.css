@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.uplot {
+  font-family: "IBM Plex Mono", monospace !important;
+  height: min-content !important;
+}
