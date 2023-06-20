@@ -9,7 +9,7 @@ interface Config {
 }
 
 const defaultConfig: Config = {
-  wsRate: 100,
+  wsRate: 1000,
 };
 
 export const getConfig = () => {

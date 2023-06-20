@@ -36,9 +36,10 @@ rate = 1000  # Hz
 
 
 def better_sleep(sleep_time):
-    start = time.time()
-    while time.time() - start < sleep_time:
-        pass
+    time.sleep(sleep_time)
+    # start = time.time()
+    # while time.time() - start < sleep_time:
+    #     pass
 
 
 last = time.time()
