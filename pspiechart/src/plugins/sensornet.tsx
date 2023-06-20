@@ -1,4 +1,4 @@
-import { IOContext, IDataPoint, genSubId } from "../io-context";
+import { IOContext, IDataPoint, genSubId } from "../contexts/io-context";
 import { useContext, useEffect, useRef } from "react";
 import useWebSocket from "react-use-websocket";
 

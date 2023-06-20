@@ -27,5 +27,6 @@
   --rct-color-renaming-input-submitbutton-text-active: #ffffff;
 }
 
-.rct-root-tree {
+.rct-tree-root {
+  font-family: "IBM Plex Mono", monospace;
 }

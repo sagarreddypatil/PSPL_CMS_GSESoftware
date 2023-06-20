@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useContext } from "react";
-import { IdentifierType, IOContext } from "../io-context";
+import { IdentifierType, IOContext } from "../contexts/io-context";
 import UPlotChart from "../components/uplotchart";
 
 export default function ObjectViewFactory() {
@@ -17,13 +17,10 @@ export default function ObjectViewFactory() {
 
   return (
     <UPlotChart
-      paused={false}
-      size={{ width: 800, height: 400 }}
-      timespan={10}
       dataSource={dataSource}
       key={123}
       pointsPerPixel={1}
-      title="test"
+      title={dataSource.identifier.name}
     />
   );
 }

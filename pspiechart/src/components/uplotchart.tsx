@@ -1,25 +1,35 @@
-import { IDataSource, IDataPoint } from "../io-context";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { IDataSource, IDataPoint } from "../contexts/io-context";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { useDebounce } from "@react-hook/debounce";
 import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";
+import SizedDiv from "../controls/sized-div";
+import { TimeConductorContext } from "../contexts/time-conductor";
 
 interface UPlotChartProps {
   title?: string;
   pointsPerPixel?: number;
 
-  timespan: number; // seconds
-  paused: boolean;
-
   dataSource?: IDataSource;
-  size: { width: number; height: number };
 }
 
 export default function UPlotChart(props: UPlotChartProps) {
   // chart references
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const divRef = useRef<HTMLDivElement | null>(null);
   const plotRef = useRef<uPlot | null>(null);
   const animationRef = useRef(0);
+  const timeConductor = useContext(TimeConductorContext);
+
+  const timespan =
+    (timeConductor.paused
+      ? timeConductor.fixed.start.getTime() - timeConductor.fixed.end.getTime()
+      : timeConductor.moving.timespan) / 1000;
 
   // current chart data
   const xRef = useRef<number[]>([]);
@@ -29,56 +39,70 @@ export default function UPlotChart(props: UPlotChartProps) {
   const timeDownsampleBuffer = useRef<IDataPoint[]>([]);
 
   // container size
-  const size = props.size;
+  const [containerSize, setSize] = useDebounce({ width: 0, height: 0 }, 0);
+  const size = {
+    width: containerSize.width,
+    height: containerSize.height - 27,
+  };
   const actualSize = {
     width: size.width * window.devicePixelRatio,
     height: size.height * window.devicePixelRatio,
   };
 
   useEffect(() => {
-    const updatePlot = () => {
-      const desiredPoints = actualSize.width * (props.pointsPerPixel ?? 1);
-      const dt = props.timespan / desiredPoints;
-
-      // downsample time data
-      const buffer = timeDownsampleBuffer.current;
-      if (buffer.length > 0) {
-        const avgBufferDt =
-          (buffer.at(-1)!.timestamp.getTime() - buffer[0].timestamp.getTime()) /
-          buffer.length;
-        const numPoints = Math.ceil(Math.max(dt / avgBufferDt, 1));
-        while (buffer.length >= numPoints) {
-          console.log(numPoints);
-          const section = buffer.splice(0, numPoints);
-          // const downsampledTime = section.at(-1)!.timestamp.getTime() / 1000;
-          // const downsampledValue = section.at(-1)!.value;
-          const downsampledTime =
-            section.reduce((a, b) => a + b.timestamp.getTime() / 1000, 0) /
-            numPoints;
-          const downsampledValue =
-            section.reduce((a, b) => a + b.value, 0) / numPoints;
-          xRef.current.push(downsampledTime);
-          yRef.current.push(downsampledValue);
-        }
-      }
-
-      // // remove old data
+    const removeOldData = () => {
+      // remove old data
       let filteredIdx = 0;
       const latest = xRef.current[xRef.current.length - 1];
-      const startTime = latest - props.timespan;
+      const startTime = latest - timespan;
       for (const x of xRef.current) {
         if (x >= startTime) break;
         filteredIdx++;
       }
       xRef.current = xRef.current.slice(filteredIdx);
       yRef.current = yRef.current.slice(filteredIdx);
+    };
+
+    const downsampleData = () => {
+      const desiredPoints = actualSize.width * (props.pointsPerPixel ?? 1);
+      const desiredDt = timespan / desiredPoints;
+
+      // downsample time data
+      const buffer = timeDownsampleBuffer.current;
+      if (buffer.length <= 1) return;
+
+      const bufStart = buffer[0].timestamp.getTime() / 1000;
+      const bufEnd = buffer.at(-1)!.timestamp.getTime() / 1000;
+      const bufDt = (bufEnd - bufStart) / buffer.length;
+      const batchSize = Math.ceil(desiredDt / bufDt); // how many points are there in the buffer per downsampled point
+
+      while (buffer.length > batchSize) {
+        const section = buffer.splice(0, batchSize);
+        const downsampledTime =
+          section.reduce((a, b) => a + b.timestamp.getTime() / 1000, 0) /
+          batchSize;
+        const downsampledValue =
+          section.reduce((a, b) => a + b.value, 0) / batchSize;
+        xRef.current.push(downsampledTime);
+        yRef.current.push(downsampledValue);
+      }
+    };
+
+    const updatePlot = () => {
+      downsampleData();
+      removeOldData();
 
       plotRef.current?.setData([xRef.current, yRef.current]);
-
+      const timeNow = Date.now() / 1000;
+      const timeStart = timeNow - timespan;
+      plotRef.current?.setScale("x", {
+        min: timeStart,
+        max: timeNow,
+      });
       animationRef.current = window.requestAnimationFrame(updatePlot);
     };
 
-    if (!props.paused) updatePlot();
+    if (!timeConductor.paused) updatePlot();
 
     return () => {
       window.cancelAnimationFrame(animationRef.current);
@@ -99,26 +123,29 @@ export default function UPlotChart(props: UPlotChartProps) {
         y: {
           auto: true,
         },
+        x: {
+          auto: false,
+        },
       },
       axes: [
         {
-          stroke: "#fff",
+          stroke: "#000",
           grid: {
-            stroke: "#ffffff50",
+            stroke: "#80808050",
           },
           ticks: {
             show: true,
-            stroke: "#ffffff50",
+            stroke: "#80808050",
           },
         },
         {
-          stroke: "#fff",
+          stroke: "#000",
           grid: {
-            stroke: "#ffffff50",
+            stroke: "#80808050",
           },
           ticks: {
             show: true,
-            stroke: "#ffffff50",
+            stroke: "#80808050",
           },
         },
       ],
@@ -160,7 +187,7 @@ export default function UPlotChart(props: UPlotChartProps) {
       xRef.current.length = 0;
       yRef.current.length = 0;
       let now = new Date();
-      let start = new Date(now.getTime() - props.timespan * 1000);
+      let start = new Date(now.getTime() - timespan * 1000);
       let dt =
         (now.getTime() - start.getTime()) /
         (1000 * actualSize.width * (props.pointsPerPixel ?? 1));
@@ -181,13 +208,7 @@ export default function UPlotChart(props: UPlotChartProps) {
         props.dataSource?.unsubscribe(subId);
       };
     }
-  }, [
-    props.dataSource,
-    props.timespan,
-    size.width,
-    props.pointsPerPixel,
-    props.paused,
-  ]);
+  }, [props.dataSource, timespan, props.pointsPerPixel, timeConductor.paused]);
 
   useEffect(() => {
     plotRef.current?.setSize({
@@ -197,8 +218,8 @@ export default function UPlotChart(props: UPlotChartProps) {
   }, [size]);
 
   return (
-    <div ref={containerRef} className="h-100 w-100 min-vw-0 min-vh-0 pt-1">
+    <SizedDiv onResize={(width, height) => setSize({ width, height })}>
       <div ref={divRef}></div>
-    </div>
+    </SizedDiv>
   );
 }
