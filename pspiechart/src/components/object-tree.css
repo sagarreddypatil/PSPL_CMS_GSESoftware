@@ -16,7 +16,7 @@
   --rct-color-drag-between-line-bg: #0366d6;
   --rct-color-arrow: #373a3f;
 
-  --rct-item-height: 22px;
+  --rct-item-height: 28px;
 
   --rct-color-renaming-input-submitbutton-bg: inherit;
   --rct-color-renaming-input-submitbutton-bg-hover: #0366d6;
@@ -29,4 +29,12 @@
 
 .rct-tree-root {
   font-family: "IBM Plex Mono", monospace;
+}
+
+.rct-tree-item-arrow {
+  margin-right: 0.25rem;
+}
+
+.rct-tree-item-li {
+  font-size: 1rem;
 }
