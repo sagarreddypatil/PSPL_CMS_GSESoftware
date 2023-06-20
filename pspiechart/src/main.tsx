@@ -16,7 +16,7 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <IconContext.Provider value={{ size: "1.25rem" }}>
+  <IconContext.Provider value={{ size: "1.25em" }}>
     <RouterProvider router={router} />
   </IconContext.Provider>
 );

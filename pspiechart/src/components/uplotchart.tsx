@@ -28,7 +28,7 @@ export default function UPlotChart(props: UPlotChartProps) {
 
   const timespan =
     (timeConductor.paused
-      ? timeConductor.fixed.start.getTime() - timeConductor.fixed.end.getTime()
+      ? timeConductor.fixed.end.getTime() - timeConductor.fixed.start.getTime()
       : timeConductor.moving.timespan) / 1000;
 
   // current chart data
@@ -208,7 +208,7 @@ export default function UPlotChart(props: UPlotChartProps) {
         props.dataSource?.unsubscribe(subId);
       };
     }
-  }, [props.dataSource, timespan, props.pointsPerPixel, timeConductor.paused]);
+  }, [props.dataSource, timespan, props.pointsPerPixel]);
 
   useEffect(() => {
     plotRef.current?.setSize({

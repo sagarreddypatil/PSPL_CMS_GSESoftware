@@ -6,7 +6,7 @@ interface SelectProps {
   children: React.ReactNode;
   className?: string;
   checked?: boolean;
-  onClick?: () => void;
+  onChange?: (value: boolean) => void;
 }
 
 export default function Select(props: SelectProps) {
@@ -19,7 +19,7 @@ export default function Select(props: SelectProps) {
         className="peer hidden"
         id={id}
         checked={props.checked}
-        onClick={() => props.onClick?.()}
+        onChange={(e) => props.onChange?.(e.target.checked)}
       />
       <label
         htmlFor={id}

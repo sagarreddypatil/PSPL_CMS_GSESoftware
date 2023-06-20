@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 interface IFixedTimespan {
   start: Date;
@@ -45,13 +45,24 @@ export default function TimeConductorProvider({
     timespan: defaultTimespan,
   });
 
+  const actualSetPaused = (newPaused: boolean) => {
+    setPaused(newPaused);
+    if (newPaused) {
+      const date = new Date();
+      setFixed({
+        start: new Date(date.getTime() - moving.timespan),
+        end: date,
+      });
+    }
+  };
+
   return (
     <TimeConductorContext.Provider
       value={{
         paused,
         fixed,
         moving,
-        setPaused,
+        setPaused: actualSetPaused.bind(null),
         setFixed,
         setMoving,
       }}
