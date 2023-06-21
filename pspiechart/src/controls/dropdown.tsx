@@ -16,7 +16,7 @@ export function Dropdown(props: DropdownProps) {
       <div>
         <button
           type="button"
-          className="rounded-sm bg-rush px-3 py-1 text-sm font-semibold text-gray-900 shadow-sm hover:bg-rush-dark"
+          className="rounded-sm bg-rush px-3 py-1 text-sm font-semibold text-black shadow-sm hover:bg-rush-dark"
           onFocus={() => setOpen(true)}
           onBlur={() => setOpen(false)}
         >
@@ -26,7 +26,7 @@ export function Dropdown(props: DropdownProps) {
       <div
         className={`absolute ${
           props.right ? "right-0" : ""
-        } z-10 mt-2 w-44 origin-top-left rounded-sm bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none`}
+        } z-10 mt-2 w-44 origin-top-left rounded-sm bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-black dark:outline dark:outline-1 dark:outline-rush`}
         hidden={!open}
       >
         <div className="py-1">{props.children}</div>
@@ -43,8 +43,8 @@ interface DropdownItemProps {
 
 export function DropdownItem(props: DropdownItemProps) {
   const classes =
-    "text-gray-700 block w-full text-left px-2 py-1 text-sm hover:bg-rush-light hover:font-bold focus:bg-gray-200";
-  const activeClases = "bg-rush-light font-bold";
+    "text-gray-700 block w-full text-left px-2 py-1 text-sm hover:bg-rush-light hover:font-bold focus:bg-gray-200 dark:text-gray-100 dark:hover:text-black";
+  const activeClases = "bg-rush-light font-bold dark:text-black";
   const className = props.active ? `${classes} ${activeClases}` : classes;
   return (
     <button

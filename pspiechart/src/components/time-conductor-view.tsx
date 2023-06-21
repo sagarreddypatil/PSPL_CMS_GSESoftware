@@ -56,7 +56,7 @@ function DateTimeTextbox(props: {
   return (
     <input
       type="datetime-local"
-      className="rounded-sm border border-rush"
+      className="rounded-sm border border-rush dark:bg-night-sky"
       defaultValue={value?.toISOString().slice(0, 19)}
       onChange={(e) => {
         const time = new Date(e.target.value + "Z");
@@ -94,9 +94,7 @@ export default function TimeConductorView() {
         checked={timeConductor.paused}
         onChange={(value) => timeConductor.setPaused(value)}
       >
-        <span className="text-black">
-          {timeConductor.paused ? <ImPause2 /> : <ImPlay3 />}
-        </span>
+        <span>{timeConductor.paused ? <ImPause2 /> : <ImPlay3 />}</span>
       </Select>
       <div className="m-1"></div>
       {timeConductor.paused ? <FixedConductorView /> : <MovingConductorView />}

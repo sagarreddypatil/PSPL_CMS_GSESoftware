@@ -10,7 +10,7 @@ import {
 } from "react-complex-tree";
 import { useNavigate } from "react-router-dom";
 import "react-complex-tree/lib/style.css";
-import "./object-tree.css";
+import { FiChevronRight, FiChevronDown } from "react-icons/fi";
 
 export default function ObjectTree() {
   const [focusedItem, setFocusedItem] = useState<TreeItemIndex>();
@@ -81,6 +81,42 @@ export default function ObjectTree() {
         )
       }
       onSelectItems={(items) => setSelectedItems(items)}
+      renderItemTitle={({ title }) => <>{title}</>}
+      renderItemArrow={({ item, context }) =>
+        item.isFolder ? (
+          <>{context.isExpanded ? <FiChevronDown /> : <FiChevronRight />}</>
+        ) : null
+      }
+      renderItem={({ title, arrow, depth, context, children }) => (
+        <div {...context.itemContainerWithChildrenProps}>
+          <label
+            className={`flex items-center hover:font-semibold ${
+              context.isSelected
+                ? "font-bold bg-rush text-black hover:bg-rush-dark dark:hover:bg-rush-light"
+                : "hover:bg-gray-200 dark:hover:bg-gray-800"
+            }`}
+            {...context.itemContainerWithoutChildrenProps}
+            {...context.interactiveElementProps}
+          >
+            {arrow}
+            <div className="mr-2"></div>
+            {title}
+          </label>
+          {children}
+        </div>
+      )}
+      renderTreeContainer={({ children, containerProps }) => (
+        <div {...containerProps} className="-space-x-6 select-none">
+          <div></div>
+          {children}
+        </div>
+      )}
+      renderItemsContainer={({ children, containerProps }) => (
+        <div {...containerProps} className="space-x-6">
+          <div></div>
+          {children}
+        </div>
+      )}
     >
       <Tree treeId="tree" rootItem="root" treeLabel="Object Tree" />
     </ControlledTreeEnvironment>

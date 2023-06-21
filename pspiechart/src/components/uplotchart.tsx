@@ -5,6 +5,7 @@ import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";
 import SizedDiv from "../controls/sized-div";
 import { TimeConductorContext } from "../contexts/time-conductor";
+import { DarkModeContext } from "../App";
 
 interface UPlotChartProps {
   title?: string;
@@ -19,6 +20,8 @@ function dateToSec(date: Date) {
 
 export default function UPlotChart(props: UPlotChartProps) {
   // chart references
+  const darkMode = useContext(DarkModeContext);
+
   const divRef = useRef<HTMLDivElement | null>(null);
   const plotRef = useRef<uPlot | null>(null);
   const animationRef = useRef(0);
@@ -147,13 +150,13 @@ export default function UPlotChart(props: UPlotChartProps) {
         {
           font: "12px IBM Plex Mono",
           labelFont: "bold 12px IBM Plex Mono",
-          stroke: "#000",
+          stroke: darkMode ? "#fff" : "#000",
           grid: {
-            stroke: "#80808050",
+            stroke: "#80808080",
           },
           ticks: {
             show: true,
-            stroke: "#80808050",
+            stroke: "#80808080",
           },
         },
         {
@@ -161,13 +164,13 @@ export default function UPlotChart(props: UPlotChartProps) {
           labelFont: "bold 12px IBM Plex Mono",
           gap: 5,
           size: 65,
-          stroke: "#000",
+          stroke: darkMode ? "#fff" : "#000",
           grid: {
-            stroke: "#80808050",
+            stroke: "#80808080",
           },
           ticks: {
             show: true,
-            stroke: "#80808050",
+            stroke: "#80808080",
           },
         },
       ],

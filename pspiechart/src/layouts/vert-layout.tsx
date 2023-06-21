@@ -18,12 +18,12 @@ export default function VertLayout(props: VertLayoutProps) {
       <Panel
         collapsible={true}
         onCollapse={props.onCollapse}
-        minSize={20}
-        defaultSize={20}
+        minSize={15}
+        defaultSize={15}
       >
         {children[0]}
       </Panel>
-      <PanelResizeHandle className="w-1 bg-gray-200 active:bg-rush hover:bg-rush" />
+      <PanelResizeHandle className="w-1 bg-gray-200 dark:bg-gray-900 active:bg-gray-300 hover:bg-gray-300 dark:active:bg-gray-700 dark:hover:bg-gray-700" />
       <Panel onResize={props.onResize}>{children[1]}</Panel>
     </PanelGroup>
   );

@@ -1,4 +1,5 @@
 import { Dropdown, DropdownItem } from "../controls/dropdown";
+import Logo from "../controls/logo";
 import ObjectTree from "./object-tree";
 
 export default function Sidebar() {
@@ -7,7 +8,7 @@ export default function Sidebar() {
       <nav className="bg-moondust dark:bg-night-sky h-11">
         <div className="h-full px-2 flex flex-row justify-between">
           <div className="flex items-center">
-            <img src="/PSP-2Color.svg" className="h-7" alt="Logo" />
+            <Logo />
           </div>
           <div className="flex items-center">
             <Dropdown right name="Create">
@@ -16,7 +17,7 @@ export default function Sidebar() {
           </div>
         </div>
       </nav>
-      <div className="p-2 flex-1">
+      <div className="pt-2 pe-2 flex-1">
         <ObjectTree />
       </div>
     </div>

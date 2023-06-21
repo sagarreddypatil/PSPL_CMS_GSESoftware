@@ -1,54 +1,70 @@
 import IOContextProvider from "./contexts/io-context";
 import VertLayout from "./layouts/vert-layout";
 import Select from "./controls/select";
-import { FiMoon } from "react-icons/fi";
+import { FiMoon, FiSun } from "react-icons/fi";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./components/sidebar";
-import { useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import SensorNetPlugin from "./plugins/sensornet";
 import TimeConductorProvider from "./contexts/time-conductor";
 import TimeConductorView from "./components/time-conductor-view";
+import Logo from "./controls/logo";
+
+export const DarkModeContext = createContext(false);
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
 
   return (
-    <TimeConductorProvider>
-      <IOContextProvider>
-        <SensorNetPlugin />
+    <DarkModeContext.Provider value={darkMode}>
+      <TimeConductorProvider>
+        <IOContextProvider>
+          <SensorNetPlugin />
 
-        <VertLayout onCollapse={setCollapsed}>
-          <Sidebar />
-          <div className="h-full flex flex-col">
-            <nav className="bg-moondust dark:bg-night-sky h-11">
-              <div className="px-2 flex h-full flex-wrap items-center">
-                <div className="flex-1">
-                  {collapsed ? (
-                    <div className="flex items-center">
-                      <img src="/PSP-2Color.svg" className="h-7" alt="Logo" />
+          <div className="bg-white dark:bg-black text-black dark:text-gray-100 h-full">
+            <VertLayout onCollapse={setCollapsed}>
+              <Sidebar />
+              <div className="h-full flex flex-col">
+                <nav className="bg-moondust dark:bg-night-sky h-11 dark:text-gray-100">
+                  <div className="px-2 flex h-full flex-wrap items-center">
+                    <div className="flex-1">
+                      {collapsed ? (
+                        <div className="flex items-center">
+                          <Logo />
+                        </div>
+                      ) : (
+                        <></>
+                      )}
                     </div>
-                  ) : (
-                    <></>
-                  )}
-                </div>
-                <div className="items-center">
-                  <TimeConductorView />
-                </div>
-                <div className="flex-1 flex justify-end items-center">
-                  <Select className="mr-2">Edit Mode</Select>
-                  <Select>
-                    <FiMoon />
-                  </Select>
+                    <div className="items-center">
+                      <TimeConductorView />
+                    </div>
+                    <div className="flex-1 flex justify-end items-center">
+                      <Select className="mr-2">Edit Mode</Select>
+                      <Select checked={darkMode} onChange={setDarkMode}>
+                        {darkMode ? <FiSun /> : <FiMoon />}
+                      </Select>
+                    </div>
+                  </div>
+                </nav>
+                <div className="flex-1 overflow-auto">
+                  <Outlet />
                 </div>
               </div>
-            </nav>
-            <div className="flex-1 overflow-auto">
-              <Outlet />
-            </div>
+            </VertLayout>
           </div>
-        </VertLayout>
-      </IOContextProvider>
-    </TimeConductorProvider>
+        </IOContextProvider>
+      </TimeConductorProvider>
+    </DarkModeContext.Provider>
   );
 }
 
