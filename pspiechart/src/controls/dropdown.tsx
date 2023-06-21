@@ -16,7 +16,7 @@ export function Dropdown(props: DropdownProps) {
       <div>
         <button
           type="button"
-          className="rounded-sm bg-rush px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-rush-dark"
+          className="rounded-sm bg-rush px-3 py-1 text-sm font-semibold text-gray-900 shadow-sm hover:bg-rush-dark"
           onFocus={() => setOpen(true)}
           onBlur={() => setOpen(false)}
         >

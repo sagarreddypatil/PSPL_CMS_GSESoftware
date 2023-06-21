@@ -1,4 +1,4 @@
-import IOContextProvider, { IOContext } from "./contexts/io-context";
+import IOContextProvider from "./contexts/io-context";
 import VertLayout from "./layouts/vert-layout";
 import Select from "./controls/select";
 import { FiMoon } from "react-icons/fi";
@@ -20,12 +20,12 @@ function App() {
         <VertLayout onCollapse={setCollapsed}>
           <Sidebar />
           <div className="h-full flex flex-col">
-            <nav className="bg-moondust dark:bg-night-sky h-14">
+            <nav className="bg-moondust dark:bg-night-sky h-11">
               <div className="px-2 flex h-full flex-wrap items-center">
                 <div className="flex-1">
                   {collapsed ? (
                     <div className="flex items-center">
-                      <img src="/PSP-2Color.svg" className="h-10" alt="Logo" />
+                      <img src="/PSP-2Color.svg" className="h-7" alt="Logo" />
                     </div>
                   ) : (
                     <></>

@@ -19,7 +19,7 @@ export default function ObjectViewFactory() {
     <UPlotChart
       dataSource={dataSource}
       key={123}
-      pointsPerPixel={1}
+      pointsPerPixel={2}
       title={dataSource.identifier.name}
     />
   );

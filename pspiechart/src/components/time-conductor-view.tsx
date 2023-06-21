@@ -16,6 +16,11 @@ function MovingConductorView() {
     "30m": 1800,
     "1h": 3600,
     "2h": 7200,
+    "4h": 14400,
+    "8h": 28800,
+    "12h": 43200,
+    "1d": 86400,
+    "2d": 172800,
   };
   const selectedLabel = Object.entries(time_options).find(
     ([label, value]) => value === timeConductor.moving.timespan / 1000
@@ -42,14 +47,41 @@ function MovingConductorView() {
   );
 }
 
-function FixedConductorView() {
-  const timeConductor = useContext(TimeConductorContext);
+function DateTimeTextbox(props: {
+  value?: Date;
+  onChange?: (time: Date) => void;
+}) {
+  const { value, onChange } = props;
 
   return (
-    <label>
-      {timeConductor.fixed.start.getTime()} to{" "}
-      {timeConductor.fixed.end.getTime()}
-    </label>
+    <input
+      type="datetime-local"
+      className="rounded-sm border border-rush"
+      defaultValue={value?.toISOString().slice(0, 19)}
+      onChange={(e) => {
+        const time = new Date(e.target.value + "Z");
+        onChange?.(time);
+      }}
+    />
+  );
+}
+
+function FixedConductorView() {
+  const timeConductor = useContext(TimeConductorContext);
+  const fixed = timeConductor.fixed;
+  const setStart = (time: Date) => {
+    timeConductor.setFixed({ start: time, end: fixed.end });
+  };
+  const setEnd = (time: Date) => {
+    timeConductor.setFixed({ start: fixed.start, end: time });
+  };
+
+  return (
+    <>
+      <DateTimeTextbox value={fixed.start} onChange={setStart} />
+      <label className="mx-2">to</label>
+      <DateTimeTextbox value={fixed.end} onChange={setEnd} />
+    </>
   );
 }
 

@@ -91,7 +91,17 @@ export default function UPlotChart(props: UPlotChartProps) {
       }
     };
 
-    const updatePlot = () => {
+    const pausedUpdate = () => {
+      plotRef.current?.setData([xRef.current, yRef.current]);
+      const timeStart = dateToSec(timeConductor.fixed.start);
+      const timeEnd = dateToSec(timeConductor.fixed.end);
+      plotRef.current?.setScale("x", {
+        min: timeStart,
+        max: timeEnd,
+      });
+    };
+
+    const resumedUpdate = () => {
       downsampleData();
       removeOldData();
 
@@ -102,10 +112,18 @@ export default function UPlotChart(props: UPlotChartProps) {
         min: timeStart,
         max: timeNow,
       });
+    };
+
+    const updatePlot = () => {
+      if (timeConductor.paused) {
+        pausedUpdate();
+      } else {
+        resumedUpdate();
+      }
       animationRef.current = window.requestAnimationFrame(updatePlot);
     };
 
-    if (!timeConductor.paused) updatePlot();
+    updatePlot();
 
     return () => {
       window.cancelAnimationFrame(animationRef.current);
@@ -117,6 +135,7 @@ export default function UPlotChart(props: UPlotChartProps) {
       title: props.title ? props.title : "",
       width: 1,
       height: 1,
+      tzDate: (ts) => uPlot.tzDate(new Date(ts * 1e3), "UTC"),
       pxAlign: false,
       cursor: {
         y: false,
@@ -161,12 +180,46 @@ export default function UPlotChart(props: UPlotChartProps) {
       series: [
         {},
         {
-          label: "Value",
+          label: props.title,
           stroke: "#daaa00",
           width: 2,
-          // fill: "rgba(218,170,0,0.1)",
         },
       ],
+      hooks: {
+        init: [
+          (u) => {
+            u.over.ondblclick = () => {
+              timeConductor.setPaused(false);
+            };
+          },
+        ],
+        setSelect: [
+          (u) => {
+            if (!timeConductor.paused) return;
+            if (u.select.width <= 0) return;
+
+            const min = u.posToVal(u.select.left, "x");
+            const max = u.posToVal(u.select.left + u.select.width, "x");
+
+            console.log("resize", min, max);
+
+            timeConductor.setFixed({
+              start: new Date(min * 1e3),
+              end: new Date(max * 1e3),
+            });
+
+            u.setSelect(
+              {
+                left: 0,
+                width: 0,
+                top: 0,
+                height: 0,
+              },
+              false
+            );
+          },
+        ],
+      },
     };
 
     plotRef.current = new uPlot(
@@ -178,39 +231,44 @@ export default function UPlotChart(props: UPlotChartProps) {
     return () => {
       plotRef.current?.destroy();
     };
-  }, [props.title]);
+  }, [props.dataSource, props.title, timeConductor]);
 
-  const readyRef = useRef(false);
+  const fetchHistorical = async () => {
+    let start: Date, end: Date;
+    if (timeConductor.paused) {
+      start = timeConductor.fixed.start;
+      end = timeConductor.fixed.end;
+    } else {
+      end = new Date();
+      start = new Date(end.getTime() - timespan * 1000);
+    }
+    const dt =
+      (end.getTime() - start.getTime()) /
+      (1000 * actualSize.width * (props.pointsPerPixel ?? 1));
+
+    return props.dataSource?.historical(start, end, dt).then((hist) => {
+      xRef.current = hist.map((point: IDataPoint) =>
+        dateToSec(point.timestamp)
+      );
+      yRef.current = hist.map((point: IDataPoint) => point.value);
+    });
+  };
+
   useEffect(() => {
-    readyRef.current = false;
     if (props.dataSource) {
+      fetchHistorical();
+
+      if (timeConductor.paused) return () => {};
+
       const addTimeData = (point: IDataPoint) => {
-        if (!readyRef.current) return;
         timeDownsampleBuffer.current.push(point);
       };
-
-      let now = new Date();
-      let start = new Date(now.getTime() - timespan * 1000);
-      let dt =
-        (now.getTime() - start.getTime()) /
-        (1000 * actualSize.width * (props.pointsPerPixel ?? 1));
-      props.dataSource.historical(start, now, dt).then((hist) => {
-        timeDownsampleBuffer.current.length = 0;
-
-        xRef.current = hist.map((point: IDataPoint) =>
-          dateToSec(point.timestamp)
-        );
-        yRef.current = hist.map((point: IDataPoint) => point.value);
-
-        readyRef.current = true;
-      });
-
       const subId = props.dataSource?.subscribe(addTimeData);
       return () => {
         props.dataSource?.unsubscribe(subId);
       };
     }
-  }, [props.dataSource, timespan, props.pointsPerPixel, timeConductor.paused]);
+  }, [props.dataSource, timespan, props.pointsPerPixel, timeConductor]);
 
   useEffect(() => {
     plotRef.current?.setSize({
