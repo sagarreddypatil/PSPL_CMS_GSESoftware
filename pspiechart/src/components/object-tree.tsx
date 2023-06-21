@@ -84,13 +84,16 @@ export default function ObjectTree() {
       renderItemTitle={({ title }) => <>{title}</>}
       renderItemArrow={({ item, context }) =>
         item.isFolder ? (
-          <>{context.isExpanded ? <FiChevronDown /> : <FiChevronRight />}</>
+          <>
+            <div className="mr-1"></div>
+            {context.isExpanded ? <FiChevronDown /> : <FiChevronRight />}
+          </>
         ) : null
       }
       renderItem={({ title, arrow, depth, context, children }) => (
         <div {...context.itemContainerWithChildrenProps}>
           <label
-            className={`flex items-center hover:font-semibold ${
+            className={`flex items-center hover:font-semibold rounded-sm my-1 ${
               context.isSelected
                 ? "font-bold bg-rush text-black hover:bg-rush-dark dark:hover:bg-rush-light"
                 : "hover:bg-gray-200 dark:hover:bg-gray-800"

@@ -26,7 +26,7 @@ export function Dropdown(props: DropdownProps) {
       <div
         className={`absolute ${
           props.right ? "right-0" : ""
-        } z-10 mt-2 w-44 origin-top-left rounded-sm bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-black dark:outline dark:outline-1 dark:outline-rush`}
+        } z-10 mt-2 w-44 origin-top-left rounded-sm bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-night-sky dark:ring-white dark:ring-opacity-30`}
         hidden={!open}
       >
         <div className="py-1">{props.children}</div>
@@ -43,9 +43,12 @@ interface DropdownItemProps {
 
 export function DropdownItem(props: DropdownItemProps) {
   const classes =
-    "text-gray-700 block w-full text-left px-2 py-1 text-sm hover:bg-rush-light hover:font-bold focus:bg-gray-200 dark:text-gray-100 dark:hover:text-black";
-  const activeClases = "bg-rush-light font-bold dark:text-black";
-  const className = props.active ? `${classes} ${activeClases}` : classes;
+    "text-black block w-full text-left px-2 py-1 text-sm hover:bg-rush-light hover:font-bold focus:bg-gray-200 dark:hover:text-black";
+  const activeClases = "bg-rush-light font-bold text-black dark:text-black";
+  const inactiveClasses = "dark:text-white";
+  const className = props.active
+    ? `${classes} ${activeClases}`
+    : `${classes} ${inactiveClasses}`;
   return (
     <button
       className={className}

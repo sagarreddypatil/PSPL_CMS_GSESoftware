@@ -11,3 +11,7 @@
   font-size: 16px !important;
   font-weight: normal !important;
 }
+
+.u-select {
+  @apply bg-black bg-opacity-10 dark:bg-white dark:bg-opacity-20 !important;
+}

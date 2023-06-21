@@ -13,10 +13,16 @@ import Logo from "./controls/logo";
 export const DarkModeContext = createContext(false);
 
 function App() {
+  const localDarkMode = window.localStorage.getItem("darkMode");
+  const [darkMode, setDarkMode] = useState(
+    JSON.parse(localDarkMode || "false")
+  );
+
   const [collapsed, setCollapsed] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
+    window.localStorage.setItem("darkMode", darkMode ? "true" : "false");
+
     if (darkMode) {
       document.documentElement.classList.add("dark");
     } else {
