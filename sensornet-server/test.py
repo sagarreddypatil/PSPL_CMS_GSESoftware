@@ -32,7 +32,7 @@ ids = list(range(0, 6))
 counters = [0 for a in ids]
 datas = [0 for a in ids]
 
-rate = 200  # Hz
+rate = 1000  # Hz
 
 
 def better_sleep(sleep_time):

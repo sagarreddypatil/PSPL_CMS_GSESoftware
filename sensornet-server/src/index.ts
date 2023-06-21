@@ -116,11 +116,10 @@ webServer.get("/historical/:id", async (req, res) => {
                   |> map(fn: (r) => ({ id: r.id, value: r._value, time_us: (uint(v: r._time) / uint(v: 1000)) }))
   `;
 
-  const rows = (await influxReader.collectRows(query))
-    .map((a: any) => {
-      return { id: a.id, value: a.value, timestamp: a.time_us };
-    })
-    .filter((a: any) => a.value !== null);
+  const rows = (await influxReader.collectRows(query)).map((a: any) => {
+    return { id: a.id, value: a.value, timestamp: a.time_us };
+  });
+  // .filter((a: any) => a.value !== null);
   return res.json(rows);
 });
 
@@ -146,7 +145,7 @@ webServer
 
 const udpSocket = dgram.createSocket("udp4"); // UDP socket for receiving data
 let lastPacketTimestamps: { [key: string]: number } = {};
-const outRate = 100; // Hz
+const outRate = 1000; // Hz
 
 udpSocket.on("message", async (msg) => {
   try {
