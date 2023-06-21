@@ -35,24 +35,22 @@ export default function ObjectTree() {
   };
   items.root = rootNode;
 
-  const sourceNodes = Object.entries(groupedSources).forEach(
-    ([namespace, sources]) => {
-      items[namespace] = {
-        index: namespace,
-        data: namespace,
-        isFolder: true,
-        children: sources.map((source) => {
-          const index = `${namespace}:${source.identifier.id}`;
-          items[index] = {
-            index,
-            data: source.identifier.name,
-            isFolder: false,
-          };
-          return index;
-        }),
-      };
-    }
-  );
+  Object.entries(groupedSources).forEach(([namespace, sources]) => {
+    items[namespace] = {
+      index: namespace,
+      data: namespace,
+      isFolder: true,
+      children: sources.map((source) => {
+        const index = `${namespace}:${source.identifier.id}`;
+        items[index] = {
+          index,
+          data: source.identifier.name,
+          isFolder: false,
+        };
+        return index;
+      }),
+    };
+  });
 
   const openItem = (item: TreeItem<any>) => {
     const identifier = (item.index as string).split(":");

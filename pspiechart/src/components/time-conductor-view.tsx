@@ -23,7 +23,7 @@ function MovingConductorView() {
     "2d": 172800,
   };
   const selectedLabel = Object.entries(time_options).find(
-    ([label, value]) => value === timeConductor.moving.timespan / 1000
+    ([, value]) => value === timeConductor.moving.timespan / 1000
   )?.[0];
 
   const setValue = (value: number) => {

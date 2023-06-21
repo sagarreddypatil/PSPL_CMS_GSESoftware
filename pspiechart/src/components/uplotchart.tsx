@@ -1,11 +1,5 @@
 import { IDataSource, IDataPoint } from "../contexts/io-context";
-import {
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useDebounce } from "@react-hook/debounce";
 import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";

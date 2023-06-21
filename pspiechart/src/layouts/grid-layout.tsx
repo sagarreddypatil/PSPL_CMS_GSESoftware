@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Responsive, Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { FiArrowDownRight } from "react-icons/fi";
 
 const COLS = 12;
 const BASE_WIDTH = 3;
@@ -44,7 +43,7 @@ export default function GridLayout(props: GridLayoutProps) {
       breakpoints={{ lg: 480, xxs: 0 }}
       cols={{ lg: COLS, xxs: BASE_WIDTH }}
       rowHeight={ROW_HEIGHT}
-      onLayoutChange={(layout, layouts) => setLayout(layouts.lg)}
+      onLayoutChange={(_, layouts) => setLayout(layouts.lg)}
       width={props.width}
     >
       <div key="1" className="border-2 border-pink-500 ">
