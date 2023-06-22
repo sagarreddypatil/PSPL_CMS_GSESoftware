@@ -90,7 +90,7 @@ export default function ObjectTree() {
           </>
         ) : null
       }
-      renderItem={({ title, arrow, depth, context, children }) => (
+      renderItem={({ title, arrow, context, children }) => (
         <div {...context.itemContainerWithChildrenProps}>
           <label
             className={`flex items-center hover:font-semibold rounded-sm my-1 ${
@@ -102,7 +102,7 @@ export default function ObjectTree() {
             {...context.interactiveElementProps}
           >
             {arrow}
-            <div className="mr-2"></div>
+            <div className="mr-1"></div>
             {title}
           </label>
           {children}

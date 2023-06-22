@@ -23,7 +23,7 @@ export default function VertLayout(props: VertLayoutProps) {
       >
         {children[0]}
       </Panel>
-      <PanelResizeHandle className="w-1 bg-gray-200 dark:bg-gray-900 active:bg-gray-300 hover:bg-gray-300 dark:active:bg-gray-700 dark:hover:bg-gray-700" />
+      <PanelResizeHandle className="w-[2px] before:absolute before:w-[4px] before:h-full bg-gray-200 dark:bg-gray-700 before:active:bg-rush before:hover:bg-rush" />
       <Panel onResize={props.onResize}>{children[1]}</Panel>
     </PanelGroup>
   );

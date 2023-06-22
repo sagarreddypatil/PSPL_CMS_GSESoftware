@@ -116,10 +116,11 @@ webServer.get("/historical/:id", async (req, res) => {
                   |> map(fn: (r) => ({ id: r.id, value: r._value, time_us: (uint(v: r._time) / uint(v: 1000)) }))
   `;
 
-  const rows = (await influxReader.collectRows(query)).map((a: any) => {
-    return { id: a.id, value: a.value, timestamp: a.time_us };
-  });
-  // .filter((a: any) => a.value !== null);
+  const rows = (await influxReader.collectRows(query))
+    .map((a: any) => {
+      return { id: a.id, value: a.value, timestamp: a.time_us };
+    })
+    .filter((a: any) => a.value !== null);
   return res.json(rows);
 });
 

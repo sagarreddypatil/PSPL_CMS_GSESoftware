@@ -9,6 +9,7 @@ import SensorNetPlugin from "./plugins/sensornet";
 import TimeConductorProvider from "./contexts/time-conductor";
 import TimeConductorView from "./components/time-conductor-view";
 import Logo from "./controls/logo";
+import Nav from "./controls/nav";
 
 export const DarkModeContext = createContext(false);
 
@@ -40,28 +41,26 @@ function App() {
             <VertLayout onCollapse={setCollapsed}>
               <Sidebar />
               <div className="h-full flex flex-col">
-                <nav className="bg-moondust dark:bg-night-sky h-11 dark:text-gray-100">
-                  <div className="px-2 flex h-full flex-wrap items-center">
-                    <div className="flex-1">
-                      {collapsed ? (
-                        <div className="flex items-center">
-                          <Logo />
-                        </div>
-                      ) : (
-                        <></>
-                      )}
-                    </div>
-                    <div className="items-center">
-                      <TimeConductorView />
-                    </div>
-                    <div className="flex-1 flex justify-end items-center">
-                      <Select className="mr-2">Edit Mode</Select>
-                      <Select checked={darkMode} onChange={setDarkMode}>
-                        {darkMode ? <FiSun /> : <FiMoon />}
-                      </Select>
-                    </div>
+                <Nav>
+                  <div className="flex-1">
+                    {collapsed ? (
+                      <div className="flex">
+                        <Logo />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
                   </div>
-                </nav>
+                  <div className="">
+                    <TimeConductorView />
+                  </div>
+                  <div className="flex-1 flex justify-end">
+                    <Select className="mr-2">Edit Mode</Select>
+                    <Select checked={darkMode} onChange={setDarkMode}>
+                      {darkMode ? <FiSun /> : <FiMoon />}
+                    </Select>
+                  </div>
+                </Nav>
                 <div className="flex-1 overflow-auto">
                   <Outlet />
                 </div>

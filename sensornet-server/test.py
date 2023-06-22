@@ -11,7 +11,7 @@ def randnorm(mu, sigma):
 
 
 # Define the structure format
-packet_format = "<4s 2x H Q Q q"
+packet_format = "<4s H 2x Q Q q"
 fmt_compiled = struct.Struct(packet_format)
 
 
@@ -52,9 +52,10 @@ while True:
         counter = counters[sensor_id]
         counter = counters[sensor_id] = counter + 1
 
-        datas[sensor_id] += randnorm(0, 1) / rate
+        datas[sensor_id] += randnorm(0, 1) * 1000 / rate
+        # datas[sensor_id] = math.sin(time.time() * 100) * 65535
 
-        data = int(datas[sensor_id] * 1000)
+        data = int(datas[sensor_id])
         packet = make_packet(b"SEN", sensor_id, timestamp, counter, data)
 
         sock.sendto(packet, (server_ip, server_port))
@@ -64,5 +65,5 @@ while True:
     if sleepval > 0:
         better_sleep(sleepval)
     diff = time.time() - last
-    print(f"Rate: {1 / (max(0.00001, diff))} Hz")
+    # print(f"Rate: {1 / (max(0.00001, diff))} Hz")
     last = time.time()

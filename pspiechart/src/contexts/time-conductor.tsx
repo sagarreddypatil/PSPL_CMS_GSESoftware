@@ -36,14 +36,11 @@ export default function TimeConductorProvider({
   const defaultTimespan = 60 * 1000; // 5 minutes
   const date = new Date();
 
-  const pausedLocal = JSON.parse(localStorage.getItem("paused") ?? "null") as
-    | boolean
-    | null;
   const movingLocal = JSON.parse(
     localStorage.getItem("moving") ?? "null"
   ) as IMovingTimespan | null;
 
-  const [paused, setPaused] = useState(pausedLocal ?? false);
+  const [paused, setPaused] = useState(false);
   const [fixed, setFixed] = useState<IFixedTimespan>({
     start: new Date(date.getTime() - defaultTimespan),
     end: date,
@@ -56,7 +53,6 @@ export default function TimeConductorProvider({
 
   useEffect(() => {
     // save paused and moving to local storage
-    localStorage.setItem("paused", JSON.stringify(paused));
     localStorage.setItem("moving", JSON.stringify(moving));
   }, [paused, moving]);
 
