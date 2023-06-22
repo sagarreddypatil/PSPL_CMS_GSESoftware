@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useContext } from "react";
-import { IOContext, IDataSource } from "../contexts/io-context";
+import { IOContext, DataSource } from "../contexts/io-context";
 import {
   Tree,
   TreeItemIndex,
@@ -19,7 +19,7 @@ export default function ObjectTree() {
   const navigate = useNavigate();
 
   const { dataSources } = useContext(IOContext);
-  let groupedSources: { [namespace: string]: IDataSource[] } = {};
+  let groupedSources: { [namespace: string]: DataSource[] } = {};
   dataSources.forEach((source) => {
     const namespace = source.identifier.namespace;
     if (!groupedSources[namespace]) groupedSources[namespace] = [];

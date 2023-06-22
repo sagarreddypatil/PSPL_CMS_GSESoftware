@@ -1,4 +1,4 @@
-import { IDataSource, IDataPoint } from "../contexts/io-context";
+import { DataSource, DataPoint } from "../contexts/io-context";
 import { useContext, useEffect, useRef } from "react";
 import { useDebounce } from "@react-hook/debounce";
 import uPlot, { Options } from "uplot";
@@ -11,7 +11,7 @@ interface UPlotChartProps {
   title?: string;
   pointsPerPixel?: number;
 
-  dataSource?: IDataSource;
+  dataSource?: DataSource;
 }
 
 function dateToSec(date: Date) {
@@ -37,7 +37,7 @@ export default function UPlotChart(props: UPlotChartProps) {
   const yRef = useRef<number[]>([]);
 
   // Downsample buffers
-  const timeDownsampleBuffer = useRef<IDataPoint[]>([]);
+  const timeDownsampleBuffer = useRef<DataPoint[]>([]);
 
   // container size
   const [containerSize, setSize] = useDebounce({ width: 800, height: 600 }, 0);
@@ -244,10 +244,8 @@ export default function UPlotChart(props: UPlotChartProps) {
       (1000 * actualSize.width * (props.pointsPerPixel ?? 1));
 
     return props.dataSource?.historical(start, end, dt).then((hist) => {
-      xRef.current = hist.map((point: IDataPoint) =>
-        dateToSec(point.timestamp)
-      );
-      yRef.current = hist.map((point: IDataPoint) => point.value);
+      xRef.current = hist.map((point: DataPoint) => dateToSec(point.timestamp));
+      yRef.current = hist.map((point: DataPoint) => point.value);
     });
   };
 
@@ -257,7 +255,7 @@ export default function UPlotChart(props: UPlotChartProps) {
 
       if (timeConductor.paused) return () => {};
 
-      const addTimeData = (point: IDataPoint) => {
+      const addTimeData = (point: DataPoint) => {
         timeDownsampleBuffer.current.push(point);
       };
       const subId = props.dataSource?.subscribe(addTimeData);

@@ -1,4 +1,4 @@
-import { IOContext, IDataPoint, genSubId } from "../contexts/io-context";
+import { IOContext, DataPoint, genSubId } from "../contexts/io-context";
 import { useContext, useEffect, useRef } from "react";
 import useWebSocket from "react-use-websocket";
 
@@ -35,7 +35,7 @@ export default function SensorNetPlugin() {
             name: source.name,
           };
 
-          const subscribe = (callback: (data: IDataPoint) => void) => {
+          const subscribe = (callback: (data: DataPoint) => void) => {
             const subId = genSubId();
 
             const subReq = {
@@ -66,7 +66,7 @@ export default function SensorNetPlugin() {
               .then((res) => res.json())
               .then((data) =>
                 data.map(
-                  (d: any): IDataPoint => ({
+                  (d: any): DataPoint => ({
                     timestamp: new Date(d.timestamp / 1000), // us to ms
                     value: d.value,
                   })

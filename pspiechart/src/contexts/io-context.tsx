@@ -22,38 +22,38 @@ export function filterObjectList<T extends { identifier: IdentifierType }>(
   );
 }
 
-export interface IDataPoint {
+export type DataPoint = {
   timestamp: Date;
   value: number;
-}
+};
 
-export interface IDataSource {
+export type DataSource = {
   identifier: IdentifierType;
-  subscribe: (callback: (data: IDataPoint) => void) => string; // returns subscription id
+  subscribe: (callback: (data: DataPoint) => void) => string; // returns subscription id
   unsubscribe: (subId: string) => void;
-  historical: (from: Date, to: Date, dt: number) => Promise<IDataPoint[]>;
-}
+  historical: (from: Date, to: Date, dt: number) => Promise<DataPoint[]>;
+};
 
-interface IConfigOption<T> {
+export type ConfigOption<T> = {
   identifier: IdentifierType;
   getValue: () => Promise<T>;
   setValue: (value: T) => Promise<boolean>; // returns success
-}
+};
 
-interface IRemoteCall {
+export type RemoteCall = {
   identifier: IdentifierType;
   call: () => Promise<boolean>; // returns success
-}
+};
 
 export type IOContextType = {
-  dataSources: IDataSource[];
-  addDataSource: (dataSource: IDataSource) => void;
+  dataSources: DataSource[];
+  addDataSource: (dataSource: DataSource) => void;
 
-  configOptions: IConfigOption<any>[];
-  addConfigOption: (configOption: IConfigOption<any>) => void;
+  configOptions: ConfigOption<any>[];
+  addConfigOption: (configOption: ConfigOption<any>) => void;
 
-  remoteCalls: IRemoteCall[];
-  addRemoteCall: (remoteCall: IRemoteCall) => void;
+  remoteCalls: RemoteCall[];
+  addRemoteCall: (remoteCall: RemoteCall) => void;
 };
 
 export const IOContext = createContext<IOContextType>({
@@ -72,22 +72,22 @@ interface IOContextProviderProps {
 export default function IOContextProvider({
   children,
 }: IOContextProviderProps) {
-  const [dataSources, setDataSources] = useState<IDataSource[]>([]);
-  const addDataSource = (newSource: IDataSource) =>
+  const [dataSources, setDataSources] = useState<DataSource[]>([]);
+  const addDataSource = (newSource: DataSource) =>
     setDataSources((dataSources) => {
       const filtered = filterObjectList(dataSources, newSource.identifier);
       return [...filtered, newSource];
     });
 
-  const [configOptions, setConfigOptions] = useState<IConfigOption<any>[]>([]);
-  const addConfigOption = (configOption: IConfigOption<any>) =>
+  const [configOptions, setConfigOptions] = useState<ConfigOption<any>[]>([]);
+  const addConfigOption = (configOption: ConfigOption<any>) =>
     setConfigOptions((configOptions) => {
       const filtered = filterObjectList(configOptions, configOption.identifier);
       return [...filtered, configOption];
     });
 
-  const [remoteCalls, setRemoteCalls] = useState<IRemoteCall[]>([]);
-  const addRemoteCall = (remoteCall: IRemoteCall) =>
+  const [remoteCalls, setRemoteCalls] = useState<RemoteCall[]>([]);
+  const addRemoteCall = (remoteCall: RemoteCall) =>
     setRemoteCalls((remoteCalls) => {
       const filtered = filterObjectList(remoteCalls, remoteCall.identifier);
       return [...filtered, remoteCall];
