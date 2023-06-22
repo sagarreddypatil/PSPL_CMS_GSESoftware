@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Responsive, Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
