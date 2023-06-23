@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ControlledTreeEnvironment,
   Tree,
@@ -6,6 +6,7 @@ import {
   TreeItemIndex,
 } from "react-complex-tree";
 import { FiChevronRight, FiChevronDown } from "react-icons/fi";
+import { useSearchParams } from "react-router-dom";
 
 interface TreeProps {
   items: Record<TreeItemIndex, TreeItem>;
@@ -13,9 +14,34 @@ interface TreeProps {
 }
 
 export default function TreeView({ items, onPrimaryAction }: TreeProps) {
-  const [focusedItem, setFocusedItem] = useState<TreeItemIndex>();
-  const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>([]);
-  const [selectedItems, setSelectedItems] = useState<TreeItemIndex[]>([]);
+  const {
+    focused,
+    expanded,
+    selected,
+  }: {
+    focused: TreeItemIndex | undefined;
+    expanded: TreeItemIndex[];
+    selected: TreeItemIndex[];
+  } = JSON.parse(localStorage.getItem("tree") || "{}");
+
+  const [focusedItem, setFocusedItem] = useState<TreeItemIndex>(focused ?? "");
+  const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>(
+    expanded ?? []
+  );
+  const [selectedItems, setSelectedItems] = useState<TreeItemIndex[]>(
+    selected ?? []
+  );
+
+  useEffect(() => {
+    localStorage.setItem(
+      "tree",
+      JSON.stringify({
+        focused: focusedItem,
+        expanded: expandedItems,
+        selected: selectedItems,
+      })
+    );
+  }, [focusedItem, expandedItems, selectedItems]);
 
   return (
     <ControlledTreeEnvironment
