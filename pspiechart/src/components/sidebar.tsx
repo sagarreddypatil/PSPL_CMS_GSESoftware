@@ -1,14 +1,8 @@
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import { IOContext, DataSource } from "../contexts/io-context";
-import {
-  Tree,
-  TreeItemIndex,
-  ControlledTreeEnvironment,
-  TreeItem,
-} from "react-complex-tree";
-import { useLocation, useNavigate } from "react-router-dom";
+import { TreeItemIndex, TreeItem } from "react-complex-tree";
+import { useNavigate } from "react-router-dom";
 import "react-complex-tree/lib/style.css";
-import { FiChevronRight, FiChevronDown } from "react-icons/fi";
 import Nav from "../controls/nav";
 import Logo from "../controls/logo";
 import { Dropdown, DropdownItem } from "../controls/dropdown";
@@ -16,7 +10,6 @@ import TreeView from "../controls/tree-view";
 
 export default function Sidebar() {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const { dataSources } = useContext(IOContext);
   let groupedSources: { [namespace: string]: DataSource[] } = {};

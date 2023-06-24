@@ -1,7 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useContext } from "react";
 import { IdentifierType, IOContext } from "../contexts/io-context";
-import UPlotChart from "../components/uplotchart";
+import UPlotChart from "../controls/uplotchart";
+import Dashboard from "./dashboard";
 
 export default function ObjectViewFactory() {
   const params = useParams<IdentifierType>();
@@ -22,5 +23,6 @@ export default function ObjectViewFactory() {
       pointsPerPixel={2}
       title={dataSource.identifier.name}
     />
+    // <Dashboard />
   );
 }

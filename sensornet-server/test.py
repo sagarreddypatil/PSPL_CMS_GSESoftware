@@ -10,7 +10,15 @@ def randnorm(mu, sigma):
     return np.random.normal(mu, sigma)
 
 
-# Define the structure format
+"""
+Packet Format
+    4s: Header (b"SEN")
+    H: Sensor ID (u16)
+    2x: Padding bytes (4-byte aligned)
+    Q: Timestamp (u64 microseconds)
+    Q: Counter (u64)
+    q: Data (i64)
+"""
 packet_format = "<4s H 2x Q Q q"
 fmt_compiled = struct.Struct(packet_format)
 
@@ -53,9 +61,10 @@ while True:
         counter = counters[sensor_id] = counter + 1
 
         datas[sensor_id] += randnorm(0, 1) * 1000 / rate
-        # datas[sensor_id] = math.sin(time.time() * 100) * 65535
+        # data = datas[sensor_id] + math.sin(time.time() * 3) * 1000
+        data = datas[sensor_id] * 10
 
-        data = int(datas[sensor_id])
+        data = int(data)
         packet = make_packet(b"SEN", sensor_id, timestamp, counter, data)
 
         sock.sendto(packet, (server_ip, server_port))

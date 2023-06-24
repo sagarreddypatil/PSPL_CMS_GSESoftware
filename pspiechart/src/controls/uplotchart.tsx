@@ -3,7 +3,7 @@ import { useContext, useEffect, useRef } from "react";
 import { useDebounce } from "@react-hook/debounce";
 import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";
-import SizedDiv from "../controls/sized-div";
+import SizedDiv from "./sized-div";
 import { TimeConductorContext } from "../contexts/time-conductor";
 import { DarkModeContext } from "../App";
 
@@ -197,8 +197,6 @@ export default function UPlotChart(props: UPlotChartProps) {
 
             const min = u.posToVal(u.select.left, "x");
             const max = u.posToVal(u.select.left + u.select.width, "x");
-
-            console.log("resize", min, max);
 
             timeConductor.setFixed({
               start: new Date(min * 1e3),
