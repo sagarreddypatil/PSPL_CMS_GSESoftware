@@ -12,7 +12,7 @@ const COLS = 12;
 const BASE_WIDTH = 3;
 const ROW_HEIGHT = 33;
 
-export default function Dashboard({ item }: UserItemProps) {
+export function Dashboard({ item }: UserItemProps) {
   const existingLayout = JSON.parse(
     localStorage.getItem(`layout:${item.id}`) ?? "[]"
   );
@@ -57,7 +57,7 @@ export default function Dashboard({ item }: UserItemProps) {
         onLayoutChange={(_, layouts) => setLayout(layouts.lg)}
         width={size.width}
       >
-        {item.childIds.map((childId) => {
+        {item.childIds?.map((childId) => {
           const child = userItems.find((item) => item.id === childId);
           return (
             <div key={childId} className="border-2 border-pink-500">

@@ -1,8 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useContext } from "react";
 import { IdentifierType, IOContext } from "../contexts/io-context";
-import UPlotChart from "../controls/uplotchart";
-import Dashboard from "./dashboard";
+import UPlotChart from "./uplotchart";
+import { Dashboard } from "./dashboard";
 import { UserItemsContext } from "../contexts/user-items-context";
 
 export enum ItemViewType {
@@ -20,7 +20,8 @@ export type UserItem = {
   id: string;
   name: string;
   type: ItemViewType;
-  childIds: string[];
+  noStore?: boolean;
+  childIds?: string[];
 };
 
 export type UserItemProps = {

@@ -87,15 +87,17 @@ export default function TreeView({ items, onPrimaryAction }: TreeProps) {
         const isSelected = context.isSelected;
         const isFocused = context.isFocused;
 
-        const selectedClass = "bg-opacity-[0.15]";
-        const unselectedClass = "bg-opacity-0 hover:bg-opacity-5";
+        const selectedClass =
+          "bg-opacity-[0.15] hover:bg-opacity-20 dark:bg-opacity-[0.15] dark:hover:bg-opacity-20";
+        const unselectedClass =
+          "bg-opacity-0 hover:bg-opacity-5 dark:bg-opacity-0 dark:hover:bg-opacity-5";
 
-        const focusedClass = "ring-2 ring-rush";
+        const focusedClass = "";
 
         const padAmount = depth * 1; // tailwind
 
         return (
-          <div {...context.itemContainerWithChildrenProps}>
+          <div {...context.itemContainerWithChildrenProps} className="">
             <label
               className={`flex bg-black dark:bg-white items-center rounded-none ${
                 isSelected ? selectedClass : unselectedClass

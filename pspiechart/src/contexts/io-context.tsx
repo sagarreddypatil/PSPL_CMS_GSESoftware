@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import { UserItemsContext } from "./user-items-context";
-import { ItemViewType } from "../item-views/item-view-factory";
+import { ItemViewType, UserItem } from "../item-views/item-view-factory";
 
 let nextSubId = 0;
 export function genSubId() {
@@ -74,8 +74,50 @@ interface IOContextProviderProps {
 export default function IOContextProvider({
   children,
 }: IOContextProviderProps) {
-  const { userItems, setUserItem } = useContext(UserItemsContext);
+  const { userItems, setUserItems } = useContext(UserItemsContext);
 
+  const addNamespacedItem = (namespace: string, item: UserItem) => {
+    setUserItems((userItems) => {
+      const filtered = userItems.filter(
+        (userItem) => userItem.id !== item.id
+      ) as UserItem[];
+      let namespaceItem = filtered.find(
+        (userItem) => userItem.id === namespace
+      );
+      const moreFiltered = filtered.filter(
+        (userItem) => userItem.id !== namespace
+      );
+
+      let final = [...moreFiltered, item];
+
+      if (!namespaceItem) {
+        namespaceItem = {
+          id: namespace,
+          name: namespace,
+          type: ItemViewType.Folder,
+          childIds: [],
+        };
+
+        let root = final.find((userItem) => userItem.id === "root");
+        if (!root) {
+          // panic
+          console.error("Root not found");
+          return final;
+        }
+
+        const rootFiltered = final.filter((userItem) => userItem.id !== "root");
+
+        root.childIds?.push(namespaceItem.id);
+        final = [...rootFiltered, root];
+      }
+
+      namespaceItem.childIds = [...(namespaceItem.childIds ?? []), item.id];
+
+      return [...final, namespaceItem];
+    });
+  };
+
+  // TODO: Refactor all this
   const [dataSources, setDataSources] = useState<DataSource[]>([]);
   const addDataSource = (newSource: DataSource) => {
     setDataSources((dataSources) => {
@@ -83,27 +125,49 @@ export default function IOContextProvider({
       return [...filtered, newSource];
     });
 
-    setUserItem({
-      id: `${newSource.identifier.namespace}:${newSource.identifier.id}`,
+    const newItemId = `${newSource.identifier.namespace}:${newSource.identifier.id}`;
+
+    addNamespacedItem(newSource.identifier.namespace, {
+      id: newItemId,
       name: newSource.identifier.name || newSource.identifier.id,
       type: ItemViewType.DataSource,
-      childIds: [],
+      noStore: true,
     });
   };
 
   const [configOptions, setConfigOptions] = useState<ConfigOption<any>[]>([]);
-  const addConfigOption = (configOption: ConfigOption<any>) =>
+  const addConfigOption = (configOption: ConfigOption<any>) => {
     setConfigOptions((configOptions) => {
       const filtered = filterObjectList(configOptions, configOption.identifier);
       return [...filtered, configOption];
     });
 
+    const newItemId = `${configOption.identifier.namespace}:${configOption.identifier.id}`;
+
+    addNamespacedItem(configOption.identifier.namespace, {
+      id: newItemId,
+      name: configOption.identifier.name || configOption.identifier.id,
+      type: ItemViewType.ConfigOption,
+      noStore: true,
+    });
+  };
+
   const [remoteCalls, setRemoteCalls] = useState<RemoteCall[]>([]);
-  const addRemoteCall = (remoteCall: RemoteCall) =>
+  const addRemoteCall = (remoteCall: RemoteCall) => {
     setRemoteCalls((remoteCalls) => {
       const filtered = filterObjectList(remoteCalls, remoteCall.identifier);
       return [...filtered, remoteCall];
     });
+
+    const newItemId = `${remoteCall.identifier.namespace}:${remoteCall.identifier.id}`;
+
+    addNamespacedItem(remoteCall.identifier.namespace, {
+      id: newItemId,
+      name: remoteCall.identifier.name || remoteCall.identifier.id,
+      type: ItemViewType.RPC,
+      noStore: true,
+    });
+  };
 
   return (
     <IOContext.Provider

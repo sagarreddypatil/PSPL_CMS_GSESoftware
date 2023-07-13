@@ -8,49 +8,38 @@ import Logo from "../controls/logo";
 import { Dropdown, DropdownItem } from "../controls/dropdown";
 import TreeView from "../controls/tree-view";
 import CreateMenu from "../item-views/create-menu";
+import { UserItemsContext } from "../contexts/user-items-context";
+import { ItemViewType } from "../item-views/item-view-factory";
 
 export default function Sidebar() {
   const navigate = useNavigate();
 
-  const { dataSources } = useContext(IOContext);
-
-  let groupedSources: { [namespace: string]: DataSource[] } = {};
-  dataSources.forEach((source) => {
-    const namespace = source.identifier.namespace;
-    if (!groupedSources[namespace]) groupedSources[namespace] = [];
-    groupedSources[namespace].push(source);
-  });
+  // const { dataSources } = useContext(IOContext);
+  const { userItems } = useContext(UserItemsContext);
 
   let items: Record<TreeItemIndex, TreeItem> = {};
 
   const rootNode: TreeItem = {
     index: "root",
     data: "root",
-    children: Object.keys(groupedSources),
+    children: userItems.find((item) => item.id === "root")?.childIds ?? [],
   };
+
   items.root = rootNode;
 
-  Object.entries(groupedSources).forEach(([namespace, sources]) => {
-    items[namespace] = {
-      index: namespace,
-      data: namespace,
-      isFolder: true,
-      children: sources.map((source) => {
-        const index = `${namespace}:${source.identifier.id}`;
-        items[index] = {
-          index,
-          data: source.identifier.name,
-          isFolder: false,
-        };
-        return index;
-      }),
+  userItems.forEach((item) => {
+    if (item.id === "root") return;
+
+    items[item.id] = {
+      index: item.id,
+      data: item.name,
+      isFolder: item.type === ItemViewType.Folder,
+      children: item.childIds ?? [],
     };
   });
 
   const openItem = (item: TreeItem<any>) => {
-    const identifier = (item.index as string).split(":");
-    if (!identifier[1]) return;
-    const route = `/remote/${identifier[0]}/${identifier[1]}`;
+    const route = `/item/${item.index}`;
     navigate(route);
   };
 
