@@ -85,9 +85,7 @@ export default function UserItemsContextProvider({
     });
   };
 
-  useEffect(() => {
-    console.log("userItems", userItems);
-  }, [userItems]);
+  useEffect(() => {}, [userItems]);
 
   return (
     <UserItemsContext.Provider

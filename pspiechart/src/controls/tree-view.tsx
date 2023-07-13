@@ -109,7 +109,7 @@ export default function TreeView({ items, onPrimaryAction }: TreeProps) {
                 className={`h-full`}
                 style={{ paddingLeft: `${padAmount}rem` }}
               ></div>
-              {arrow}
+              {arrow ?? <div className="w-2"></div>}
               {title}
             </label>
             {children}
