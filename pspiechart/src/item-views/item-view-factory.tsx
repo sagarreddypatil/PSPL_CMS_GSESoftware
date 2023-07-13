@@ -4,7 +4,23 @@ import { IdentifierType, IOContext } from "../contexts/io-context";
 import UPlotChart from "../controls/uplotchart";
 import Dashboard from "./dashboard";
 
-export default function ObjectViewFactory() {
+export enum ItemViewType {
+  DashboardItem = "dashboard",
+  CompositeChartItem = "compositechart",
+
+  DataSourceItem = "datasource",
+  ConfigOptionItem = "configoption",
+  RPCItem = "rpc",
+}
+
+export type UserItem = {
+  id: string;
+  name: string;
+  type: ItemViewType;
+  childIds: string[];
+};
+
+export default function ItemViewFactory() {
   const params = useParams<IdentifierType>();
   const { dataSources } = useContext(IOContext);
 

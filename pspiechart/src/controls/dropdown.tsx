@@ -2,7 +2,7 @@ import { useState } from "react";
 
 interface DropdownProps {
   name: React.ReactNode;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   right?: boolean;
 }
 

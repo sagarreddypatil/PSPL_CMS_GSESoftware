@@ -10,6 +10,7 @@ import TimeConductorProvider from "./contexts/time-conductor";
 import TimeConductorView from "./components/time-conductor-view";
 import Logo from "./controls/logo";
 import Nav from "./controls/nav";
+import { Button } from "./controls/button";
 
 export const DarkModeContext = createContext(false);
 
@@ -35,8 +36,9 @@ function App() {
     <DarkModeContext.Provider value={darkMode}>
       <TimeConductorProvider>
         <IOContextProvider>
-          <SensorNetPlugin />
-
+          <>
+            <SensorNetPlugin />
+          </>
           <div className="bg-white dark:bg-black text-black dark:text-gray-100 h-full">
             <VertLayout onCollapse={setCollapsed}>
               <Sidebar />
@@ -55,7 +57,7 @@ function App() {
                     <TimeConductorView />
                   </div>
                   <div className="flex-1 flex justify-end">
-                    <Select className="mr-2">Edit Mode</Select>
+                    <Button className="mr-2" name="Download" />
                     <Select checked={darkMode} onChange={setDarkMode}>
                       {darkMode ? <FiSun /> : <FiMoon />}
                     </Select>

@@ -5,8 +5,7 @@ import {
   TreeItem,
   TreeItemIndex,
 } from "react-complex-tree";
-import { FiChevronRight, FiChevronDown } from "react-icons/fi";
-import { useSearchParams } from "react-router-dom";
+import { FiChevronRight, FiChevronDown, FiAnchor } from "react-icons/fi";
 
 interface TreeProps {
   items: Record<TreeItemIndex, TreeItem>;
@@ -14,23 +13,24 @@ interface TreeProps {
 }
 
 export default function TreeView({ items, onPrimaryAction }: TreeProps) {
-  const {
-    focused,
-    expanded,
-    selected,
-  }: {
-    focused: TreeItemIndex | undefined;
-    expanded: TreeItemIndex[];
-    selected: TreeItemIndex[];
-  } = JSON.parse(localStorage.getItem("tree") || "{}");
+  const [focusedItem, setFocusedItem] = useState<TreeItemIndex>("root");
+  const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>([]);
+  const [selectedItems, setSelectedItems] = useState<TreeItemIndex[]>([]);
 
-  const [focusedItem, setFocusedItem] = useState<TreeItemIndex>(focused ?? "");
-  const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>(
-    expanded ?? []
-  );
-  const [selectedItems, setSelectedItems] = useState<TreeItemIndex[]>(
-    selected ?? []
-  );
+  useEffect(() => {
+    const {
+      focused,
+      expanded,
+      selected,
+    }: {
+      focused: TreeItemIndex | undefined;
+      expanded: TreeItemIndex[];
+      selected: TreeItemIndex[];
+    } = JSON.parse(localStorage.getItem("tree") || "{}");
+    setFocusedItem(focused ?? "root");
+    setExpandedItems(expanded ?? []);
+    setSelectedItems(selected ?? []);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(
@@ -46,6 +46,13 @@ export default function TreeView({ items, onPrimaryAction }: TreeProps) {
   return (
     <ControlledTreeEnvironment
       items={items}
+      canDragAndDrop={true}
+      canDropOnFolder={true}
+      canDropOnNonFolder={true}
+      canReorderItems={true}
+      canDrag={(selected) => true}
+      canDropAt={(dragged, target) => true}
+      onDrop={(items, target) => console.log(items, target)}
       getItemTitle={(item) => item.data}
       viewState={{
         ["tree"]: {
@@ -68,41 +75,56 @@ export default function TreeView({ items, onPrimaryAction }: TreeProps) {
       renderItemTitle={({ title }) => <>{title}</>}
       renderItemArrow={({ item, context }) =>
         item.isFolder ? (
-          <>
-            <div className="mr-1"></div>
+          <div className="mx-0.5">
             {context.isExpanded ? <FiChevronDown /> : <FiChevronRight />}
-          </>
+          </div>
         ) : null
       }
-      renderItem={({ title, arrow, context, children }) => (
-        <div {...context.itemContainerWithChildrenProps}>
-          <label
-            className={`flex items-center hover:font-semibold rounded-sm my-1 ${
-              context.isSelected
-                ? "font-bold bg-rush text-black hover:bg-rush-dark dark:hover:bg-rush-light"
-                : "hover:bg-gray-200 dark:hover:bg-gray-800"
-            }`}
-            {...context.itemContainerWithoutChildrenProps}
-            {...context.interactiveElementProps}
-          >
-            {arrow}
-            <div className="mr-1"></div>
-            {title}
-          </label>
-          {children}
-        </div>
-      )}
+      renderDragBetweenLine={() => {
+        return <div className="bg-rush h-1 w-full"></div>;
+      }}
+      renderItem={({ title, arrow, context, depth, children }) => {
+        const isSelected = context.isSelected;
+        const isFocused = context.isFocused;
+
+        const selectedClass = "bg-opacity-[0.15]";
+        const unselectedClass = "bg-opacity-0 hover:bg-opacity-5";
+
+        const focusedClass = "ring-2 ring-rush";
+
+        const padAmount = depth * 1; // tailwind
+
+        return (
+          <div {...context.itemContainerWithChildrenProps}>
+            <label
+              className={`flex bg-black dark:bg-white items-center rounded-none ${
+                isSelected ? selectedClass : unselectedClass
+              } ${isFocused ? focusedClass : ""}`}
+              {...context.itemContainerWithoutChildrenProps}
+              {...context.interactiveElementProps}
+            >
+              <div
+                className={`h-full`}
+                style={{ paddingLeft: `${padAmount}rem` }}
+              ></div>
+              {arrow}
+              {title}
+            </label>
+            {children}
+          </div>
+        );
+      }}
       renderTreeContainer={({ children, containerProps }) => (
-        <div {...containerProps} className="-space-x-6 select-none">
-          <div></div>
+        <div
+          {...containerProps}
+          className="select-none"
+          // onBlur={() => setFocusedItem("root")}
+        >
           {children}
         </div>
       )}
       renderItemsContainer={({ children, containerProps }) => (
-        <div {...containerProps} className="space-x-6">
-          <div></div>
-          {children}
-        </div>
+        <div {...containerProps}>{children}</div>
       )}
     >
       <Tree treeId="tree" rootItem="root" treeLabel="Object Tree" />

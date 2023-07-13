@@ -7,11 +7,13 @@ import Nav from "../controls/nav";
 import Logo from "../controls/logo";
 import { Dropdown, DropdownItem } from "../controls/dropdown";
 import TreeView from "../controls/tree-view";
+import CreateMenu from "../item-views/create-menu";
 
 export default function Sidebar() {
   const navigate = useNavigate();
 
   const { dataSources } = useContext(IOContext);
+
   let groupedSources: { [namespace: string]: DataSource[] } = {};
   dataSources.forEach((source) => {
     const namespace = source.identifier.namespace;
@@ -48,7 +50,7 @@ export default function Sidebar() {
   const openItem = (item: TreeItem<any>) => {
     const identifier = (item.index as string).split(":");
     if (!identifier[1]) return;
-    const route = `/${identifier[0]}/${identifier[1]}`;
+    const route = `/remote/${identifier[0]}/${identifier[1]}`;
     navigate(route);
   };
 
@@ -59,12 +61,10 @@ export default function Sidebar() {
           <Logo />
         </div>
         <div className="flex">
-          <Dropdown right name="Create">
-            <DropdownItem>Dashboard</DropdownItem>
-          </Dropdown>
+          <CreateMenu />
         </div>
       </Nav>
-      <div className="pt-2 pe-2 flex-1">
+      <div className="pt-2 flex-1">
         <TreeView items={items} onPrimaryAction={openItem} />
       </div>
     </div>
