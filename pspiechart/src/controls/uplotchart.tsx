@@ -4,7 +4,7 @@ import { useDebounce } from "@react-hook/debounce";
 import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";
 import SizedDiv from "./sized-div";
-import { TimeConductorContext } from "../contexts/time-conductor";
+import { TimeConductorContext } from "../contexts/time-conductor-context";
 import { DarkModeContext } from "../App";
 
 interface UPlotChartProps {

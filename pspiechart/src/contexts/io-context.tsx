@@ -1,4 +1,6 @@
-import { createContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
+import { UserItemsContext } from "./user-items-context";
+import { ItemViewType } from "../item-views/item-view-factory";
 
 let nextSubId = 0;
 export function genSubId() {
@@ -72,12 +74,22 @@ interface IOContextProviderProps {
 export default function IOContextProvider({
   children,
 }: IOContextProviderProps) {
+  const { userItems, setUserItem } = useContext(UserItemsContext);
+
   const [dataSources, setDataSources] = useState<DataSource[]>([]);
-  const addDataSource = (newSource: DataSource) =>
+  const addDataSource = (newSource: DataSource) => {
     setDataSources((dataSources) => {
       const filtered = filterObjectList(dataSources, newSource.identifier);
       return [...filtered, newSource];
     });
+
+    setUserItem({
+      id: `${newSource.identifier.namespace}:${newSource.identifier.id}`,
+      name: newSource.identifier.name || newSource.identifier.id,
+      type: ItemViewType.DataSource,
+      childIds: [],
+    });
+  };
 
   const [configOptions, setConfigOptions] = useState<ConfigOption<any>[]>([]);
   const addConfigOption = (configOption: ConfigOption<any>) =>

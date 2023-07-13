@@ -3,14 +3,17 @@ import { useContext } from "react";
 import { IdentifierType, IOContext } from "../contexts/io-context";
 import UPlotChart from "../controls/uplotchart";
 import Dashboard from "./dashboard";
+import { UserItemsContext } from "../contexts/user-items-context";
 
 export enum ItemViewType {
-  DashboardItem = "dashboard",
-  CompositeChartItem = "compositechart",
+  Folder = "folder",
 
-  DataSourceItem = "datasource",
-  ConfigOptionItem = "configoption",
-  RPCItem = "rpc",
+  Dashboard = "dashboard",
+  CompositeChart = "compositechart",
+
+  DataSource = "datasource",
+  ConfigOption = "configoption",
+  RPC = "rpc",
 }
 
 export type UserItem = {
@@ -20,25 +23,63 @@ export type UserItem = {
   childIds: string[];
 };
 
-export default function ItemViewFactory() {
+export type UserItemProps = {
+  item: UserItem;
+};
+
+export function RemoteViewRoute() {
   const params = useParams<IdentifierType>();
-  const { dataSources } = useContext(IOContext);
-
-  const dataSource = dataSources.find(
-    (source) =>
-      source.identifier.namespace === params.namespace &&
-      source.identifier.id === params.id
-  );
-
-  if (!dataSource) return <h1>Not found</h1>; // todo: 404 page
 
   return (
-    <UPlotChart
-      dataSource={dataSource}
-      key={123}
-      pointsPerPixel={2}
-      title={dataSource.identifier.name}
+    <ItemViewFactory
+      item={{
+        id: `${params.namespace}:${params.id}`,
+        name: params.id ?? "",
+        type: ItemViewType.DataSource,
+        childIds: [],
+      }}
     />
-    // <Dashboard />
   );
+}
+
+export function UserItemRoute() {
+  const params = useParams<IdentifierType>();
+  const { userItems } = useContext(UserItemsContext);
+
+  const item = userItems.find((item) => item.id === params.id);
+
+  return <ItemViewFactory item={item} />;
+}
+
+type ItemViewFactoryProps = {
+  item?: UserItem;
+};
+export function ItemViewFactory({ item }: ItemViewFactoryProps) {
+  const { dataSources } = useContext(IOContext);
+
+  if (!item) return <h1>Not found</h1>;
+
+  switch (item.type) {
+    case ItemViewType.DataSource:
+      const [namespace, id] = item.id.split(":");
+      const dataSource = dataSources.find(
+        (source) =>
+          source.identifier.namespace === namespace &&
+          source.identifier.id === id
+      );
+
+      if (!dataSource) break;
+
+      return (
+        <UPlotChart
+          dataSource={dataSource}
+          pointsPerPixel={2}
+          title={dataSource.identifier.name}
+        />
+      );
+    case ItemViewType.Dashboard:
+      return <Dashboard item={item} />;
+  }
+
+  return <h1>Not found</h1>; // TODO: 404 page
 }

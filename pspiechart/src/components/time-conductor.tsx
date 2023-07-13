@@ -1,4 +1,4 @@
-import { TimeConductorContext } from "../contexts/time-conductor";
+import { TimeConductorContext } from "../contexts/time-conductor-context";
 import { ImPause2, ImPlay3 } from "react-icons/im";
 import Select from "../controls/select";
 import { useContext } from "react";

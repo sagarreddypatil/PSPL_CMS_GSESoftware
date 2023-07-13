@@ -1,22 +1,30 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Responsive, Layout } from "react-grid-layout";
 import SizedDiv from "../controls/sized-div";
 
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
+import { UserItemProps } from "./item-view-factory";
+import { UserItemsContext } from "../contexts/user-items-context";
+import { ItemViewFactory } from "./item-view-factory";
 
 const COLS = 12;
 const BASE_WIDTH = 3;
 const ROW_HEIGHT = 33;
 
-export interface DashboardData {
-  layout: Layout[];
-  //   items:
-}
+export default function Dashboard({ item }: UserItemProps) {
+  const existingLayout = JSON.parse(
+    localStorage.getItem(`layout:${item.id}`) ?? "[]"
+  );
 
-export default function Dashboard() {
-  const [layout, setLayout] = useState<Layout[]>([]);
+  const [layout, setLayout] = useState<Layout[]>(existingLayout);
   const [size, setSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    localStorage.setItem(`layout:${item.id}`, JSON.stringify(layout));
+  }, [layout]);
+
+  const { userItems } = useContext(UserItemsContext);
 
   const genSmallLayout = () => {
     if (layout.length === 0) return [];
@@ -49,15 +57,14 @@ export default function Dashboard() {
         onLayoutChange={(_, layouts) => setLayout(layouts.lg)}
         width={size.width}
       >
-        <div key="1" className="border-2 border-pink-500 ">
-          1
-        </div>
-        <div key="2" className="border-2 border-pink-500">
-          2
-        </div>
-        <div key="3" className="border-2 border-pink-500">
-          3
-        </div>
+        {item.childIds.map((childId) => {
+          const child = userItems.find((item) => item.id === childId);
+          return (
+            <div key={childId} className="border-2 border-pink-500">
+              <ItemViewFactory key={childId} item={child} />
+            </div>
+          );
+        })}
       </Responsive>
     </SizedDiv>
   );
