@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, createContext } from "react";
 import { Responsive, Layout } from "react-grid-layout";
 import SizedDiv from "../controls/sized-div";
 
@@ -12,6 +12,20 @@ const COLS = 12;
 const BASE_WIDTH = 3;
 const ROW_HEIGHT = 33;
 
+type DashboardContext = {
+  layout: Layout[];
+  setLayout: (layout: Layout[]) => void;
+  editMode: boolean;
+  setEditMode: (editMode: boolean) => void;
+};
+
+const DashboardContext = createContext<DashboardContext>({
+  layout: [],
+  setLayout: () => {},
+  editMode: false,
+  setEditMode: () => {},
+});
+
 export function Dashboard({ item }: UserItemProps) {
   const existingLayout = JSON.parse(
     localStorage.getItem(`layout:${item.id}`) ?? "[]"
@@ -23,6 +37,10 @@ export function Dashboard({ item }: UserItemProps) {
   useEffect(() => {
     localStorage.setItem(`layout:${item.id}`, JSON.stringify(layout));
   }, [layout]);
+
+  useEffect(() => {
+    setLayout(existingLayout);
+  }, [item.id]);
 
   const { userItems } = useContext(UserItemsContext);
 
@@ -69,3 +87,5 @@ export function Dashboard({ item }: UserItemProps) {
     </SizedDiv>
   );
 }
+
+export function DashboardTreeItem() {}

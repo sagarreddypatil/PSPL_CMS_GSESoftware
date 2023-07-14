@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 interface ButtonProps {
   name: React.ReactNode;
   className?: string;
@@ -12,7 +10,7 @@ export function Button(props: ButtonProps) {
       <div>
         <button
           type="button"
-          className={`rounded-sm bg-rush px-3 py-1 text-sm font-semibold text-black shadow-sm hover:bg-rush-dark ${props.className}`}
+          className={`rounded-none bg-rush px-3 py-1 text-sm font-semibold text-black shadow-sm hover:bg-rush-dark ${props.className}`}
           onClick={props.onClick}
         >
           {props.name}

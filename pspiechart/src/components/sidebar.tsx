@@ -1,11 +1,9 @@
 import { useContext } from "react";
-import { IOContext, DataSource } from "../contexts/io-context";
 import { TreeItemIndex, TreeItem } from "react-complex-tree";
 import { useNavigate } from "react-router-dom";
 import "react-complex-tree/lib/style.css";
 import Nav from "../controls/nav";
 import Logo from "../controls/logo";
-import { Dropdown, DropdownItem } from "../controls/dropdown";
 import TreeView from "../controls/tree-view";
 import CreateMenu from "../item-views/create-menu";
 import { UserItemsContext } from "../contexts/user-items-context";
@@ -33,12 +31,13 @@ export default function Sidebar() {
     items[item.id] = {
       index: item.id,
       data: item.name,
-      isFolder: item.type === ItemViewType.Folder,
+      isFolder: item.childIds ? true : false,
       children: item.childIds ?? [],
     };
   });
 
   const openItem = (item: TreeItem<any>) => {
+    console.log(item);
     const route = `/item/${item.index}`;
     navigate(route);
   };

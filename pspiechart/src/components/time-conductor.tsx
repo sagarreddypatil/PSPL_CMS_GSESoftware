@@ -56,7 +56,7 @@ function DateTimeTextbox(props: {
   return (
     <input
       type="datetime-local"
-      className="rounded-sm border border-rush dark:bg-night-sky"
+      className="rounded-none border border-rush dark:bg-night-sky"
       defaultValue={value?.toISOString().slice(0, 19)}
       onChange={(e) => {
         const time = new Date(e.target.value + "Z");

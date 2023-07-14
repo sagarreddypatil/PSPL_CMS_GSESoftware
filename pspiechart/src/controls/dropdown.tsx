@@ -14,7 +14,7 @@ export function Dropdown(props: DropdownProps) {
       <div>
         <button
           type="button"
-          className="rounded-sm bg-rush px-3 py-1 text-sm font-semibold text-black shadow-sm hover:bg-rush-dark"
+          className="rounded-none bg-rush px-3 py-1 text-sm font-semibold text-black shadow-sm hover:bg-rush-dark"
           onFocus={() => setOpen(true)}
           onBlur={() => setOpen(false)}
         >
@@ -24,7 +24,7 @@ export function Dropdown(props: DropdownProps) {
       <div
         className={`absolute ${
           props.right ? "right-0" : ""
-        } z-10 mt-2 w-44 origin-top-left rounded-sm bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-night-sky dark:ring-white dark:ring-opacity-30`}
+        } z-10 mt-2 w-44 origin-top-left rounded-none bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-night-sky dark:ring-white dark:ring-opacity-30`}
         hidden={!open}
       >
         <div className="py-1">{props.children}</div>

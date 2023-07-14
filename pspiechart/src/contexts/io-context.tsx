@@ -74,7 +74,7 @@ interface IOContextProviderProps {
 export default function IOContextProvider({
   children,
 }: IOContextProviderProps) {
-  const { userItems, setUserItems } = useContext(UserItemsContext);
+  const { setUserItems } = useContext(UserItemsContext);
 
   const addNamespacedItem = (namespace: string, item: UserItem) => {
     setUserItems((userItems) => {

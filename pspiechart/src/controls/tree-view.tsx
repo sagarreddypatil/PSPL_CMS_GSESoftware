@@ -5,7 +5,7 @@ import {
   TreeItem,
   TreeItemIndex,
 } from "react-complex-tree";
-import { FiChevronRight, FiChevronDown, FiAnchor } from "react-icons/fi";
+import { FiChevronRight, FiChevronDown } from "react-icons/fi";
 
 interface TreeProps {
   items: Record<TreeItemIndex, TreeItem>;
@@ -17,32 +17,6 @@ export default function TreeView({ items, onPrimaryAction }: TreeProps) {
   const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>([]);
   const [selectedItems, setSelectedItems] = useState<TreeItemIndex[]>([]);
 
-  useEffect(() => {
-    const {
-      focused,
-      expanded,
-      selected,
-    }: {
-      focused: TreeItemIndex | undefined;
-      expanded: TreeItemIndex[];
-      selected: TreeItemIndex[];
-    } = JSON.parse(localStorage.getItem("tree") || "{}");
-    setFocusedItem(focused ?? "root");
-    setExpandedItems(expanded ?? []);
-    setSelectedItems(selected ?? []);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "tree",
-      JSON.stringify({
-        focused: focusedItem,
-        expanded: expandedItems,
-        selected: selectedItems,
-      })
-    );
-  }, [focusedItem, expandedItems, selectedItems]);
-
   return (
     <ControlledTreeEnvironment
       items={items}
@@ -50,8 +24,8 @@ export default function TreeView({ items, onPrimaryAction }: TreeProps) {
       canDropOnFolder={true}
       canDropOnNonFolder={true}
       canReorderItems={true}
-      canDrag={(selected) => true}
-      canDropAt={(dragged, target) => true}
+      canDrag={() => true}
+      canDropAt={() => true}
       onDrop={(items, target) => console.log(items, target)}
       getItemTitle={(item) => item.data}
       viewState={{
@@ -61,17 +35,22 @@ export default function TreeView({ items, onPrimaryAction }: TreeProps) {
           selectedItems,
         },
       }}
-      onPrimaryAction={onPrimaryAction}
+      // onPrimaryAction={onPrimaryAction}
       onFocusItem={(item) => setFocusedItem(item.index)}
-      onExpandItem={(item) => setExpandedItems([...expandedItems, item.index])}
-      onCollapseItem={(item) =>
+      onExpandItem={(item) => {
+        setExpandedItems([...expandedItems, item.index]);
+        onPrimaryAction(item);
+      }}
+      onCollapseItem={(item) => {
         setExpandedItems(
           expandedItems.filter(
             (expandedItemIndex) => expandedItemIndex !== item.index
           )
-        )
-      }
+        );
+        onPrimaryAction(item);
+      }}
       onSelectItems={(items) => setSelectedItems(items)}
+      onPrimaryAction={onPrimaryAction}
       renderItemTitle={({ title }) => <>{title}</>}
       renderItemArrow={({ item, context }) =>
         item.isFolder ? (
