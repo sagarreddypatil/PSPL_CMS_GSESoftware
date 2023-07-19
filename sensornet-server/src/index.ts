@@ -111,8 +111,14 @@ webServer.get("/historical/:id", async (req, res) => {
 
   const query = `from(bucket: "sensornet")
                   |> range(start: time(v: ${start_ns}), stop: time(v: ${end_ns}))
-                  |> filter(fn: (r) => r._measurement == "sensor" and r.id == "${req.params.id}")
-                  |> aggregateWindow(every: duration(v: ${aggregateWindow_ns}), fn: mean)
+                  |> filter(fn: (r) => r._measurement == "sensor" and r.id == "${
+                    req.params.id
+                  }")
+                  ${
+                    aggregateWindow_ns > 0
+                      ? `|> aggregateWindow(every: duration(v: ${aggregateWindow_ns}), fn: mean)`
+                      : ""
+                  }
                   |> map(fn: (r) => ({ id: r.id, value: r._value, time_us: (uint(v: r._time) / uint(v: 1000)) }))
   `;
 
