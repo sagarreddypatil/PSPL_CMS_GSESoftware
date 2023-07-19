@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useContext } from "react";
 import { IdentifierType, IOContext } from "../contexts/io-context";
 import UPlotChart from "./uplotchart";
-import { Dashboard } from "./dashboard";
+import { Dashboard, DashboardTreeItem } from "./dashboard";
 import { UserItemsContext } from "../contexts/user-items-context";
 
 export enum ItemViewType {
@@ -83,4 +83,15 @@ export function ItemViewFactory({ item }: ItemViewFactoryProps) {
   }
 
   return <h1>Not found</h1>; // TODO: 404 page
+}
+
+export function TreeItemFactory({ item }: ItemViewFactoryProps) {
+  if (!item) return <div className="bg-red-500 text-white">Not Found</div>;
+
+  switch (item.type) {
+    case ItemViewType.Dashboard:
+      return <DashboardTreeItem item={item} />;
+  }
+
+  return <div className="">{item.name}</div>;
 }

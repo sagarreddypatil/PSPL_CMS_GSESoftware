@@ -30,14 +30,13 @@ export default function Sidebar() {
 
     items[item.id] = {
       index: item.id,
-      data: item.name,
+      data: item,
       isFolder: item.childIds ? true : false,
       children: item.childIds ?? [],
     };
   });
 
   const openItem = (item: TreeItem<any>) => {
-    console.log(item);
     const route = `/item/${item.index}`;
     navigate(route);
   };

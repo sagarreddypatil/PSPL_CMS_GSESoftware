@@ -42,7 +42,6 @@ export default function UserItemsContextProvider({
   ]);
 
   const setUserItem = (userItem: UserItem) => {
-    console.log("setUserItem", userItem);
     setUserItems((userItems) => {
       const filtered = userItems.filter((item) => item.id !== userItem.id);
       return [...filtered, userItem];

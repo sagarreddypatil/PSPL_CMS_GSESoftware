@@ -6,6 +6,7 @@ import {
   TreeItemIndex,
 } from "react-complex-tree";
 import { FiChevronRight, FiChevronDown } from "react-icons/fi";
+import { TreeItemFactory } from "../item-views/item-view-factory";
 
 interface TreeProps {
   items: Record<TreeItemIndex, TreeItem>;
@@ -27,7 +28,7 @@ export default function TreeView({ items, onPrimaryAction }: TreeProps) {
       canDrag={() => true}
       canDropAt={() => true}
       onDrop={(items, target) => console.log(items, target)}
-      getItemTitle={(item) => item.data}
+      getItemTitle={() => "you should never see this"}
       viewState={{
         ["tree"]: {
           focusedItem,
@@ -35,34 +36,43 @@ export default function TreeView({ items, onPrimaryAction }: TreeProps) {
           selectedItems,
         },
       }}
-      // onPrimaryAction={onPrimaryAction}
       onFocusItem={(item) => setFocusedItem(item.index)}
-      onExpandItem={(item) => {
-        setExpandedItems([...expandedItems, item.index]);
-        onPrimaryAction(item);
-      }}
-      onCollapseItem={(item) => {
-        setExpandedItems(
-          expandedItems.filter(
-            (expandedItemIndex) => expandedItemIndex !== item.index
-          )
-        );
-        onPrimaryAction(item);
-      }}
+      // onExpandItem={(item) => {
+      //   setExpandedItems([...expandedItems, item.index]);
+      // }}
+      // onCollapseItem={(item) => {
+      //   setExpandedItems(
+      //     expandedItems.filter(
+      //       (expandedItemIndex) => expandedItemIndex !== item.index
+      //     )
+      //   );
+      // }}
       onSelectItems={(items) => setSelectedItems(items)}
-      onPrimaryAction={onPrimaryAction}
       renderItemTitle={({ title }) => <>{title}</>}
-      renderItemArrow={({ item, context }) =>
-        item.isFolder ? (
-          <div className="mx-0.5">
+      renderItemArrow={({ item, context }) => {
+        return item.isFolder ? (
+          <div
+            className="mx-0.5"
+            onClick={() => {
+              if (context.isExpanded) {
+                setExpandedItems(
+                  expandedItems.filter(
+                    (expandedItemIndex) => expandedItemIndex !== item.index
+                  )
+                );
+              } else {
+                setExpandedItems([...expandedItems, item.index]);
+              }
+            }}
+          >
             {context.isExpanded ? <FiChevronDown /> : <FiChevronRight />}
           </div>
-        ) : null
-      }
+        ) : null;
+      }}
       renderDragBetweenLine={() => {
         return <div className="bg-rush h-1 w-full"></div>;
       }}
-      renderItem={({ title, arrow, context, depth, children }) => {
+      renderItem={({ item, arrow, context, depth, children }) => {
         const isSelected = context.isSelected;
         const isFocused = context.isFocused;
 
@@ -78,7 +88,7 @@ export default function TreeView({ items, onPrimaryAction }: TreeProps) {
         return (
           <div {...context.itemContainerWithChildrenProps} className="">
             <label
-              className={`flex bg-black dark:bg-white items-center rounded-none ${
+              className={`flex bg-black dark:bg-white items-center rounded-none h-7 ${
                 isSelected ? selectedClass : unselectedClass
               } ${isFocused ? focusedClass : ""}`}
               {...context.itemContainerWithoutChildrenProps}
@@ -89,7 +99,12 @@ export default function TreeView({ items, onPrimaryAction }: TreeProps) {
                 style={{ paddingLeft: `${padAmount}rem` }}
               ></div>
               {arrow ?? <div className="w-2"></div>}
-              {title}
+              <div
+                onClick={() => onPrimaryAction(item)}
+                className="flex-1 me-2"
+              >
+                <TreeItemFactory item={item.data} />
+              </div>
             </label>
             {children}
           </div>

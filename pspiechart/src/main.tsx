@@ -14,10 +14,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    children: [
-      { path: "/remote/:namespace/:id", element: <RemoteViewRoute /> },
-      { path: "/item/:id", element: <UserItemRoute /> },
-    ],
+    children: [{ path: "/item/:id", element: <UserItemRoute /> }],
   },
 ]);
 
