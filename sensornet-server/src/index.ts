@@ -152,7 +152,7 @@ webServer
 
 const udpSocket = dgram.createSocket("udp4"); // UDP socket for receiving data
 let lastPacketTimestamps: { [key: string]: number } = {};
-const outRate = 1000; // Hz
+const outRate = 100; // Hz
 
 udpSocket.on("message", async (msg) => {
   try {
