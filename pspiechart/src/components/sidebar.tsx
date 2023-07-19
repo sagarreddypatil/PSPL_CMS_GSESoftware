@@ -7,7 +7,6 @@ import Logo from "../controls/logo";
 import TreeView from "../controls/tree-view";
 import CreateMenu from "../item-views/create-menu";
 import { UserItemsContext } from "../contexts/user-items-context";
-import { ItemViewType } from "../item-views/item-view-factory";
 
 export default function Sidebar() {
   const navigate = useNavigate();

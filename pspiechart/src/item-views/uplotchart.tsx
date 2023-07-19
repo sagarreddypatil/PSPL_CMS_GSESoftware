@@ -40,14 +40,17 @@ export default function UPlotChart(props: UPlotChartProps) {
   const timeDownsampleBuffer = useRef<DataPoint[]>([]);
 
   // container size
-  const [containerSize, setSize] = useDebounce({ width: 800, height: 600 }, 0);
-  const size = {
+  const [containerSize, setSize] = useDebounce(
+    { width: 800, height: 600 },
+    100
+  );
+  const unscaledSize = {
     width: containerSize.width,
     height: containerSize.height - 60,
   };
-  const actualSize = {
-    width: size.width * window.devicePixelRatio,
-    height: size.height * window.devicePixelRatio,
+  const size = {
+    width: unscaledSize.width * window.devicePixelRatio,
+    height: unscaledSize.height * window.devicePixelRatio,
   };
 
   useEffect(() => {
@@ -65,7 +68,7 @@ export default function UPlotChart(props: UPlotChartProps) {
     };
 
     const downsampleData = () => {
-      const desiredPoints = actualSize.width * (props.pointsPerPixel ?? 1);
+      const desiredPoints = size.width * (props.pointsPerPixel ?? 1);
       const desiredDt = timespan / desiredPoints;
 
       // downsample time data
@@ -239,7 +242,7 @@ export default function UPlotChart(props: UPlotChartProps) {
     }
     const dt =
       (end.getTime() - start.getTime()) /
-      (1000 * actualSize.width * (props.pointsPerPixel ?? 1));
+      (1000 * size.width * (props.pointsPerPixel ?? 1));
 
     return props.dataSource?.historical(start, end, dt).then((hist) => {
       xRef.current = hist.map((point: DataPoint) => dateToSec(point.timestamp));
@@ -265,10 +268,10 @@ export default function UPlotChart(props: UPlotChartProps) {
 
   useEffect(() => {
     plotRef.current?.setSize({
-      width: size.width,
-      height: size.height,
+      width: unscaledSize.width,
+      height: unscaledSize.height,
     });
-  }, [size]);
+  }, [unscaledSize]);
 
   return (
     <SizedDiv onResize={(width, height) => setSize({ width, height })}>

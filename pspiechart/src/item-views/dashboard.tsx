@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { create } from "zustand";
 
-import { Responsive, Layout } from "react-grid-layout";
+import { Responsive, Layout, Layouts } from "react-grid-layout";
 import SizedDiv from "../controls/sized-div";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -12,6 +12,7 @@ import { ItemViewFactory } from "./item-view-factory";
 import Select from "../controls/select";
 
 import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
+import { useDebounce } from "@react-hook/debounce";
 
 const COLS = 12;
 const BASE_WIDTH = 3;
@@ -35,7 +36,7 @@ export function Dashboard({ item }: UserItemProps) {
   const editMode = useEditMode((state) => state.editMode);
 
   const [layout, setLayout] = useState<Layout[]>(existingLayout);
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  const [size, setSize] = useDebounce({ width: 0, height: 0 }, 100);
 
   useEffect(() => {
     localStorage.setItem(`layout:${item.id}`, JSON.stringify(layout));
@@ -47,11 +48,11 @@ export function Dashboard({ item }: UserItemProps) {
 
   const { userItems } = useContext(UserItemsContext);
 
-  const genSmallLayout = () => {
-    if (layout.length === 0) return [];
-    let y = -layout[0].h;
+  const genSmallLayout = (curLayout: Layout[]) => {
+    if (curLayout.length === 0) return [];
+    let y = -curLayout[0].h;
 
-    return layout.map((item) => {
+    return curLayout.map((item) => {
       return {
         ...item,
         x: 0,
@@ -63,11 +64,19 @@ export function Dashboard({ item }: UserItemProps) {
 
   const layouts = {
     lg: layout,
-    xxs: genSmallLayout(),
+    xxs: genSmallLayout(layout),
   };
 
+  const onResize = useCallback((width: number, height: number) => {
+    setSize({ width, height });
+  }, []);
+
+  const onLayoutChange = useCallback((_: Layout[], allLayouts: Layouts) => {
+    setLayout(allLayouts.lg);
+  }, []);
+
   return (
-    <SizedDiv onResize={(width, height) => setSize({ width, height })}>
+    <SizedDiv onResize={onResize}>
       <Responsive
         className="layout"
         layouts={layouts}
@@ -76,7 +85,7 @@ export function Dashboard({ item }: UserItemProps) {
         breakpoints={{ lg: 480, xxs: 0 }}
         cols={{ lg: COLS, xxs: BASE_WIDTH }}
         rowHeight={ROW_HEIGHT}
-        onLayoutChange={(_, layouts) => setLayout(layouts.lg)}
+        onLayoutChange={onLayoutChange}
         width={size.width}
       >
         {item.childIds?.map((childId) => {
