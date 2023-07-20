@@ -1,19 +1,28 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   ControlledTreeEnvironment,
+  DraggingPosition,
   Tree,
   TreeItem,
   TreeItemIndex,
 } from "react-complex-tree";
+
 import { FiChevronRight, FiChevronDown } from "react-icons/fi";
 import { TreeItemFactory } from "../item-views/item-view-factory";
+import { useHotkeys } from "react-hotkeys-hook";
+import { UserItemsContext } from "../contexts/user-items-context";
 
 interface TreeProps {
   items: Record<TreeItemIndex, TreeItem>;
   onPrimaryAction: (item: TreeItem) => void;
+  onDrop: (items: TreeItem[], target: DraggingPosition) => void;
 }
 
-export default function TreeView({ items, onPrimaryAction }: TreeProps) {
+export default function TreeView({
+  items,
+  onPrimaryAction,
+  onDrop,
+}: TreeProps) {
   const [focusedItem, setFocusedItem] = useState<TreeItemIndex>("root");
   const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>([]);
   const [selectedItems, setSelectedItems] = useState<TreeItemIndex[]>([]);
@@ -27,7 +36,7 @@ export default function TreeView({ items, onPrimaryAction }: TreeProps) {
       canReorderItems={true}
       canDrag={() => true}
       canDropAt={() => true}
-      onDrop={(items, target) => console.log(items, target)}
+      onDrop={onDrop}
       getItemTitle={() => "you should never see this"}
       viewState={{
         ["tree"]: {
@@ -75,6 +84,8 @@ export default function TreeView({ items, onPrimaryAction }: TreeProps) {
       renderItem={({ item, arrow, context, depth, children }) => {
         const isSelected = context.isSelected;
         const isFocused = context.isFocused;
+
+        const { setUserItems } = useContext(UserItemsContext);
 
         const selectedClass =
           "bg-opacity-[0.15] hover:bg-opacity-20 dark:bg-opacity-[0.15] dark:hover:bg-opacity-20";

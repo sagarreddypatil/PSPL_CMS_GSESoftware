@@ -4,6 +4,8 @@ import { IdentifierType, IOContext } from "../contexts/io-context";
 import UPlotChart from "./uplotchart";
 import { Dashboard, DashboardTreeItem } from "./dashboard";
 import { UserItemsContext } from "../contexts/user-items-context";
+import { Button } from "../controls/button";
+import { FiTrash } from "react-icons/fi";
 
 export enum ItemViewType {
   Folder = "folder",
@@ -88,10 +90,21 @@ export function ItemViewFactory({ item }: ItemViewFactoryProps) {
 export function TreeItemFactory({ item }: ItemViewFactoryProps) {
   if (!item) return <div className="bg-red-500 text-white">Not Found</div>;
 
-  switch (item.type) {
-    case ItemViewType.Dashboard:
-      return <DashboardTreeItem item={item} />;
-  }
+  return (
+    <div className="flex flex-row w-full">
+      {(() => {
+        switch (item.type) {
+          case ItemViewType.Dashboard:
+            return <DashboardTreeItem item={item} />;
+        }
 
-  return <div className="">{item.name}</div>;
+        return (
+          <>
+            {item.name}
+            <div className="flex-grow"></div>
+          </>
+        );
+      })()}
+    </div>
+  );
 }

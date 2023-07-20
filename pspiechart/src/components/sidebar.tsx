@@ -1,18 +1,28 @@
 import { useContext } from "react";
-import { TreeItemIndex, TreeItem } from "react-complex-tree";
 import { useNavigate } from "react-router-dom";
+
+import {
+  TreeItemIndex,
+  TreeItem,
+  DraggingPositionItem,
+  DraggingPositionBetweenItems,
+} from "react-complex-tree";
 import "react-complex-tree/lib/style.css";
+
 import Nav from "../controls/nav";
 import Logo from "../controls/logo";
 import TreeView from "../controls/tree-view";
+
 import CreateMenu from "../item-views/create-menu";
+
 import { UserItemsContext } from "../contexts/user-items-context";
+import { UserItem } from "../item-views/item-view-factory";
 
 export default function Sidebar() {
   const navigate = useNavigate();
 
   // const { dataSources } = useContext(IOContext);
-  const { userItems } = useContext(UserItemsContext);
+  const { userItems, setUserItems } = useContext(UserItemsContext);
 
   let items: Record<TreeItemIndex, TreeItem> = {};
 
@@ -40,6 +50,38 @@ export default function Sidebar() {
     navigate(route);
   };
 
+  const addChild = (childItems: UserItem[], parentId: string, pos: number) => {
+    setUserItems((items) => {
+      const parent = items.find((item) => item.id === parentId);
+      if (!parent) {
+        console.error(`Parentn not found: ${parentId}`);
+        return items;
+      }
+      if (!parent.childIds) {
+        console.error(`Parent is not a folder: ${parentId}`);
+        return items;
+      }
+
+      const addChildIds = childItems
+        .map((item) => item.id)
+        .filter((id) => !parent.childIds?.includes(id));
+      if (pos < 0) pos = parent.childIds.length;
+
+      let newChildIds = parent.childIds.slice();
+      newChildIds.splice(pos, 0, ...addChildIds);
+
+      const newParent = {
+        ...parent,
+        childIds: newChildIds,
+      };
+
+      return items.map((item) => {
+        if (item.id === parentId) return newParent;
+        return item;
+      });
+    });
+  };
+
   return (
     <div className="h-full flex flex-col">
       <Nav>
@@ -51,7 +93,27 @@ export default function Sidebar() {
         </div>
       </Nav>
       <div className="pt-2 flex-1">
-        <TreeView items={items} onPrimaryAction={openItem} />
+        <TreeView
+          items={items}
+          onPrimaryAction={openItem}
+          onDrop={(items, target) => {
+            const userItems = items.map((item) => item.data);
+            if (target.targetType == "item") {
+              const actTarget = target as DraggingPositionItem;
+              addChild(userItems, actTarget.targetItem.toString(), -1);
+            }
+            if (target.targetType == "between-items") {
+              const actTarget = target as DraggingPositionBetweenItems;
+              addChild(
+                userItems,
+                actTarget.parentItem.toString(),
+                actTarget.linePosition == "top"
+                  ? actTarget.childIndex - 1
+                  : actTarget.childIndex
+              );
+            }
+          }}
+        />
       </div>
     </div>
   );

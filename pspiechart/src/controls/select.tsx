@@ -17,7 +17,7 @@ export default function Select(props: SelectProps) {
         className="peer hidden"
         id={id}
         checked={props.checked}
-        // onChange={(e) => props.onChange?.(e.target.checked)}
+        onChange={() => {}}
       />
       <label
         htmlFor={id}

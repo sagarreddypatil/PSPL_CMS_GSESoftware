@@ -1,6 +1,7 @@
 interface ButtonProps {
-  name: React.ReactNode;
+  name?: React.ReactNode;
   className?: string;
+  children?: React.ReactNode;
   onClick?: () => void;
 }
 
@@ -14,6 +15,7 @@ export function Button(props: ButtonProps) {
           onClick={props.onClick}
         >
           {props.name}
+          {props.children}
         </button>
       </div>
     </div>

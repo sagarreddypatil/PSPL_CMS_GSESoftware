@@ -16,7 +16,8 @@ import { useDebounce } from "@react-hook/debounce";
 
 const COLS = 12;
 const BASE_WIDTH = 3;
-const ROW_HEIGHT = 33;
+const BASE_HEIGHT = 3;
+const ROW_HEIGHT = 86;
 
 type EditModeState = {
   editMode: boolean;
@@ -40,6 +41,7 @@ export function Dashboard({ item }: UserItemProps) {
 
   useEffect(() => {
     localStorage.setItem(`layout:${item.id}`, JSON.stringify(layout));
+    console.log(layout);
   }, [layout]);
 
   useEffect(() => {
@@ -72,7 +74,14 @@ export function Dashboard({ item }: UserItemProps) {
   }, []);
 
   const onLayoutChange = useCallback((_: Layout[], allLayouts: Layouts) => {
-    setLayout(allLayouts.lg);
+    setLayout(
+      allLayouts.lg.map((item) => {
+        if (item.w === 1) item.w = BASE_WIDTH;
+        if (item.h === 1) item.h = BASE_HEIGHT;
+
+        return item;
+      })
+    );
   }, []);
 
   return (
@@ -114,17 +123,18 @@ export function DashboardTreeItem({ item }: UserItemProps) {
   const { editMode, setEditMode } = useEditMode();
 
   return (
-    <div className="flex flex-row justify-between items-center w-full">
+    <>
       {item.name}
+      <div className="flex-grow"></div>
       <div>
         <Select
           checked={editMode}
           onChange={(value) => setEditMode(value)}
-          className="py-0.5 px-1 text-sm"
+          className="py-0.5 px-[0.25rem] text-sm"
         >
           <HiOutlineWrenchScrewdriver />
         </Select>
       </div>
-    </div>
+    </>
   );
 }

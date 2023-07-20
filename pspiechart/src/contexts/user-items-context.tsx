@@ -6,8 +6,6 @@ export type UserItemsContextType = {
   setUserItems: React.Dispatch<React.SetStateAction<UserItem[]>>;
   setUserItem: (userItem: UserItem) => void;
   removeUserItem: (userItem: UserItem) => void;
-  addChild: (parentId: string, childId: string) => void;
-  removeChild: (parentId: string, childId: string) => void;
 };
 
 export const UserItemsContext = createContext<UserItemsContextType>({
@@ -15,8 +13,6 @@ export const UserItemsContext = createContext<UserItemsContextType>({
   setUserItems: () => {},
   setUserItem: () => {},
   removeUserItem: () => {},
-  addChild: () => {},
-  removeChild: () => {},
 });
 
 type UserItemsContextProviderProps = {
@@ -54,36 +50,6 @@ export default function UserItemsContextProvider({
       return [...filtered];
     });
 
-  const addChild = (parentId: string, childId: string) => {
-    setUserItems((userItems) => {
-      const parent = userItems.find((item) => item.id === parentId);
-      if (!parent) return userItems;
-      if (!parent.childIds) return userItems;
-
-      const newParent = {
-        ...parent,
-        childIds: [...parent.childIds, childId],
-      };
-
-      return [...userItems.filter((item) => item.id !== parentId), newParent];
-    });
-  };
-
-  const removeChild = (parentId: string, childId: string) => {
-    setUserItems((userItems) => {
-      const parent = userItems.find((item) => item.id === parentId);
-      if (!parent) return userItems;
-      if (!parent.childIds) return userItems;
-
-      const newParent = {
-        ...parent,
-        childIds: parent.childIds.filter((id) => id !== childId),
-      };
-
-      return [...userItems.filter((item) => item.id !== parentId), newParent];
-    });
-  };
-
   useEffect(() => {}, [userItems]);
 
   return (
@@ -93,8 +59,6 @@ export default function UserItemsContextProvider({
         setUserItems,
         setUserItem,
         removeUserItem,
-        addChild,
-        removeChild,
       }}
     >
       {children}
