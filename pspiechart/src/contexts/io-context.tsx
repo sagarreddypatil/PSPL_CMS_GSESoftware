@@ -78,7 +78,7 @@ export default function IOContextProvider({
 
   const addNamespacedItem = (namespace: string, item: UserItem) => {
     setUserItems((userItems) => {
-      const filtered = userItems.filter(
+      const filtered = Array.from(userItems.values()).filter(
         (userItem) => userItem.id !== item.id
       ) as UserItem[];
       let namespaceItem = filtered.find(
@@ -113,7 +113,13 @@ export default function IOContextProvider({
 
       namespaceItem.childIds = [...(namespaceItem.childIds ?? []), item.id];
 
-      return [...final, namespaceItem];
+      // convert to map
+      let finalMap = new Map<string, UserItem>();
+      [...final, namespaceItem].forEach((userItem) => {
+        finalMap.set(userItem.id, userItem);
+      });
+
+      return finalMap;
     });
   };
 

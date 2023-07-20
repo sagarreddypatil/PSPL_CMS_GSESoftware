@@ -29,7 +29,7 @@ export default function Sidebar() {
   const rootNode: TreeItem = {
     index: "root",
     data: "root",
-    children: userItems.find((item) => item.id === "root")?.childIds ?? [],
+    children: userItems.get("root")?.childIds ?? [],
   };
 
   items.root = rootNode;
@@ -52,9 +52,9 @@ export default function Sidebar() {
 
   const addChild = (childItems: UserItem[], parentId: string, pos: number) => {
     setUserItems((items) => {
-      const parent = items.find((item) => item.id === parentId);
+      const parent = items.get(parentId);
       if (!parent) {
-        console.error(`Parentn not found: ${parentId}`);
+        console.error(`Parent not found: ${parentId}`);
         return items;
       }
       if (!parent.childIds) {
@@ -75,10 +75,8 @@ export default function Sidebar() {
         childIds: newChildIds,
       };
 
-      return items.map((item) => {
-        if (item.id === parentId) return newParent;
-        return item;
-      });
+      items.set(parentId, newParent);
+      return items;
     });
   };
 

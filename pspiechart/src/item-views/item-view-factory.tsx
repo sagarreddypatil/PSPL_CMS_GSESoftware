@@ -49,7 +49,7 @@ export function UserItemRoute() {
   const params = useParams<IdentifierType>();
   const { userItems } = useContext(UserItemsContext);
 
-  const item = userItems.find((item) => item.id === params.id);
+  const item = userItems.get(params.id ?? "");
 
   return <ItemViewFactory item={item} />;
 }

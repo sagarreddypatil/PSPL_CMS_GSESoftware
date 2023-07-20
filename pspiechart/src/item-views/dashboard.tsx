@@ -41,7 +41,6 @@ export function Dashboard({ item }: UserItemProps) {
 
   useEffect(() => {
     localStorage.setItem(`layout:${item.id}`, JSON.stringify(layout));
-    console.log(layout);
   }, [layout]);
 
   useEffect(() => {
@@ -98,7 +97,7 @@ export function Dashboard({ item }: UserItemProps) {
         width={size.width}
       >
         {item.childIds?.map((childId) => {
-          const child = userItems.find((item) => item.id === childId);
+          const child = userItems.get(childId);
           return (
             <div
               key={childId}
