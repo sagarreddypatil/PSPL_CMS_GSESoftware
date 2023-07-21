@@ -40,10 +40,7 @@ export default function UPlotChart(props: UPlotChartProps) {
   const timeDownsampleBuffer = useRef<DataPoint[]>([]);
 
   // container size
-  const [containerSize, setSize] = useDebounce(
-    { width: 800, height: 600 },
-    100
-  );
+  const [containerSize, setSize] = useDebounce({ width: -1, height: -1 }, 0);
   const unscaledSize = {
     width: containerSize.width,
     height: containerSize.height - 60,
@@ -68,6 +65,7 @@ export default function UPlotChart(props: UPlotChartProps) {
     };
 
     const downsampleData = () => {
+      if (size.width < 0) return;
       const desiredPoints = size.width * (props.pointsPerPixel ?? 1);
       const desiredDt = timespan / desiredPoints;
 
@@ -232,6 +230,9 @@ export default function UPlotChart(props: UPlotChartProps) {
   }, [props.dataSource, props.title, timeConductor]);
 
   const fetchHistorical = async () => {
+    let curWidth = size.width;
+    if (curWidth < 0) curWidth = 1000;
+
     let start: Date, end: Date;
 
     xRef.current.length = 0;
@@ -246,7 +247,7 @@ export default function UPlotChart(props: UPlotChartProps) {
     }
     const dt =
       (end.getTime() - start.getTime()) /
-      (1000 * size.width * (props.pointsPerPixel ?? 1));
+      (1000 * curWidth * (props.pointsPerPixel ?? 1));
 
     return props.dataSource?.historical(start, end, dt).then((hist) => {
       xRef.current = hist.map((point: DataPoint) => dateToSec(point.timestamp));

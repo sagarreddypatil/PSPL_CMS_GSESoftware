@@ -101,13 +101,13 @@ export function Dashboard({ item }: UserItemProps) {
           const child = userItems.get(childId);
           return (
             <div key={childId}>
-              <fieldset className="ring-1 ring-opacity-20 dark:ring-opacity-20 ring-black dark:ring-white w-full h-full min-w-0">
+              <fieldset className="bg-white dark:bg-black ring-1 ring-opacity-20 dark:ring-opacity-20 ring-black dark:ring-white w-full h-full min-w-0">
                 <legend className="w-auto mx-auto bg-white dark:bg-black">
                   {child?.name}
                 </legend>
                 {editMode ? (
-                  <div className="bg-aged-light dark:bg-aged w-full h-full flex text-center text-5xl text-white shadow-md shadow-night-sky">
-                    <div className="m-auto">{child?.name}</div>
+                  <div className="w-full h-full flex text-center text-5xl">
+                    <div className="m-auto">It goeth here</div>
                   </div>
                 ) : (
                   <ItemViewFactory key={childId} item={child} />
