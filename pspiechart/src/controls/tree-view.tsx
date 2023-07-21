@@ -9,23 +9,24 @@ import {
 
 import { FiChevronRight, FiChevronDown } from "react-icons/fi";
 import { TreeItemFactory } from "../item-views/item-view-factory";
-import { useHotkeys } from "react-hotkeys-hook";
-import { UserItemsContext } from "../contexts/user-items-context";
 
 interface TreeProps {
   items: Record<TreeItemIndex, TreeItem>;
   onPrimaryAction: (item: TreeItem) => void;
   onDrop: (items: TreeItem[], target: DraggingPosition) => void;
+  selectedItems: string[];
+  setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export default function TreeView({
   items,
   onPrimaryAction,
   onDrop,
+  selectedItems,
+  setSelectedItems,
 }: TreeProps) {
   const [focusedItem, setFocusedItem] = useState<TreeItemIndex>("root");
   const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>([]);
-  const [selectedItems, setSelectedItems] = useState<TreeItemIndex[]>([]);
 
   return (
     <ControlledTreeEnvironment
@@ -46,17 +47,9 @@ export default function TreeView({
         },
       }}
       onFocusItem={(item) => setFocusedItem(item.index)}
-      // onExpandItem={(item) => {
-      //   setExpandedItems([...expandedItems, item.index]);
-      // }}
-      // onCollapseItem={(item) => {
-      //   setExpandedItems(
-      //     expandedItems.filter(
-      //       (expandedItemIndex) => expandedItemIndex !== item.index
-      //     )
-      //   );
-      // }}
-      onSelectItems={(items) => setSelectedItems(items)}
+      onSelectItems={(items) =>
+        setSelectedItems(items.map((item) => item.toString()))
+      }
       renderItemTitle={({ title }) => <>{title}</>}
       renderItemArrow={({ item, context }) => {
         return item.isFolder ? (
@@ -84,8 +77,6 @@ export default function TreeView({
       renderItem={({ item, arrow, context, depth, children }) => {
         const isSelected = context.isSelected;
         const isFocused = context.isFocused;
-
-        const { setUserItems } = useContext(UserItemsContext);
 
         const selectedClass =
           "bg-opacity-[0.15] hover:bg-opacity-20 dark:bg-opacity-[0.15] dark:hover:bg-opacity-20";

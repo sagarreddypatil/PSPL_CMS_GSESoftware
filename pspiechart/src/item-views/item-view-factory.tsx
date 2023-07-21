@@ -60,7 +60,10 @@ type ItemViewFactoryProps = {
 export function ItemViewFactory({ item }: ItemViewFactoryProps) {
   const { dataSources } = useContext(IOContext);
 
-  if (!item) return <h1>Not found</h1>;
+  if (!item) {
+    console.log("Item not found", item);
+    return <h1>Not found</h1>;
+  }
 
   switch (item.type) {
     case ItemViewType.DataSource:

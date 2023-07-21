@@ -102,7 +102,7 @@ export default function IOContextProvider({
         if (!root) {
           // panic
           console.error("Root not found");
-          return final;
+          return userItems;
         }
 
         const rootFiltered = final.filter((userItem) => userItem.id !== "root");

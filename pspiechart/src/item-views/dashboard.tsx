@@ -17,7 +17,7 @@ import { useDebounce } from "@react-hook/debounce";
 const COLS = 12;
 const BASE_WIDTH = 3;
 const BASE_HEIGHT = 3;
-const ROW_HEIGHT = 86;
+const ROW_HEIGHT = 85;
 
 type EditModeState = {
   editMode: boolean;
@@ -90,26 +90,29 @@ export function Dashboard({ item }: UserItemProps) {
         layouts={layouts}
         isResizable={editMode}
         isDraggable={editMode}
-        breakpoints={{ lg: 480, xxs: 0 }}
+        breakpoints={{ lg: 640, xxs: 0 }}
         cols={{ lg: COLS, xxs: BASE_WIDTH }}
         rowHeight={ROW_HEIGHT}
         onLayoutChange={onLayoutChange}
         width={size.width}
+        margin={[12, 2]}
       >
         {item.childIds?.map((childId) => {
           const child = userItems.get(childId);
           return (
-            <div
-              key={childId}
-              className="ring-1 ring-opacity-20 dark:ring-opacity-20 ring-black dark:ring-white"
-            >
-              {editMode ? (
-                <div className="bg-aged-light dark:bg-aged w-full h-full flex text-center text-5xl text-white shadow-md shadow-night-sky">
-                  <div className="m-auto">{child?.name}</div>
-                </div>
-              ) : (
-                <ItemViewFactory key={childId} item={child} />
-              )}
+            <div key={childId}>
+              <fieldset className="ring-1 ring-opacity-20 dark:ring-opacity-20 ring-black dark:ring-white w-full h-full min-w-0">
+                <legend className="w-auto mx-auto bg-white dark:bg-black">
+                  {child?.name}
+                </legend>
+                {editMode ? (
+                  <div className="bg-aged-light dark:bg-aged w-full h-full flex text-center text-5xl text-white shadow-md shadow-night-sky">
+                    <div className="m-auto">{child?.name}</div>
+                  </div>
+                ) : (
+                  <ItemViewFactory key={childId} item={child} />
+                )}
+              </fieldset>
             </div>
           );
         })}

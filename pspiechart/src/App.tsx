@@ -33,6 +33,34 @@ function App() {
     }
   }, [darkMode]);
 
+  const mainView = (
+    <div className="h-full flex flex-col">
+      <Nav>
+        <div className="flex-1">
+          {collapsed ? (
+            <div className="flex">
+              <Logo />
+            </div>
+          ) : (
+            <></>
+          )}
+        </div>
+        <div className="">
+          <TimeConductorView />
+        </div>
+        <div className="flex-1 flex justify-end">
+          <Button className="mr-2" name="Download" />
+          <Select checked={darkMode} onChange={setDarkMode}>
+            {darkMode ? <FiSun /> : <FiMoon />}
+          </Select>
+        </div>
+      </Nav>
+      <div className="flex-1 overflow-auto">
+        <Outlet />
+      </div>
+    </div>
+  );
+
   return (
     <DarkModeContext.Provider value={darkMode}>
       <TimeConductorProvider>
@@ -44,31 +72,7 @@ function App() {
             <div className="bg-white dark:bg-black text-black dark:text-gray-100 h-full">
               <VertLayout onCollapse={setCollapsed}>
                 <Sidebar />
-                <div className="h-full flex flex-col">
-                  <Nav>
-                    <div className="flex-1">
-                      {collapsed ? (
-                        <div className="flex">
-                          <Logo />
-                        </div>
-                      ) : (
-                        <></>
-                      )}
-                    </div>
-                    <div className="">
-                      <TimeConductorView />
-                    </div>
-                    <div className="flex-1 flex justify-end">
-                      <Button className="mr-2" name="Download" />
-                      <Select checked={darkMode} onChange={setDarkMode}>
-                        {darkMode ? <FiSun /> : <FiMoon />}
-                      </Select>
-                    </div>
-                  </Nav>
-                  <div className="flex-1 overflow-auto">
-                    <Outlet />
-                  </div>
-                </div>
+                {mainView}
               </VertLayout>
             </div>
           </IOContextProvider>

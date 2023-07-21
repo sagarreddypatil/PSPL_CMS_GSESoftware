@@ -132,7 +132,7 @@ export default function UPlotChart(props: UPlotChartProps) {
 
   useEffect(() => {
     const opts: Options = {
-      title: props.title ? props.title : "",
+      title: "",
       width: 1,
       height: 1,
       tzDate: (ts) => uPlot.tzDate(new Date(ts * 1e3), "UTC"),
@@ -233,6 +233,10 @@ export default function UPlotChart(props: UPlotChartProps) {
 
   const fetchHistorical = async () => {
     let start: Date, end: Date;
+
+    xRef.current.length = 0;
+    yRef.current.length = 0;
+
     if (timeConductor.paused) {
       start = timeConductor.fixed.start;
       end = timeConductor.fixed.end;

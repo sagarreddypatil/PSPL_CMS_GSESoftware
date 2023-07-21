@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -17,49 +17,130 @@ import CreateMenu from "../item-views/create-menu";
 
 import { UserItemsContext } from "../contexts/user-items-context";
 import { UserItem } from "../item-views/item-view-factory";
+import { useHotkeys } from "react-hotkeys-hook";
+
+type MyTreeIndex = {
+  id: string;
+  parentId: string | null;
+};
+
+/*
+ * stupid fucking hack because
+ * this idiotic tree view library
+ * decides to not return the whole
+ * item object when setting selected
+ * items so I need to encode this
+ * information in the item's id
+ * so I can properly delete items
+ * from the tree
+ *
+ * don't make the mistake of using
+ * react-complex-tree
+ *
+ * roll your own
+ *
+ * holy fucking shit
+ *  - Sagar Patil (sagarreddypatil@gmail.com)
+ */
+
+function toIndex(item: MyTreeIndex) {
+  return btoa(JSON.stringify(item));
+}
+
+function fromIndex(index: string): MyTreeIndex {
+  return JSON.parse(atob(index));
+}
 
 export default function Sidebar() {
   const navigate = useNavigate();
 
-  // const { dataSources } = useContext(IOContext);
   const { userItems, setUserItems } = useContext(UserItemsContext);
+  const [selected, setSeleced] = useState<string[]>([]);
+
+  // deleting items
+  useHotkeys(
+    "delete",
+    () => {
+      setUserItems((items) => {
+        let newItems = new Map(items);
+
+        selected.forEach((index) => {
+          const { id, parentId } = fromIndex(index);
+
+          if (!parentId) return; // tried to delete root?
+
+          const oldParent = newItems.get(parentId);
+          if (!oldParent) {
+            console.error("Should be unreachable", oldParent);
+            return;
+          }
+
+          const newChildren = oldParent.childIds?.filter(
+            (childId) => childId != id
+          );
+
+          newItems.set(parentId, {
+            ...oldParent,
+            childIds: newChildren,
+          });
+        });
+
+        return newItems;
+      });
+    },
+    [selected]
+  );
 
   let items: Record<TreeItemIndex, TreeItem> = {};
 
-  const rootNode: TreeItem = {
-    index: "root",
-    data: "root",
-    children: userItems.get("root")?.childIds ?? [],
-  };
+  const buildTree = (id: string, parent: string | null) => {
+    const item = userItems.get(id);
+    if (!item) return;
 
-  items.root = rootNode;
+    const index = toIndex({ id, parentId: parent });
+    const childIdxs =
+      item.childIds?.map((childId) => toIndex({ id: childId, parentId: id })) ??
+      [];
 
-  userItems.forEach((item) => {
-    if (item.id === "root") return;
-
-    items[item.id] = {
-      index: item.id,
+    items[index] = {
+      index,
       data: item,
       isFolder: item.childIds ? true : false,
-      children: item.childIds ?? [],
+      children: childIdxs,
     };
-  });
+
+    item.childIds?.forEach((childId) => {
+      buildTree(childId, id);
+    });
+
+    return items[index];
+  };
+
+  const rootNode = buildTree("root", null);
+  items.root = rootNode!!;
 
   const openItem = (item: TreeItem<any>) => {
-    const route = `/item/${item.index}`;
+    const route = `/item/${(item.data as UserItem).id}`;
     navigate(route);
   };
 
   const addChild = (childItems: UserItem[], parentId: string, pos: number) => {
-    setUserItems((items) => {
-      const parent = items.get(parentId);
+    // fuck you again complex tree
+    // the below line is because the library uses "root" for the parentId
+    // instead of the index I specifically told it was the root
+
+    if (parentId == "root") parentId = items.root.index.toString();
+    parentId = fromIndex(parentId).id;
+
+    setUserItems((userItems) => {
+      const parent = userItems.get(parentId);
       if (!parent) {
         console.error(`Parent not found: ${parentId}`);
-        return items;
+        return userItems;
       }
       if (!parent.childIds) {
         console.error(`Parent is not a folder: ${parentId}`);
-        return items;
+        return userItems;
       }
 
       const addChildIds = childItems
@@ -75,8 +156,10 @@ export default function Sidebar() {
         childIds: newChildIds,
       };
 
-      items.set(parentId, newParent);
-      return items;
+      let newItems = new Map(userItems);
+      newItems.set(parentId, newParent);
+
+      return newItems;
     });
   };
 
@@ -94,6 +177,8 @@ export default function Sidebar() {
         <TreeView
           items={items}
           onPrimaryAction={openItem}
+          selectedItems={selected}
+          setSelectedItems={setSeleced}
           onDrop={(items, target) => {
             const userItems = items.map((item) => item.data);
             if (target.targetType == "item") {

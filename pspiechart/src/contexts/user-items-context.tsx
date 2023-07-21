@@ -43,8 +43,6 @@ export default function UserItemsContextProvider({
     ])
   );
 
-  useEffect(() => {}, [userItems]);
-
   return (
     <UserItemsContext.Provider
       value={{
