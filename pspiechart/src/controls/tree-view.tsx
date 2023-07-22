@@ -90,7 +90,7 @@ export default function TreeView({
         return (
           <div {...context.itemContainerWithChildrenProps} className="">
             <label
-              className={`flex bg-black dark:bg-white items-center rounded-none h-7 ${
+              className={`flex flex-row bg-black dark:bg-white items-center rounded-none h-7 ${
                 isSelected ? selectedClass : unselectedClass
               } ${isFocused ? focusedClass : ""}`}
               {...context.itemContainerWithoutChildrenProps}
@@ -103,8 +103,11 @@ export default function TreeView({
               {arrow ?? <div className="w-2"></div>}
               <div
                 onClick={() => onPrimaryAction(item)}
-                className="flex-1 me-2"
+                className="h-full flex-grow min-w-0 flex flex-row mr-2 whitespace-nowrap"
+                title={item.data.name}
               >
+                <div className="truncate align-middle">{item.data.name}</div>
+                <div className="flex-grow mx-1"></div>
                 <TreeItemFactory item={item.data} />
               </div>
             </label>
@@ -115,7 +118,7 @@ export default function TreeView({
       renderTreeContainer={({ children, containerProps }) => (
         <div
           {...containerProps}
-          className="select-none"
+          className="select-none w-full"
           // onBlur={() => setFocusedItem("root")}
         >
           {children}

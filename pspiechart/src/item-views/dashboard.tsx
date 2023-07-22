@@ -101,7 +101,7 @@ export function Dashboard({ item }: UserItemProps) {
           const child = userItems.get(childId);
           return (
             <div key={childId}>
-              <fieldset className="bg-white dark:bg-black ring-1 ring-opacity-20 dark:ring-opacity-20 ring-black dark:ring-white w-full h-full min-w-0">
+              <fieldset className="bg-white dark:bg-black ring-1 ring-opacity-20 dark:ring-opacity-20 ring-black dark:ring-white w-full h-full min-w-0 text-center flex flex-col justify-center">
                 <legend className="w-auto mx-auto bg-white dark:bg-black">
                   {child?.name}
                 </legend>
@@ -125,18 +125,12 @@ export function DashboardTreeItem({ item }: UserItemProps) {
   const { editMode, setEditMode } = useEditMode();
 
   return (
-    <>
-      {item.name}
-      <div className="flex-grow"></div>
-      <div>
-        <Select
-          checked={editMode}
-          onChange={(value) => setEditMode(value)}
-          className="py-0.5 px-[0.25rem] text-sm"
-        >
-          <HiOutlineWrenchScrewdriver />
-        </Select>
-      </div>
-    </>
+    <Select
+      checked={editMode}
+      onChange={(value) => setEditMode(value)}
+      className="py-0.5 px-[0.25rem] text-sm"
+    >
+      <HiOutlineWrenchScrewdriver />
+    </Select>
   );
 }

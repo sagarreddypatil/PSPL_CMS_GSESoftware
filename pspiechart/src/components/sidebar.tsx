@@ -173,7 +173,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col overflow-x-visible">
       <Nav>
         <div className="flex">
           <Logo />

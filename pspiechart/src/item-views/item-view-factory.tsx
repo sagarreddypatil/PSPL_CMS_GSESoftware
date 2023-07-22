@@ -102,21 +102,10 @@ export function ItemViewFactory({ item }: ItemViewFactoryProps) {
 export function TreeItemFactory({ item }: ItemViewFactoryProps) {
   if (!item) return <div className="bg-red-500 text-white">Not Found</div>;
 
-  return (
-    <div className="flex flex-row w-full">
-      {(() => {
-        switch (item.type) {
-          case ItemViewType.Dashboard:
-            return <DashboardTreeItem item={item} />;
-        }
+  switch (item.type) {
+    case ItemViewType.Dashboard:
+      return <DashboardTreeItem item={item} />;
+  }
 
-        return (
-          <>
-            {item.name}
-            <div className="flex-grow"></div>
-          </>
-        );
-      })()}
-    </div>
-  );
+  return <></>;
 }

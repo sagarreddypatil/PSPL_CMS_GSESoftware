@@ -2,6 +2,7 @@ import { useContext, useEffect } from "react";
 import { UserItemProps } from "./item-view-factory";
 import { DataPoint, IOContext } from "../contexts/io-context";
 import { useDebounce } from "@react-hook/debounce";
+import { TimeConductorContext } from "../contexts/time-conductor-context";
 
 const UPDATE_RATE = 100;
 
@@ -15,19 +16,33 @@ export default function DataSourceView({ item }: UserItemProps) {
   );
 
   const [value, setValue] = useDebounce<number>(NaN, 1000 / UPDATE_RATE);
+  const { paused, fixed } = useContext(TimeConductorContext);
 
   useEffect(() => {
     if (!dataSource) return;
 
-    const onData = (point: DataPoint) => {
-      setValue(point.value);
-    };
+    if (!paused) {
+      const onData = (point: DataPoint) => {
+        setValue(point.value);
+      };
 
-    const subId = dataSource.subscribe(onData);
-    return () => {
-      dataSource.unsubscribe(subId);
-    };
-  }, [dataSource]);
+      const subId = dataSource.subscribe(onData);
+      return () => {
+        dataSource.unsubscribe(subId);
+      };
+    }
+
+    dataSource
+      .historical(new Date(fixed.end.getTime() - 1000), fixed.end, 0)
+      .then((points) => {
+        console.log(points);
+        if (points.length === 0) {
+          setValue(NaN);
+          return;
+        }
+        setValue(points[points.length - 1].value);
+      });
+  }, [dataSource, paused, fixed]);
 
   return <div className="text-4xl">{value}</div>;
 }
