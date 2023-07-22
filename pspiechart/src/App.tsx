@@ -2,7 +2,7 @@ import IOContextProvider from "./contexts/io-context";
 import VertLayout from "./layouts/vert-layout";
 import Select from "./controls/select";
 import { FiMoon, FiSun } from "react-icons/fi";
-import { Outlet } from "react-router-dom";
+import { Outlet, useOutlet } from "react-router-dom";
 import Sidebar from "./components/sidebar";
 import { createContext, useEffect, useState } from "react";
 import SensorNetPlugin from "./plugins/sensornet";
@@ -12,10 +12,13 @@ import Logo from "./controls/logo";
 import Nav from "./controls/nav";
 import { Button } from "./controls/button";
 import UserItemsContextProvider from "./contexts/user-items-context";
+import Video from "./controls/video";
 
 export const DarkModeContext = createContext(false);
 
 function App() {
+  const outlet = useOutlet();
+
   const localDarkMode = window.localStorage.getItem("darkMode");
   const [darkMode, setDarkMode] = useState(
     JSON.parse(localDarkMode || "false")
@@ -35,29 +38,34 @@ function App() {
 
   const mainView = (
     <div className="h-full flex flex-col">
-      <Nav>
-        <div className="flex-1">
-          {collapsed ? (
-            <div className="flex">
-              <Logo />
+      {outlet ? (
+        <>
+          <Nav>
+            <div className="flex-1">
+              {collapsed ? (
+                <div className="flex">
+                  <Logo />
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
-          ) : (
-            <></>
-          )}
-        </div>
-        <div className="">
-          <TimeConductorView />
-        </div>
-        <div className="flex-1 flex justify-end">
-          <Button className="mr-2" name="Download" />
-          <Select checked={darkMode} onChange={setDarkMode}>
-            {darkMode ? <FiSun /> : <FiMoon />}
-          </Select>
-        </div>
-      </Nav>
-      <div className="flex-1 overflow-auto">
-        <Outlet />
-      </div>
+            <div className="">
+              <TimeConductorView />
+            </div>
+            <div className="flex-1 flex justify-end">
+              <Button className="mr-2" name="Download" />
+              <Select checked={darkMode} onChange={setDarkMode}>
+                {darkMode ? <FiSun /> : <FiMoon />}
+              </Select>
+            </div>
+          </Nav>
+          {outlet}
+        </>
+      ) : (
+        <Video />
+      )}
+      {/* <div className="flex-1 overflow-auto">{outlet || <Video />}</div> */}
     </div>
   );
 

@@ -4,6 +4,7 @@ import { IdentifierType, IOContext } from "../contexts/io-context";
 import UPlotChart from "./uplotchart";
 import { Dashboard, DashboardTreeItem } from "./dashboard";
 import { UserItemsContext } from "../contexts/user-items-context";
+import { Folder } from "./folder";
 
 export enum ItemViewType {
   Folder = "folder",
@@ -59,7 +60,7 @@ export function ItemViewFactory({ item }: ItemViewFactoryProps) {
   const { dataSources } = useContext(IOContext);
 
   if (!item) {
-    console.log("Item not found", item);
+    console.error("Item not found", item);
     return <h1>Not found</h1>;
   }
 
@@ -83,6 +84,8 @@ export function ItemViewFactory({ item }: ItemViewFactoryProps) {
       );
     case ItemViewType.Dashboard:
       return <Dashboard item={item} />;
+    case ItemViewType.Folder:
+      return <Folder item={item} />;
   }
 
   return <h1>Not found</h1>; // TODO: 404 page

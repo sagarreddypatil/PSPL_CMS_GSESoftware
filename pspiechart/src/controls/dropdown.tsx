@@ -24,7 +24,7 @@ export function Dropdown(props: DropdownProps) {
       <div
         className={`absolute ${
           props.right ? "right-0" : ""
-        } z-10 mt-2 w-44 origin-top-left rounded-none bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-night-sky dark:ring-white dark:ring-opacity-30`}
+        } z-10 mt-2 w-44 origin-top-left rounded-none bg-moondust shadow-lg ring-1 ring-black ring-opacity-30 focus:outline-none dark:bg-night-sky dark:ring-white dark:ring-opacity-30`}
         hidden={!open}
       >
         <div className="py-1">{props.children}</div>

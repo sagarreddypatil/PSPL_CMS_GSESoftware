@@ -32,13 +32,7 @@ export default function UserItemsContextProvider({
         id: "root",
         name: "Root",
         type: ItemViewType.Folder,
-        childIds: ["testdash"],
-      },
-      {
-        id: "testdash",
-        name: "Some Dashboard",
-        type: ItemViewType.Dashboard,
-        childIds: ["SensorNet:1", "SensorNet:2", "SensorNet:3", "SensorNet:4"],
+        childIds: [],
       },
     ])
   );
@@ -46,8 +40,6 @@ export default function UserItemsContextProvider({
   useEffect(() => {
     // garbage collection, delete items with no references
     // reference is when another item has this item as a child
-
-    console.log("bruh");
 
     setUserItems((items) => {
       const newItems = new Map(items);
@@ -74,8 +66,6 @@ export default function UserItemsContextProvider({
           newItems.delete(key);
         }
       });
-
-      console.log(newItems);
 
       return items;
     });
