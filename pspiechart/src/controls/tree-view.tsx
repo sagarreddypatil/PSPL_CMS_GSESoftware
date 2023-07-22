@@ -106,7 +106,9 @@ export default function TreeView({
                 className="h-full flex-grow min-w-0 flex flex-row mr-2 whitespace-nowrap"
                 title={item.data.name}
               >
-                <div className="truncate align-middle">{item.data.name}</div>
+                <span className="truncate flex items-center">
+                  <span className="truncate min-w-0">{item.data.name}</span>
+                </span>
                 <div className="flex-grow mx-1"></div>
                 <TreeItemFactory item={item.data} />
               </div>
