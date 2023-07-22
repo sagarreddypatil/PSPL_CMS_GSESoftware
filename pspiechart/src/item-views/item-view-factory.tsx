@@ -5,6 +5,7 @@ import UPlotChart from "./uplotchart";
 import { Dashboard, DashboardTreeItem } from "./dashboard";
 import { UserItemsContext } from "../contexts/user-items-context";
 import { Folder } from "./folder";
+import DataSourceView from "./datasource-view";
 
 export enum ItemViewType {
   Folder = "folder",
@@ -66,22 +67,23 @@ export function ItemViewFactory({ item }: ItemViewFactoryProps) {
 
   switch (item.type) {
     case ItemViewType.DataSource:
-      const [namespace, id] = item.id.split(":");
-      const dataSource = dataSources.find(
-        (source) =>
-          source.identifier.namespace === namespace &&
-          source.identifier.id === id
-      );
+      // const [namespace, id] = item.id.split(":");
+      // const dataSource = dataSources.find(
+      //   (source) =>
+      //     source.identifier.namespace === namespace &&
+      //     source.identifier.id === id
+      // );
 
-      if (!dataSource) break;
+      // if (!dataSource) break;
 
-      return (
-        <UPlotChart
-          dataSource={dataSource}
-          pointsPerPixel={2}
-          title={dataSource.identifier.name}
-        />
-      );
+      // return (
+      //   <UPlotChart
+      //     dataSource={dataSource}
+      //     pointsPerPixel={2}
+      //     title={dataSource.identifier.name}
+      //   />
+      // );
+      return <DataSourceView item={item} />;
     case ItemViewType.Dashboard:
       return <Dashboard item={item} />;
     case ItemViewType.Folder:
