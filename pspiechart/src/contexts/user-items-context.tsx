@@ -27,15 +27,43 @@ export default function UserItemsContextProvider({
   };
 
   const [userItems, setUserItems] = useState<Map<string, UserItem>>(
-    fromList([
-      {
-        id: "root",
-        name: "Root",
-        type: ItemViewType.Folder,
-        childIds: [],
-      },
-    ])
+    fromList([])
   );
+
+  useEffect(() => {
+    // load from local storage
+
+    const storedItemsStr = localStorage.getItem("userItems") ?? "[]";
+
+    const defaultRootItem: UserItem = {
+      id: "root",
+      name: "Root",
+      type: ItemViewType.Folder,
+      childIds: [],
+    };
+
+    let storedItems = JSON.parse(storedItemsStr) as UserItem[];
+
+    if (storedItems.length === 0) {
+      storedItems = [defaultRootItem];
+    }
+
+    console.log("loading", storedItems);
+
+    setUserItems(fromList(storedItems));
+  }, []);
+
+  useEffect(() => {
+    // save to local storage
+
+    // filter out items with noStore
+    const items = Array.from(userItems.values()).filter(
+      (item) => !item.noStore
+    );
+
+    console.log("saving", items);
+    localStorage.setItem("userItems", JSON.stringify(items));
+  }, [userItems]);
 
   useEffect(() => {
     // garbage collection, delete items with no references

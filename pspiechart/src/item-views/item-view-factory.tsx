@@ -8,15 +8,21 @@ import { Folder } from "./folder";
 import DataSourceView from "./datasource-view";
 
 export enum ItemViewType {
-  Folder = "folder",
+  Folder = "Folder",
 
-  Dashboard = "dashboard",
-  CompositeChart = "compositechart",
+  Dashboard = "Dashboard",
+  Chart = "Composite Chart",
 
   DataSource = "datasource",
   ConfigOption = "configoption",
   RPC = "rpc",
 }
+
+export type DefaultUserItem = {
+  name: string;
+  type: ItemViewType;
+  childIds?: string[];
+};
 
 export type UserItem = {
   id: string;

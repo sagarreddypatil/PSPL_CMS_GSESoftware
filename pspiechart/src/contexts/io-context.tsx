@@ -108,7 +108,8 @@ export default function IOContextProvider({
 
         const rootFiltered = final.filter((userItem) => userItem.id !== "root");
 
-        root.childIds?.push(namespaceItem.id);
+        if (!root.childIds?.includes(namespaceItem.id))
+          root.childIds?.push(namespaceItem.id);
         final = [...rootFiltered, root];
       }
 

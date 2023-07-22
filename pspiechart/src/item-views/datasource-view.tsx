@@ -3,7 +3,7 @@ import { UserItemProps } from "./item-view-factory";
 import { DataPoint, IOContext } from "../contexts/io-context";
 import { useDebounce } from "@react-hook/debounce";
 
-const UPDATE_RATE = 120;
+const UPDATE_RATE = 100;
 
 export default function DataSourceView({ item }: UserItemProps) {
   const { dataSources } = useContext(IOContext);
@@ -29,10 +29,5 @@ export default function DataSourceView({ item }: UserItemProps) {
     };
   }, [dataSource]);
 
-  return (
-    <div className="text-4xl">
-      {dataSource?.identifier.name}:&nbsp;
-      {value}
-    </div>
-  );
+  return <div className="text-4xl">{value}</div>;
 }

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -136,7 +136,9 @@ export default function Sidebar() {
     // the below line is because the library uses "root" for the parentId
     // instead of the index I specifically told it was the root
 
-    if (parentId == "root") parentId = items.root.index.toString();
+    if (parentId == "root") return;
+
+    // if (parentId == "root") parentId = items.root.index.toString();
     parentId = fromIndex(parentId).id;
 
     setUserItems((userItems) => {
