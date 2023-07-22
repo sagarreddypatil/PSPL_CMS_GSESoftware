@@ -43,6 +43,44 @@ export default function UserItemsContextProvider({
     ])
   );
 
+  useEffect(() => {
+    // garbage collection, delete items with no references
+    // reference is when another item has this item as a child
+
+    console.log("bruh");
+
+    setUserItems((items) => {
+      const newItems = new Map(items);
+      const referenceCounts = new Map<string, number>();
+
+      Array.from(newItems.keys()).forEach((key) => {
+        if (key === "root") return;
+        referenceCounts.set(key, 0);
+      });
+
+      // count references
+      items.forEach((item) => {
+        if (!item.childIds) return;
+
+        item.childIds.forEach((childId) => {
+          const count = referenceCounts.get(childId) ?? 0;
+          referenceCounts.set(childId, count + 1);
+        });
+      });
+
+      // delete items with no references
+      referenceCounts.forEach((count, key) => {
+        if (count === 0) {
+          newItems.delete(key);
+        }
+      });
+
+      console.log(newItems);
+
+      return items;
+    });
+  }, [userItems]);
+
   return (
     <UserItemsContext.Provider
       value={{

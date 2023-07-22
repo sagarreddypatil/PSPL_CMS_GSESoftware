@@ -4,8 +4,6 @@ import { IdentifierType, IOContext } from "../contexts/io-context";
 import UPlotChart from "./uplotchart";
 import { Dashboard, DashboardTreeItem } from "./dashboard";
 import { UserItemsContext } from "../contexts/user-items-context";
-import { Button } from "../controls/button";
-import { FiTrash } from "react-icons/fi";
 
 export enum ItemViewType {
   Folder = "folder",

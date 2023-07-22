@@ -69,7 +69,14 @@ export default function Sidebar() {
 
           if (!parentId) return; // tried to delete root?
 
+          // don't delete if parent is read-only (noStore)
           const oldParent = newItems.get(parentId);
+          if (oldParent?.noStore) return;
+
+          // don't delete if item is read-only (noStore) and parent is root
+          const child = newItems.get(id);
+          if (oldParent?.id === "root" && child?.noStore) return;
+
           if (!oldParent) {
             console.error("Should be unreachable", oldParent);
             return;

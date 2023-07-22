@@ -96,6 +96,7 @@ export default function IOContextProvider({
           name: namespace,
           type: ItemViewType.Folder,
           childIds: [],
+          noStore: true,
         };
 
         let root = final.find((userItem) => userItem.id === "root");
