@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom";
 import { useContext } from "react";
-import { IdentifierType, IOContext } from "../contexts/io-context";
-import UPlotChart from "./uplotchart";
+import { IdentifierType } from "../contexts/io-context";
 import { Dashboard, DashboardTreeItem } from "./dashboard";
 import { UserItemsContext } from "../contexts/user-items-context";
 import { Folder } from "./folder";
 import DataSourceView from "./datasource-view";
+import NotFound from "../not-found";
 
 export enum ItemViewType {
   Folder = "Folder",
@@ -36,37 +36,22 @@ export type UserItemProps = {
   item: UserItem;
 };
 
-export function RemoteViewRoute() {
-  const params = useParams<IdentifierType>();
-
-  return (
-    <ItemViewFactory
-      item={{
-        id: `${params.namespace}:${params.id}`,
-        name: params.id ?? "",
-        type: ItemViewType.DataSource,
-        childIds: [],
-      }}
-    />
-  );
-}
-
 export function UserItemRoute() {
   const params = useParams<IdentifierType>();
-  const { userItems } = useContext(UserItemsContext);
 
-  const item = userItems.get(params.id ?? "");
-
-  return <ItemViewFactory item={item} />;
+  return <ItemViewFactory itemId={params.id ?? ""} />;
 }
 
 type ItemViewFactoryProps = {
-  item?: UserItem;
+  itemId: string;
 };
-export function ItemViewFactory({ item }: ItemViewFactoryProps) {
+
+export function ItemViewFactory({ itemId }: ItemViewFactoryProps) {
+  const item = useContext(UserItemsContext).userItems.get(itemId);
+
   if (!item) {
-    console.error("Item not found (this is normal during load)", item);
-    return <h1>Not found</h1>;
+    console.error("Item not found (this is normal during load)", itemId);
+    return <NotFound />;
   }
 
   switch (item.type) {
@@ -94,11 +79,16 @@ export function ItemViewFactory({ item }: ItemViewFactoryProps) {
       return <Folder item={item} />;
   }
 
-  return <h1>Not found</h1>; // TODO: 404 page
+  return <NotFound />;
 }
 
-export function TreeItemFactory({ item }: ItemViewFactoryProps) {
-  if (!item) return <div className="bg-red-500 text-white">Not Found</div>;
+export function TreeItemFactory({ itemId }: ItemViewFactoryProps) {
+  const item = useContext(UserItemsContext).userItems.get(itemId);
+
+  if (!item) {
+    console.error("Item not found (this is normal during load)", itemId);
+    return <>Item Not Found</>;
+  }
 
   switch (item.type) {
     case ItemViewType.Dashboard:

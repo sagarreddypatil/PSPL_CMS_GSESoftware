@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   ControlledTreeEnvironment,
   DraggingPosition,
@@ -8,8 +8,13 @@ import {
 } from "react-complex-tree";
 
 import { FiChevronRight, FiChevronDown } from "react-icons/fi";
-import { TreeItemFactory, UserItem } from "../item-views/item-view-factory";
+import {
+  TreeItemFactory,
+  UserItem,
+  UserItemRoute,
+} from "../item-views/item-view-factory";
 import Textbox from "./textbox";
+import { UserItemsContext } from "../contexts/user-items-context";
 
 interface TreeProps {
   items: Record<TreeItemIndex, TreeItem>;
@@ -19,11 +24,50 @@ interface TreeProps {
   setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-function ItemText({ item, onClick }: { item: UserItem; onClick: () => void }) {
-  // return <Textbox />;
+function ItemText({ item, onClick }: { item: UserItem; onClick?: () => void }) {
+  const [editMode, setEditMode] = useState(false);
+  const [renameValue, setRenameValue] = useState(item.name);
+
+  const { setUserItems } = useContext(UserItemsContext);
+  const renameRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!editMode) return;
+    renameRef.current?.focus();
+    renameRef.current?.select();
+  }, [editMode]);
+
+  const saveRename = () => {
+    setEditMode(false);
+    setUserItems((items) => {
+      const newItems = new Map(items);
+
+      const newItem = { ...item, name: renameValue };
+      newItems.set(item.id, newItem);
+
+      return newItems;
+    });
+  };
+
+  if (editMode) {
+    return (
+      <Textbox
+        className="w-full mr-2 z-50"
+        value={renameValue}
+        setValue={setRenameValue}
+        onSubmit={saveRename}
+        ref={renameRef}
+      />
+    );
+  }
+
   return (
     <div
       onClick={onClick}
+      onDoubleClick={() => {
+        if (item.noStore) return; // can't rename read-only
+        setEditMode(true);
+      }}
       className="h-full flex-grow min-w-0 flex flex-row items-center mr-2 whitespace-nowrap"
       title={item.name}
     >
@@ -31,7 +75,7 @@ function ItemText({ item, onClick }: { item: UserItem; onClick: () => void }) {
         <span className="truncate min-w-0">{item.name}</span>
       </span>
       <div className="flex-grow mx-1"></div>
-      <TreeItemFactory item={item} />
+      <TreeItemFactory itemId={item.id} />
     </div>
   );
 }
@@ -55,6 +99,8 @@ export default function TreeView({
       canDropOnFolder={true}
       canDropOnNonFolder={true}
       canReorderItems={true}
+      canSearchByStartingTyping={false}
+      canInvokePrimaryActionOnItemContainer={false}
       canDrag={() => true}
       canDropAt={() => true}
       onDrop={onDrop}
@@ -108,12 +154,16 @@ export default function TreeView({
 
         return (
           <div {...context.itemContainerWithChildrenProps} className="">
-            <label
+            <div
               className={`flex flex-row bg-black dark:bg-white items-center rounded-none h-7 ${
                 isSelected ? selectedClass : unselectedClass
               } ${isFocused ? focusedClass : ""}`}
               {...context.itemContainerWithoutChildrenProps}
-              {...context.interactiveElementProps}
+              onClick={context.interactiveElementProps.onClick}
+              onDragStart={context.interactiveElementProps.onDragStart}
+              onDragOver={context.interactiveElementProps.onDragOver}
+              onFocus={context.interactiveElementProps.onFocus}
+              draggable={context.interactiveElementProps.draggable}
             >
               <div
                 className={`h-full`}
@@ -124,7 +174,7 @@ export default function TreeView({
                 item={item.data}
                 onClick={() => onPrimaryAction(item)}
               />
-            </label>
+            </div>
             {children}
           </div>
         );

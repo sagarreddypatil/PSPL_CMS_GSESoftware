@@ -101,7 +101,7 @@ export function Dashboard({ item }: UserItemProps) {
                     <div className="m-auto">It goeth here</div>
                   </div>
                 ) : (
-                  <ItemViewFactory item={child} />
+                  <ItemViewFactory itemId={childId} />
                 )}
               </fieldset>
             </div>
@@ -112,7 +112,7 @@ export function Dashboard({ item }: UserItemProps) {
   );
 }
 
-export function DashboardTreeItem({ item }: UserItemProps) {
+export function DashboardTreeItem({}: UserItemProps) {
   const { editMode, setEditMode } = useEditMode();
 
   return (

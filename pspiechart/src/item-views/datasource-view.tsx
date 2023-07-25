@@ -33,7 +33,6 @@ export default function DataSourceView({ item }: UserItemProps) {
     }
 
     dataSource.historical(fixed.end, fixed.end, 0).then((points) => {
-      console.log(points);
       if (points.length === 0) {
         setValue(NaN);
         return;

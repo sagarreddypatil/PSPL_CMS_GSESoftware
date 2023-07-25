@@ -6,12 +6,16 @@ import { UserItemRoute } from "./item-views/item-view-factory.tsx";
 import { IconContext } from "react-icons";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import NotFound from "./not-found.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    children: [{ path: "/item/:id", element: <UserItemRoute /> }],
+    children: [
+      { path: "/item/:id", element: <UserItemRoute /> },
+      { path: "notfound", element: <NotFound /> },
+    ],
   },
 ]);
 
