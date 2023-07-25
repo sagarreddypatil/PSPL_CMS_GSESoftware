@@ -1,4 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from "react";
+import useLocalStorage from "use-local-storage";
 import { create } from "zustand";
 
 import { Responsive, Layout, Layouts } from "react-grid-layout";
@@ -16,8 +17,7 @@ import { useDebounce } from "@react-hook/debounce";
 
 const COLS = 12;
 const BASE_WIDTH = 3;
-const BASE_HEIGHT = 3;
-const ROW_HEIGHT = 85;
+const ROW_HEIGHT = 85 / 2;
 
 type EditModeState = {
   editMode: boolean;
@@ -30,22 +30,14 @@ const useEditMode = create<EditModeState>((set) => ({
 }));
 
 export function Dashboard({ item }: UserItemProps) {
-  const existingLayout = JSON.parse(
-    localStorage.getItem(`layout:${item.id}`) ?? "[]"
-  );
-
+  const [size, setSize] = useDebounce({ width: 0, height: 0 }, 100);
   const editMode = useEditMode((state) => state.editMode);
 
-  const [layout, setLayout] = useState<Layout[]>(existingLayout);
-  const [size, setSize] = useDebounce({ width: 0, height: 0 }, 100);
+  const [allLayouts, setAllLayouts] = useLocalStorage<{
+    [key: string]: Layout[];
+  }>(`layouts`, {});
 
-  useEffect(() => {
-    localStorage.setItem(`layout:${item.id}`, JSON.stringify(layout));
-  }, [layout]);
-
-  useEffect(() => {
-    setLayout(existingLayout);
-  }, [item.id]);
+  const myLayout = allLayouts[item.id] ?? [];
 
   const { userItems } = useContext(UserItemsContext);
 
@@ -64,24 +56,22 @@ export function Dashboard({ item }: UserItemProps) {
   };
 
   const layouts = {
-    lg: layout,
-    xxs: genSmallLayout(layout),
+    lg: myLayout,
+    xxs: genSmallLayout(myLayout),
   };
 
   const onResize = useCallback((width: number, height: number) => {
     setSize({ width, height });
   }, []);
 
-  const onLayoutChange = useCallback((_: Layout[], allLayouts: Layouts) => {
-    setLayout(
-      allLayouts.lg.map((item) => {
-        if (item.w === 1) item.w = BASE_WIDTH;
-        if (item.h === 1) item.h = BASE_HEIGHT;
-
-        return item;
-      })
-    );
-  }, []);
+  const onLayoutChange = (_: Layout[], allLayouts: Layouts) => {
+    setAllLayouts((oldAllLayouts) => {
+      return {
+        ...oldAllLayouts,
+        [item.id]: allLayouts.lg,
+      };
+    });
+  };
 
   return (
     <SizedDiv onResize={onResize}>
@@ -93,6 +83,7 @@ export function Dashboard({ item }: UserItemProps) {
         breakpoints={{ lg: 640, xxs: 0 }}
         cols={{ lg: COLS, xxs: BASE_WIDTH }}
         rowHeight={ROW_HEIGHT}
+        useCSSTransforms={false}
         onLayoutChange={onLayoutChange}
         width={size.width}
         margin={[12, 2]}
@@ -110,7 +101,7 @@ export function Dashboard({ item }: UserItemProps) {
                     <div className="m-auto">It goeth here</div>
                   </div>
                 ) : (
-                  <ItemViewFactory key={childId} item={child} />
+                  <ItemViewFactory item={child} />
                 )}
               </fieldset>
             </div>
@@ -128,7 +119,7 @@ export function DashboardTreeItem({ item }: UserItemProps) {
     <Select
       checked={editMode}
       onChange={(value) => setEditMode(value)}
-      className="py-0.5 px-[0.25rem] text-sm"
+      className="pl-1 pr-1 pt-1 pb-1 text-sm h-3/4 flex items-center"
     >
       <HiOutlineWrenchScrewdriver />
     </Select>

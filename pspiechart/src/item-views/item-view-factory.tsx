@@ -64,10 +64,8 @@ type ItemViewFactoryProps = {
   item?: UserItem;
 };
 export function ItemViewFactory({ item }: ItemViewFactoryProps) {
-  const { dataSources } = useContext(IOContext);
-
   if (!item) {
-    console.error("Item not found", item);
+    console.error("Item not found (this is normal during load)", item);
     return <h1>Not found</h1>;
   }
 

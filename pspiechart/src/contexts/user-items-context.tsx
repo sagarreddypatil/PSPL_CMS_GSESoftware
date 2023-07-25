@@ -78,7 +78,7 @@ export default function UserItemsContextProvider({
         referenceCounts.set(key, 0);
       });
 
-      // count references
+      // reference counting
       items.forEach((item) => {
         if (!item.childIds) return;
 
@@ -88,12 +88,21 @@ export default function UserItemsContextProvider({
         });
       });
 
+      console.log("gc ref counts", referenceCounts);
+
       // delete items with no references
       referenceCounts.forEach((count, key) => {
         if (count === 0) {
+          const item = newItems.get(key);
+          if (item?.noStore) return; // don't gc noStore items
           newItems.delete(key);
         }
       });
+
+      // preventing infinite loop of rerenders
+      if (newItems.size !== items.size) {
+        return newItems;
+      }
 
       return items;
     });

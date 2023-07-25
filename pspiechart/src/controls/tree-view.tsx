@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   ControlledTreeEnvironment,
   DraggingPosition,
@@ -8,7 +8,8 @@ import {
 } from "react-complex-tree";
 
 import { FiChevronRight, FiChevronDown } from "react-icons/fi";
-import { TreeItemFactory } from "../item-views/item-view-factory";
+import { TreeItemFactory, UserItem } from "../item-views/item-view-factory";
+import Textbox from "./textbox";
 
 interface TreeProps {
   items: Record<TreeItemIndex, TreeItem>;
@@ -16,6 +17,23 @@ interface TreeProps {
   onDrop: (items: TreeItem[], target: DraggingPosition) => void;
   selectedItems: string[];
   setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+function ItemText({ item, onClick }: { item: UserItem; onClick: () => void }) {
+  // return <Textbox />;
+  return (
+    <div
+      onClick={onClick}
+      className="h-full flex-grow min-w-0 flex flex-row items-center mr-2 whitespace-nowrap"
+      title={item.name}
+    >
+      <span className="truncate">
+        <span className="truncate min-w-0">{item.name}</span>
+      </span>
+      <div className="flex-grow mx-1"></div>
+      <TreeItemFactory item={item} />
+    </div>
+  );
 }
 
 export default function TreeView({
@@ -31,6 +49,8 @@ export default function TreeView({
   return (
     <ControlledTreeEnvironment
       items={items}
+      canSearch={false}
+      canRename={false}
       canDragAndDrop={true}
       canDropOnFolder={true}
       canDropOnNonFolder={true}
@@ -84,7 +104,6 @@ export default function TreeView({
           "bg-opacity-0 hover:bg-opacity-5 dark:bg-opacity-0 dark:hover:bg-opacity-5";
 
         const focusedClass = "";
-
         const padAmount = depth * 1; // tailwind
 
         return (
@@ -101,17 +120,10 @@ export default function TreeView({
                 style={{ paddingLeft: `${padAmount}rem` }}
               ></div>
               {arrow ?? <div className="w-2"></div>}
-              <div
+              <ItemText
+                item={item.data}
                 onClick={() => onPrimaryAction(item)}
-                className="h-full flex-grow min-w-0 flex flex-row mr-2 whitespace-nowrap"
-                title={item.data.name}
-              >
-                <span className="truncate flex items-center">
-                  <span className="truncate min-w-0">{item.data.name}</span>
-                </span>
-                <div className="flex-grow mx-1"></div>
-                <TreeItemFactory item={item.data} />
-              </div>
+              />
             </label>
             {children}
           </div>

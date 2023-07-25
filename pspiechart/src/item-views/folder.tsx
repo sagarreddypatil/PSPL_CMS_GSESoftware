@@ -9,7 +9,7 @@ function GridItem({ item }: UserItemProps) {
 
   return (
     <button
-      className="rounded-none w-full sm:w-48 h-48 bg-white dark:bg-black text-rush outline outline-2 outline-rush hover:text-black dark:hover:text-black hover:bg-rush dark:hover:bg-rush p-4 m-2 text-center flex flex-col"
+      className="rounded-none w-full sm:w-48 h-48 bg-moondust dark:bg-night-sky text-rush-dark outline outline-2 outline-rush hover:text-black dark:hover:text-black hover:bg-rush dark:hover:bg-rush p-4 m-2 text-center flex flex-col"
       onClick={() => {
         navigate(`/item/${item.id}`);
       }}

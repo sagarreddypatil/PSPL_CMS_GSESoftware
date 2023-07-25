@@ -32,17 +32,15 @@ export default function DataSourceView({ item }: UserItemProps) {
       };
     }
 
-    dataSource
-      .historical(new Date(fixed.end.getTime() - 1000), fixed.end, 0)
-      .then((points) => {
-        console.log(points);
-        if (points.length === 0) {
-          setValue(NaN);
-          return;
-        }
-        setValue(points[points.length - 1].value);
-      });
+    dataSource.historical(fixed.end, fixed.end, 0).then((points) => {
+      console.log(points);
+      if (points.length === 0) {
+        setValue(NaN);
+        return;
+      }
+      setValue(points[points.length - 1].value);
+    });
   }, [dataSource, paused, fixed]);
 
-  return <div className="text-4xl">{value}</div>;
+  return <div className="text-4xl">{value.toString()}</div>;
 }
