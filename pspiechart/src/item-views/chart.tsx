@@ -97,7 +97,7 @@ export function ChartChildTreeItem({ item }: UserItemProps) {
             backgroundColor: myColor,
           }}
         />
-        <div className="hidden group-hover:block overflow-visible absolute pl-8 z-50">
+        <div className="hidden group-focus-within:block overflow-visible absolute pl-8 z-50">
           <div className="p-4 px-8 border border-rush bg-white dark:bg-black">
             <HexColorPicker
               color={myColor}

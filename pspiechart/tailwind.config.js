@@ -41,7 +41,7 @@ export default {
   },
   variants: {
     extend: {
-      display: ["group-hover"],
+      display: ["group-hover", "group-focus", "group-focus-within"],
     },
   },
   plugins: [],
