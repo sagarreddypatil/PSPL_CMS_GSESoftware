@@ -19,9 +19,16 @@ const defaultDashboard: DefaultUserItem = {
   childIds: [],
 };
 
+const defaultChart: DefaultUserItem = {
+  name: "Untitled Chart",
+  type: ItemViewType.Chart,
+  childIds: [],
+};
+
 const typeDefaults = new Map<ItemViewType, DefaultUserItem>([
   [ItemViewType.Folder, defaultFolder],
   [ItemViewType.Dashboard, defaultDashboard],
+  [ItemViewType.Chart, defaultChart],
 ]);
 
 export default function CreateMenu() {

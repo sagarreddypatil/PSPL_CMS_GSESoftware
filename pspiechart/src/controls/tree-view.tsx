@@ -8,11 +8,7 @@ import {
 } from "react-complex-tree";
 
 import { FiChevronRight, FiChevronDown } from "react-icons/fi";
-import {
-  TreeItemFactory,
-  UserItem,
-  UserItemRoute,
-} from "../item-views/item-view-factory";
+import { TreeItemFactory, UserItem } from "../item-views/item-view-factory";
 import Textbox from "./textbox";
 import { UserItemsContext } from "../contexts/user-items-context";
 
@@ -24,7 +20,15 @@ interface TreeProps {
   setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-function ItemText({ item, onClick }: { item: UserItem; onClick?: () => void }) {
+function ItemText({
+  item,
+  onClick,
+  allowEdit = true,
+}: {
+  item: UserItem;
+  onClick?: () => void;
+  allowEdit?: boolean;
+}) {
   const [editMode, setEditMode] = useState(false);
   const [renameValue, setRenameValue] = useState(item.name);
 
@@ -32,7 +36,12 @@ function ItemText({ item, onClick }: { item: UserItem; onClick?: () => void }) {
   const renameRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (!allowEdit) setEditMode(false);
+  }, [allowEdit]);
+
+  useEffect(() => {
     if (!editMode) return;
+
     renameRef.current?.focus();
     renameRef.current?.select();
   }, [editMode]);
@@ -66,6 +75,7 @@ function ItemText({ item, onClick }: { item: UserItem; onClick?: () => void }) {
       onClick={onClick}
       onDoubleClick={() => {
         if (item.noStore) return; // can't rename read-only
+        if (!allowEdit) return; // can't rename if not allowed
         setEditMode(true);
       }}
       className="h-full flex-grow min-w-0 flex flex-row items-center mr-2 whitespace-nowrap"
@@ -173,6 +183,7 @@ export default function TreeView({
               <ItemText
                 item={item.data}
                 onClick={() => onPrimaryAction(item)}
+                allowEdit={isSelected}
               />
             </div>
             {children}

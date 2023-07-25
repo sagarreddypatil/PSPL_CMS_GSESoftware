@@ -26,7 +26,7 @@ export function Folder({ item }: UserItemProps) {
   const { userItems } = useContext(UserItemsContext);
 
   return (
-    <div className="flex flex-wrap p-2">
+    <div className="flex flex-wrap p-2 overflow-scroll">
       {item.childIds?.map((childId) => {
         const child = userItems.get(childId);
         if (!child) return <></>;

@@ -6,6 +6,7 @@ import { UserItemsContext } from "../contexts/user-items-context";
 import { Folder } from "./folder";
 import DataSourceView from "./datasource-view";
 import NotFound from "../not-found";
+import { Chart } from "./chart";
 
 export enum ItemViewType {
   Folder = "Folder",
@@ -73,6 +74,8 @@ export function ItemViewFactory({ itemId }: ItemViewFactoryProps) {
       //   />
       // );
       return <DataSourceView item={item} />;
+    case ItemViewType.Chart:
+      return <Chart item={item} />;
     case ItemViewType.Dashboard:
       return <Dashboard item={item} />;
     case ItemViewType.Folder:
