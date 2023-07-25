@@ -12,6 +12,7 @@ interface UPlotChartProps {
   pointsPerPixel?: number;
 
   dataSources: DataSource[];
+  colors: string[];
 }
 
 function dateToSec(date: Date) {
@@ -209,10 +210,11 @@ export default function UPlotChart(props: UPlotChartProps) {
         //   stroke: "#daaa00",
         //   width: 2,
         // },
-        ...props.dataSources.map((source) => {
+        ...props.dataSources.map((source, index) => {
           return {
             label: source.identifier.name,
-            stroke: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+            // stroke: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+            stroke: props.colors[index] ?? "#ff00ff",
             width: 2,
           };
         }),
@@ -261,7 +263,7 @@ export default function UPlotChart(props: UPlotChartProps) {
     return () => {
       plotRef.current?.destroy();
     };
-  }, [props.dataSources, props.title, timeConductor]);
+  }, [props.dataSources, props.colors, props.title, timeConductor]);
 
   const fetchHistorical = async () => {
     let curWidth = size.width;

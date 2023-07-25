@@ -19,6 +19,13 @@ export default function VertLayout(props: VertLayoutProps) {
   const [width, setWidth] = useState(-1);
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
 
+  const [leftSize, setLeftSize] = useState(0);
+  const [leftCollapsed, setLeftCollapsed] = useState(false);
+
+  useEffect(() => {
+    props.onCollapse?.(leftCollapsed);
+  }, [leftCollapsed]);
+
   useEffect(() => {
     if (width > 0 && width < 640) {
       leftPanelRef.current?.collapse();
@@ -30,10 +37,16 @@ export default function VertLayout(props: VertLayoutProps) {
       <PanelGroup direction="horizontal">
         <Panel
           collapsible={true}
-          onCollapse={props.onCollapse}
+          onCollapse={setLeftCollapsed}
           minSize={15}
           defaultSize={15}
+          onResize={setLeftSize}
           ref={leftPanelRef}
+          className="!overflow-visible"
+          style={{
+            width: `${leftSize}%`,
+            visibility: leftCollapsed ? "hidden" : "visible",
+          }}
         >
           {children[0]}
         </Panel>

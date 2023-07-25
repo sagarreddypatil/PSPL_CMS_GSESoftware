@@ -11,6 +11,7 @@ import { FiChevronRight, FiChevronDown } from "react-icons/fi";
 import { TreeItemFactory, UserItem } from "../item-views/item-view-factory";
 import Textbox from "./textbox";
 import { UserItemsContext } from "../contexts/user-items-context";
+import { fromIndex } from "../components/sidebar";
 
 interface TreeProps {
   items: Record<TreeItemIndex, TreeItem>;
@@ -20,11 +21,13 @@ interface TreeProps {
   setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-function ItemText({
+function TreeItemContent({
+  parentId,
   item,
   onClick,
   allowEdit = true,
 }: {
+  parentId?: string;
   item: UserItem;
   onClick?: () => void;
   allowEdit?: boolean;
@@ -86,7 +89,7 @@ function ItemText({
         <span className="truncate min-w-0">{item.name}</span>
       </span>
       <div className="flex-grow mx-1"></div>
-      <TreeItemFactory itemId={item.id} />
+      <TreeItemFactory itemId={item.id} parentId={parentId} />
     </div>
   );
 }
@@ -163,6 +166,8 @@ export default function TreeView({
         const focusedClass = "";
         const padAmount = depth * 1; // tailwind
 
+        const parentId = fromIndex(item.index.toString()).parentId;
+
         return (
           <div {...context.itemContainerWithChildrenProps} className="">
             <div
@@ -181,7 +186,8 @@ export default function TreeView({
                 style={{ paddingLeft: `${padAmount}rem` }}
               ></div>
               {arrow ?? <div className="w-2"></div>}
-              <ItemText
+              <TreeItemContent
+                parentId={parentId ?? undefined}
                 item={item.data}
                 onClick={() => onPrimaryAction(item)}
                 allowEdit={isSelected}

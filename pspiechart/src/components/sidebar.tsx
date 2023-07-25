@@ -47,7 +47,7 @@ function toIndex(item: MyTreeIndex) {
   return btoa(JSON.stringify(item));
 }
 
-function fromIndex(index: string): MyTreeIndex {
+export function fromIndex(index: string): MyTreeIndex {
   return JSON.parse(atob(index));
 }
 
@@ -179,7 +179,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="h-full flex flex-col overflow-x-visible">
+    <div className="h-full flex flex-col">
       <Nav>
         <div className="flex">
           <Logo />

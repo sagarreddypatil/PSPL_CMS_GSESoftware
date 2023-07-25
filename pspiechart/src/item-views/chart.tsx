@@ -1,13 +1,40 @@
-import { useContext } from "react";
+import { useContext, useId, useState } from "react";
 import { UserItemProps } from "./item-view-factory";
 import { UserItemsContext } from "../contexts/user-items-context";
 import NotFound from "../not-found";
 import { DataSource, IOContext } from "../contexts/io-context";
 import UPlotChart from "./uplotchart";
+import { create } from "zustand";
+import { HexColorPicker } from "react-colorful";
+
+type Color = {
+  hex: string;
+};
+
+type ChartColors = {
+  [key: string]: Color;
+};
+
+type ChartColorsState = {
+  colors: ChartColors;
+  setColor: (id: string, color: Color) => void;
+};
+
+const useChartColors = create<ChartColorsState>((set) => ({
+  colors: {},
+  setColor: (id, color) =>
+    set((state) => ({
+      colors: {
+        ...state.colors,
+        [id]: color,
+      },
+    })),
+}));
 
 export function Chart({ item }: UserItemProps) {
   const { userItems } = useContext(UserItemsContext);
   const { dataSources } = useContext(IOContext);
+  const { colors } = useChartColors();
 
   if (!item.childIds) {
     console.log("No child ids");
@@ -37,11 +64,48 @@ export function Chart({ item }: UserItemProps) {
     myDataSources.push(dataSource);
   }
 
+  const myColors = sources.map(
+    (source) => colors[source?.id ?? ""]?.hex ?? "#000000"
+  );
+
   return (
     <UPlotChart
       dataSources={myDataSources}
       pointsPerPixel={1}
       title={item.name}
+      colors={myColors}
     />
+  );
+}
+
+export function ChartChildTreeItem({ item }: UserItemProps) {
+  const { colors, setColor } = useChartColors();
+
+  const myColor = colors[item.id]?.hex ?? "#000000";
+
+  return (
+    <>
+      <div
+        className="flex group flex-col justify-center"
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        <button
+          className="rounded-none border border-1 border-rush w-4 h-4"
+          style={{
+            backgroundColor: myColor,
+          }}
+        />
+        <div className="hidden group-hover:block overflow-visible absolute pl-8 z-50">
+          <div className="p-4 px-8 border border-rush bg-white dark:bg-black">
+            <HexColorPicker
+              color={myColor}
+              onChange={(newColor) => setColor(item.id, { hex: newColor })}
+            />
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

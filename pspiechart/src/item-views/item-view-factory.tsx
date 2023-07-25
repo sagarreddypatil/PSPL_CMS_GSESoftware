@@ -6,7 +6,7 @@ import { UserItemsContext } from "../contexts/user-items-context";
 import { Folder } from "./folder";
 import DataSourceView from "./datasource-view";
 import NotFound from "../not-found";
-import { Chart } from "./chart";
+import { Chart, ChartChildTreeItem } from "./chart";
 
 export enum ItemViewType {
   Folder = "Folder",
@@ -45,6 +45,7 @@ export function UserItemRoute() {
 
 type ItemViewFactoryProps = {
   itemId: string;
+  parentId?: string;
 };
 
 export function ItemViewFactory({ itemId }: ItemViewFactoryProps) {
@@ -85,18 +86,43 @@ export function ItemViewFactory({ itemId }: ItemViewFactoryProps) {
   return <NotFound />;
 }
 
-export function TreeItemFactory({ itemId }: ItemViewFactoryProps) {
-  const item = useContext(UserItemsContext).userItems.get(itemId);
-
-  if (!item) {
-    console.error("Item not found (this is normal during load)", itemId);
-    return <>Item Not Found</>;
-  }
-
+function BaseTreeItemFactory({ item }: UserItemProps) {
   switch (item.type) {
     case ItemViewType.Dashboard:
       return <DashboardTreeItem item={item} />;
   }
 
   return <></>;
+}
+
+function ChildTreeItemFactory({
+  parent,
+  item,
+}: {
+  parent: UserItem;
+  item: UserItem;
+}) {
+  switch (parent.type) {
+    case ItemViewType.Chart:
+      return <ChartChildTreeItem item={item} />;
+  }
+
+  return <></>;
+}
+
+export function TreeItemFactory({ itemId, parentId }: ItemViewFactoryProps) {
+  const item = useContext(UserItemsContext).userItems.get(itemId);
+  const parent = useContext(UserItemsContext).userItems.get(parentId ?? "");
+
+  if (!item) {
+    console.error("Item not found (this is normal during load)", itemId);
+    return <>Item Not Found</>;
+  }
+
+  return (
+    <>
+      {parent && <ChildTreeItemFactory parent={parent} item={item} />}
+      <BaseTreeItemFactory item={item} />
+    </>
+  );
 }
