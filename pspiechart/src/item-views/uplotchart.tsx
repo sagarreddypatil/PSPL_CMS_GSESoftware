@@ -37,7 +37,13 @@ export default function UPlotChart(props: UPlotChartProps) {
   const yRefs = useRef<number[][]>([]);
 
   // Downsample buffers
-  const timeDownsampleBuffer = useRef<DataPoint[][]>([]);
+  const timeDownsampleBuffer = useRef<
+    {
+      series: number;
+      timestamp: number;
+      value: number;
+    }[]
+  >([]);
 
   // container size
   const [containerSize, setSize] = useDebounce({ width: -1, height: -1 }, 0);
@@ -65,30 +71,50 @@ export default function UPlotChart(props: UPlotChartProps) {
       // yRef.current = yRef.current.slice(filteredIdx);
     };
 
-    // const downsampleData = () => {
-    //   if (size.width < 0) return;
-    //   const desiredPoints = size.width * (props.pointsPerPixel ?? 1);
-    //   const desiredDt = timespan / desiredPoints;
+    const downsampleData = () => {
+      if (size.width < 0) return;
 
-    //   // downsample time data
-    //   const buffer = timeDownsampleBuffer.current;
-    //   if (buffer.length <= 1) return;
+      const desiredPoints = size.width * (props.pointsPerPixel ?? 1);
+      const desiredDt = timespan / desiredPoints;
 
-    //   const bufStart = dateToSec(buffer[0].timestamp);
-    //   const bufEnd = dateToSec(buffer.at(-1)!.timestamp);
-    //   const bufDt = (bufEnd - bufStart) / buffer.length;
-    //   const batchSize = Math.ceil(desiredDt / bufDt); // how many points are there in the buffer per downsampled point
+      // downsample time data
+      const buffer = timeDownsampleBuffer.current;
+      if (buffer.length <= 1) return;
 
-    //   while (buffer.length > batchSize) {
-    //     const section = buffer.splice(0, batchSize);
-    //     const downsampledTime =
-    //       section.reduce((a, b) => a + dateToSec(b.timestamp), 0) / batchSize;
-    //     const downsampledValue =
-    //       section.reduce((a, b) => a + b.value, 0) / batchSize;
-    //     xRef.current.push(downsampledTime);
-    //     yRef.current.push(downsampledValue);
-    //   }
-    // };
+      const bufStart = buffer[0].timestamp;
+      const bufEnd = buffer.at(-1)!.timestamp;
+      const bufDt = (bufEnd - bufStart) / buffer.length;
+      const batchSize = Math.ceil(desiredDt / bufDt); // how many points are there in the buffer per downsampled point
+
+      while (buffer.length > batchSize) {
+        const section = buffer.splice(0, batchSize);
+
+        // const downsampledTime =
+        //   section.reduce((a, b) => a + b.timestamp, 0) / batchSize;
+        // const downsampledValue =
+        //   section.reduce((a, b) => a + b.value, 0) / batchSize;
+
+        let timeCount = 0;
+        let timeSum = 0;
+        let valueCounts = yRefs.current.map(() => 0);
+        let valueSums = yRefs.current.map(() => 0);
+
+        for (const point of section) {
+          timeSum += point.timestamp;
+          timeCount++;
+
+          valueSums[point.series] += point.value;
+          valueCounts[point.series]++;
+        }
+
+        xRef.current.push(timeSum / timeCount);
+        for (let i = 0; i < yRefs.current.length; i++) {
+          if (valueCounts[i] <= 0) continue;
+          yRefs.current[i].push(valueSums[i] / valueCounts[i]);
+        }
+        // yRef.current.push(downsampledValue);
+      }
+    };
 
     const pausedUpdate = () => {
       plotRef.current?.setData([xRef.current, ...yRefs.current]);
@@ -100,24 +126,24 @@ export default function UPlotChart(props: UPlotChartProps) {
       });
     };
 
-    // const resumedUpdate = () => {
-    //   downsampleData();
-    //   removeOldData();
+    const resumedUpdate = () => {
+      downsampleData();
+      removeOldData();
 
-    //   plotRef.current?.setData([xRef.current, ...yRefs.current]);
-    //   const timeNow = Date.now() / 1000;
-    //   const timeStart = timeNow - timespan;
-    //   plotRef.current?.setScale("x", {
-    //     min: timeStart,
-    //     max: timeNow,
-    //   });
-    // };
+      plotRef.current?.setData([xRef.current, ...yRefs.current]);
+      const timeNow = Date.now() / 1000;
+      const timeStart = timeNow - timespan;
+      plotRef.current?.setScale("x", {
+        min: timeStart,
+        max: timeNow,
+      });
+    };
 
     const updatePlot = () => {
       if (timeConductor.paused) {
         pausedUpdate();
       } else {
-        // resumedUpdate();
+        resumedUpdate();
       }
       animationRef.current = window.requestAnimationFrame(updatePlot);
     };
@@ -287,8 +313,6 @@ export default function UPlotChart(props: UPlotChartProps) {
 
       yRefs.current[point.series].push(point.value);
     }
-
-    console.log(allPoints);
   };
 
   useEffect(() => {
@@ -297,11 +321,15 @@ export default function UPlotChart(props: UPlotChartProps) {
     fetchHistorical();
     if (timeConductor.paused) return () => {};
 
-    timeDownsampleBuffer.current = props.dataSources.map(() => []);
+    timeDownsampleBuffer.current.length = 0;
 
     props.dataSources.forEach((source, index) => {
       const addTimeData = (point: DataPoint) => {
-        timeDownsampleBuffer.current[index].push(point);
+        timeDownsampleBuffer.current.push({
+          series: index,
+          timestamp: dateToSec(point.timestamp),
+          value: point.value,
+        });
       };
 
       const subId = source?.subscribe(addTimeData);
