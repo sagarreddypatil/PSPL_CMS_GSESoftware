@@ -65,6 +65,7 @@ function ItemText({
         value={renameValue}
         setValue={setRenameValue}
         onSubmit={saveRename}
+        onBlur={() => setEditMode(false)}
         ref={renameRef}
       />
     );
@@ -193,7 +194,7 @@ export default function TreeView({
       renderTreeContainer={({ children, containerProps }) => (
         <div
           {...containerProps}
-          className="select-none w-full"
+          className="select-none w-full h-full"
           // onBlur={() => setFocusedItem("root")}
         >
           {children}

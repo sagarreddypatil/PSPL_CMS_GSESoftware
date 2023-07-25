@@ -6,11 +6,13 @@ export default forwardRef(
       value,
       setValue,
       onSubmit,
+      onBlur,
       className,
     }: {
       className?: string;
       value?: string;
       setValue?: (value: string) => void;
+      onBlur?: () => void;
       onSubmit?: () => void;
     },
     ref: React.Ref<HTMLInputElement>
@@ -30,6 +32,7 @@ export default forwardRef(
             onSubmit?.();
           }
         }}
+        onBlur={onBlur}
         ref={ref}
       />
     );

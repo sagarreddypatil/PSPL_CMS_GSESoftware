@@ -58,7 +58,7 @@ function App() {
           <TimeConductorView />
         </div>
         <div className="flex-1 flex justify-end">
-          <Button className="mr-2" name="Download" />
+          {/* <Button className="mr-2" name="Download" /> */}
           <Select checked={darkMode} onChange={setDarkMode}>
             {darkMode ? <FiSun /> : <FiMoon />}
           </Select>

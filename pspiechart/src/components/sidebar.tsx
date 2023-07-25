@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import {
   TreeItemIndex,
@@ -53,6 +53,7 @@ function fromIndex(index: string): MyTreeIndex {
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { userItems, setUserItems } = useContext(UserItemsContext);
   const [selected, setSeleced] = useState<string[]>([]);
@@ -127,7 +128,12 @@ export default function Sidebar() {
   items.root = rootNode!!;
 
   const openItem = (item: TreeItem<any>) => {
-    const route = `/item/${(item.data as UserItem).id}`;
+    const currentId = location.pathname.split("/").at(-1);
+    const newId = (item.data as UserItem).id;
+
+    if (currentId == newId) return;
+
+    const route = `/item/${newId}`;
     navigate(route);
   };
 

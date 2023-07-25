@@ -12,7 +12,7 @@ export enum ItemViewType {
   Folder = "Folder",
 
   Dashboard = "Dashboard",
-  Chart = "Composite Chart",
+  Chart = "Chart",
 
   DataSource = "datasource",
   ConfigOption = "configoption",
