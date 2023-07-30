@@ -23,9 +23,7 @@ packet_format = "<4s H 2x Q Q q"
 fmt_compiled = struct.Struct(packet_format)
 
 
-def make_packet(
-    header: bytes, sensor_id: int, timestamp: int, counter: int, data: int
-) -> bytes:
+def make_packet(header: bytes, sensor_id: int, timestamp: int, counter: int, data: int) -> bytes:
     return fmt_compiled.pack(header, sensor_id, timestamp, counter, data)
 
 

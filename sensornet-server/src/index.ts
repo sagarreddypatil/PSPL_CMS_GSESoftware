@@ -27,7 +27,7 @@ const influxClient = new InfluxDB({
 });
 
 if (!process.env.INFLUXDB_ORG) {
-  console.error("Environment variable INFLUXDB_ORG not set, using pspl");
+  console.error("Environment variable INFLUXDB_ORG not set, using psp-liquids");
 }
 
 if (!process.env.INFLUXDB_BUCKET) {
