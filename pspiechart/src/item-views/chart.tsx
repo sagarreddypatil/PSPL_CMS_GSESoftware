@@ -1,9 +1,9 @@
-import { useContext, useId, useState } from "react";
+import { useContext } from "react";
 import { UserItemProps } from "./item-view-factory";
 import { UserItemsContext } from "../contexts/user-items-context";
 import NotFound from "../not-found";
 import { DataSource, IOContext } from "../contexts/io-context";
-import UPlotChart from "./uplotchart";
+import UPlotChart from "../controls/uplotchart";
 import { create } from "zustand";
 import { HexColorPicker } from "react-colorful";
 

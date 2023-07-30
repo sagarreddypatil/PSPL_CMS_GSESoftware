@@ -3,7 +3,7 @@ import { useContext, useEffect, useRef } from "react";
 import { useDebounce } from "@react-hook/debounce";
 import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";
-import SizedDiv from "../controls/sized-div";
+import SizedDiv from "./sized-div";
 import { TimeConductorContext } from "../contexts/time-conductor-context";
 import { DarkModeContext } from "../App";
 
@@ -58,6 +58,8 @@ export default function UPlotChart(props: UPlotChartProps) {
   };
 
   useEffect(() => {
+    console.log("useeffect with downsampling");
+
     const removeOldData = () => {
       // remove old data
       let filteredIdx = 0;
@@ -154,9 +156,28 @@ export default function UPlotChart(props: UPlotChartProps) {
     return () => {
       window.cancelAnimationFrame(animationRef.current);
     };
-  });
+  }, [timeConductor, props.pointsPerPixel, size]);
+
+  const sourceToSeries = (source: DataSource, index: number) => {
+    return {
+      label: source.identifier.name,
+      stroke: props.colors[index] ?? "#ff00ff",
+      width: 2,
+    };
+  };
+
+  const genSeries = () => {
+    return [
+      {},
+      ...props.dataSources.map((source, index) =>
+        sourceToSeries(source, index)
+      ),
+    ];
+  };
 
   useEffect(() => {
+    console.log("useeffect with plot creation");
+
     const opts: Options = {
       title: "",
       width: 1,
@@ -203,22 +224,7 @@ export default function UPlotChart(props: UPlotChartProps) {
           },
         },
       ],
-      series: [
-        {},
-        // {
-        //   label: props.title,
-        //   stroke: "#daaa00",
-        //   width: 2,
-        // },
-        ...props.dataSources.map((source, index) => {
-          return {
-            label: source.identifier.name,
-            // stroke: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-            stroke: props.colors[index] ?? "#ff00ff",
-            width: 2,
-          };
-        }),
-      ],
+      series: genSeries(),
       hooks: {
         init: [
           (u) => {
@@ -263,16 +269,20 @@ export default function UPlotChart(props: UPlotChartProps) {
     return () => {
       plotRef.current?.destroy();
     };
-  }, [props.dataSources, props.colors, props.title, timeConductor]);
+  }, [props.dataSources, props.title, timeConductor]);
+
+  // useEffect(() => {
+  //   console.log("useeffect with change color");
+  //   props.dataSources.forEach((source, index) => {
+  //     plotRef.current?.addSeries(sourceToSeries(source, index), index);
+  //   });
+  // }, [props.colors]);
 
   const fetchHistorical = async () => {
     let curWidth = size.width;
-    if (curWidth < 0) curWidth = 1000;
+    if (curWidth < 0) curWidth = 1920;
 
     let start: Date, end: Date;
-
-    xRef.current.length = 0;
-    yRefs.current = props.dataSources.map(() => []);
 
     if (timeConductor.paused) {
       start = timeConductor.fixed.start;
@@ -307,6 +317,9 @@ export default function UPlotChart(props: UPlotChartProps) {
 
     allPoints.sort((a, b) => a.timestamp - b.timestamp);
 
+    xRef.current.length = 0;
+    yRefs.current = props.dataSources.map(() => []);
+
     let lastTime = 0;
     for (const point of allPoints) {
       const time = point.timestamp;
@@ -318,6 +331,8 @@ export default function UPlotChart(props: UPlotChartProps) {
   };
 
   useEffect(() => {
+    console.log("useeffect with subscription");
+
     let unsubscribeFuncs: (() => void)[] = [];
 
     fetchHistorical();
@@ -343,22 +358,11 @@ export default function UPlotChart(props: UPlotChartProps) {
     return () => {
       unsubscribeFuncs.forEach((func) => func());
     };
-
-    // fetchHistorical();
-
-    // if (timeConductor.paused) return () => {};
-
-    // const addTimeData = (point: DataPoint) => {
-    //   timeDownsampleBuffer.current.push(point);
-    // };
-
-    // const subId = source?.subscribe(addTimeData);
-    // return () => {
-    //   source?.unsubscribe(subId);
-    // };
-  }, [props.dataSources, timespan, props.pointsPerPixel, timeConductor]);
+  }, [props.dataSources, props.pointsPerPixel, timeConductor]);
 
   useEffect(() => {
+    console.log("useeffect with resize");
+
     plotRef.current?.setSize({
       width: unscaledSize.width,
       height: unscaledSize.height,

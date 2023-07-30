@@ -60,7 +60,7 @@ while True:
         counter = counters[sensor_id]
         counter = counters[sensor_id] = counter + 1
 
-        datas[sensor_id] += randnorm(0, 1) * 1000 / rate
+        datas[sensor_id] += randnorm(0, 1) * 100 / rate
         # data = datas[sensor_id] + math.sin(time.time() * 3) * 1000
         data = datas[sensor_id] * 10
 

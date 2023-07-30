@@ -3,6 +3,7 @@ import useResizeObserver from "use-resize-observer";
 interface SizedDivProps {
   children: React.ReactNode;
   onResize: (width: number, height: number) => void;
+  className?: string;
 }
 
 const noop = (n: number) => n;
@@ -14,7 +15,7 @@ export default function SizedDiv(props: SizedDivProps) {
   });
 
   return (
-    <div className="h-full w-full" ref={ref}>
+    <div className={`h-full w-full ${props.className}`} ref={ref}>
       {props.children}
     </div>
   );

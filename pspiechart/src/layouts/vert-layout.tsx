@@ -51,7 +51,7 @@ export default function VertLayout(props: VertLayoutProps) {
           {children[0]}
         </Panel>
         {width > 640 ? (
-          <PanelResizeHandle className="w-[2px] before:absolute before:w-[4px] before:h-full bg-gray-200 dark:bg-gray-700 before:active:bg-rush before:hover:bg-rush" />
+          <PanelResizeHandle className="w-[2px] bg-gray-200 dark:bg-gray-700 relative after:active:bg-rush after:hover:bg-rush after:absolute after:w-[4px] after:h-full after:-left-[1px] before:absolute before:h-full before:w-[16px] before:-left-[6px] before:z-50" />
         ) : (
           <></>
         )}

@@ -9,12 +9,12 @@ function GridItem({ item }: UserItemProps) {
 
   return (
     <button
-      className="rounded-none w-full sm:w-48 h-48 bg-moondust dark:bg-night-sky text-rush-dark outline outline-2 outline-rush hover:text-black dark:hover:text-black hover:bg-rush dark:hover:bg-rush p-4 m-2 text-center flex flex-col"
+      className="rounded-none w-full sm:w-48 h-48 bg-moondust dark:bg-night-sky text-rush-dark outline outline-2 outline-rush hover:text-black dark:hover:text-black hover:bg-rush dark:hover:bg-rush p-4 m-2 text-center flex flex-col justify-around"
       onClick={() => {
         navigate(`/item/${item.id}`);
       }}
     >
-      <span className="text-8xl text-center m-auto mb-2">
+      <span className="text-6xl text-center m-2 mx-auto">
         <FiPieChart />
       </span>
       <span className="text-lg">{item.name}</span>
