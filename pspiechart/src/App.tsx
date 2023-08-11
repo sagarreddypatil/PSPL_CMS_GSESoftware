@@ -5,7 +5,7 @@ import { FiMoon, FiSun } from "react-icons/fi";
 import { Outlet, useNavigate, useOutlet } from "react-router-dom";
 import Sidebar from "./components/sidebar";
 import { createContext, useEffect, useState } from "react";
-import SensorNetPlugin from "./plugins/sensornet";
+import SensorNetPlugin from "./io-plugins/sensornet";
 import TimeConductorProvider from "./contexts/time-conductor-context";
 import TimeConductorView from "./components/time-conductor";
 import Logo from "./controls/logo";
