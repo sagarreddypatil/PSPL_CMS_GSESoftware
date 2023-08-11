@@ -51,7 +51,7 @@ export default function UPlotChart(props: UPlotChartProps) {
     // then update the plot
 
     // downsample backlog into plot data, runs every animation frame when not paused
-    const downsample = () => {
+    const updateData = () => {
       const backlog = downsampleBacklog.current;
 
       for (const [timestamp, data] of backlog) {
@@ -73,7 +73,7 @@ export default function UPlotChart(props: UPlotChartProps) {
 
     // plot data update, runs every animation frame
     const updatePlot = () => {
-      downsample();
+      updateData();
 
       plotRef.current?.setData([plotTimeRef.current, ...plotDataRef.current]);
 
