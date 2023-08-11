@@ -31,7 +31,7 @@ export default function UPlotChart(props: UPlotChartProps) {
   const plotDataRef = useRef<number[][]>([]);
 
   // stuff to downsample into the plot data
-  const downsampleBacklog = useRef<DataPoint[]>([]);
+  const downsampleBacklog = useRef<Map<number, number[]>>(new Map()); // key is time, value is array indexed by local data source index
 
   // animation ref for plot updates
   const animationRef = useRef<number>(0);
@@ -50,14 +50,48 @@ export default function UPlotChart(props: UPlotChartProps) {
     // downsample backlog into plot data
     // then update the plot
 
-    // for now, just update the plot
+    // downsample backlog into plot data, runs every animation frame when not paused
+    const downsample = () => {
+      const backlog = downsampleBacklog.current;
+
+      for (const [timestamp, data] of backlog) {
+        const time = timestamp / 1000; // uPlot uses seconds, unlike js which is ms
+
+        // add time to plotTimeRef
+        plotTimeRef.current.push(time);
+
+        // add data to plotDataRef
+        for (let i = 0; i < props.dataSources.length; i++) {
+          const newVal = data[i] ?? null;
+          if (!plotDataRef.current[i]) plotDataRef.current[i] = [];
+          plotDataRef.current[i].push(newVal);
+        }
+      }
+
+      backlog.clear();
+    };
+
+    // plot data update, runs every animation frame
     const updatePlot = () => {
+      downsample();
+
       plotRef.current?.setData([plotTimeRef.current, ...plotDataRef.current]);
 
-      plotRef.current?.setScale("x", {
-        min: timeStart.getTime() / 1000,
-        max: timeEnd.getTime() / 1000,
-      });
+      // timeStart and timeEnd only update every render
+      const currentTimeEnd = Date.now();
+      const currentTimeStart = currentTimeEnd - timeConductor.moving.timespan;
+
+      if (timeConductor.paused) {
+        plotRef.current?.setScale("x", {
+          min: timeStart.getTime() / 1000,
+          max: timeEnd.getTime() / 1000,
+        });
+      } else {
+        plotRef.current?.setScale("x", {
+          min: currentTimeStart / 1000,
+          max: currentTimeEnd / 1000,
+        });
+      }
 
       animationRef.current = requestAnimationFrame(updatePlot);
     };
@@ -75,13 +109,12 @@ export default function UPlotChart(props: UPlotChartProps) {
     // new data gets sent to downsampleBacklog
 
     // map between time and array of data, which is indexed by data source
-    console.log("width", size.width);
-    const historicalData = new Map<number, number[]>();
+    const historicalData = new Map<number, number[]>(); // key is time, value is array indexed by local data source index
     const promises: Promise<void>[] = [];
 
     props.dataSources.forEach((source, index) => {
       const promise = source
-        .historical(timeStart, timeEnd, dt / 1000) // dt in seconds
+        .historical(timeStart, timeEnd, dt / 1000) // historical wants dt in seconds
         .then((data) => {
           data.forEach((point) => {
             const timestamp = point.timestamp.getTime();
@@ -111,8 +144,26 @@ export default function UPlotChart(props: UPlotChartProps) {
     const paused = timeConductor.paused;
     if (paused) return;
 
-    // let subIds = [];
-    // props.dataSources.forEach((source) => {});
+    let subIds: string[] = [];
+    props.dataSources.forEach((source, index) => {
+      // subscribe to new data from each source
+      const subId = source.subscribe((data) => {
+        const timestamp = data.timestamp.getTime();
+
+        const current = downsampleBacklog.current.get(timestamp) ?? [];
+        current[index] = data.value;
+        downsampleBacklog.current.set(timestamp, current);
+      });
+
+      subIds.push(subId);
+    });
+
+    return () => {
+      // unsubscribe from all sources
+      props.dataSources.forEach((source, index) => {
+        source.unsubscribe(subIds[index]);
+      });
+    };
   }, [props.dataSources, timeConductor]);
 
   const sourceToSeries = (source: DataSource, index: number) => {

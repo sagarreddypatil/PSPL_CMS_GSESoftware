@@ -32,7 +32,11 @@ export default function DataSourceView({ item }: UserItemProps) {
       };
     }
 
-    dataSource.historical(fixed.end, fixed.end, 0).then((points) => {
+    const dt = 0.001;
+    const start = new Date(fixed.end.getTime() - dt * 1000);
+    const end = fixed.end;
+
+    dataSource.historical(start, end, dt).then((points) => {
       if (points.length === 0) {
         setValue(NaN);
         return;
