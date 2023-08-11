@@ -5,6 +5,7 @@ import "uplot/dist/uPlot.min.css";
 import SizedDiv from "./sized-div";
 import { TimeConductorContext } from "../contexts/time-conductor-context";
 import { DarkModeContext } from "../App";
+import { useDebounce } from "@react-hook/debounce";
 
 interface UPlotChartProps {
   title?: string;
@@ -20,6 +21,7 @@ export default function UPlotChart(props: UPlotChartProps) {
   const timeConductor = useContext(TimeConductorContext);
 
   // state for the size of the chart, using SizedDiv
+  const historicalSize = useRef({ width: 0, height: 0 });
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   // refs for creating and using the uplot stuff
@@ -106,44 +108,52 @@ export default function UPlotChart(props: UPlotChartProps) {
   useEffect(() => {
     // fetch historical data and subscribe to new data
     // historical data gets sent straight to plotTimeRef and plotDataRef
-    // new data gets sent to downsampleBacklog
 
-    // map between time and array of data, which is indexed by data source
-    const historicalData = new Map<number, number[]>(); // key is time, value is array indexed by local data source index
-    const promises: Promise<void>[] = [];
+    // only refetch historical if size changes significantly (> 0.5 orders of magnitude)
+    const sizeChange = Math.log10(size.width / historicalSize.current.width);
+    if (sizeChange > 0.5) {
+      console.log("size change", size.width);
+      historicalSize.current = size;
 
-    props.dataSources.forEach((source, index) => {
-      const promise = source
-        .historical(timeStart, timeEnd, dt / 1000) // historical wants dt in seconds
-        .then((data) => {
-          data.forEach((point) => {
-            const timestamp = point.timestamp.getTime();
+      // map between time and array of data, which is indexed by data source
+      const historicalData = new Map<number, number[]>(); // key is time, value is array indexed by local data source index
+      const promises: Promise<void>[] = [];
 
-            const current = historicalData.get(timestamp) ?? [];
-            current[index] = point.value;
-            historicalData.set(timestamp, current);
+      props.dataSources.forEach((source, index) => {
+        const promise = source
+          .historical(timeStart, timeEnd, dt / 1000) // historical wants dt in seconds
+          .then((data) => {
+            data.forEach((point) => {
+              const timestamp = point.timestamp.getTime();
+
+              const current = historicalData.get(timestamp) ?? [];
+              current[index] = point.value;
+              historicalData.set(timestamp, current);
+            });
           });
-        });
 
-      promises.push(promise);
-    });
-
-    Promise.all(promises).then(() => {
-      plotTimeRef.current.length = 0;
-      plotDataRef.current.length = 0;
-      historicalData.forEach((data, timestamp) => {
-        plotTimeRef.current.push(timestamp / 1000); // uplot uses seconds, not ms unlike js
-        for (let i = 0; i < props.dataSources.length; i++) {
-          const newVal = data[i] ?? NaN;
-          if (!plotDataRef.current[i]) plotDataRef.current[i] = [];
-          plotDataRef.current[i].push(newVal);
-        }
+        promises.push(promise);
       });
-    });
+
+      Promise.all(promises).then(() => {
+        plotTimeRef.current.length = 0;
+        plotDataRef.current.length = 0;
+        historicalData.forEach((data, timestamp) => {
+          plotTimeRef.current.push(timestamp / 1000); // uplot uses seconds, not ms unlike js
+          for (let i = 0; i < props.dataSources.length; i++) {
+            const newVal = data[i] ?? NaN;
+            if (!plotDataRef.current[i]) plotDataRef.current[i] = [];
+            plotDataRef.current[i].push(newVal);
+          }
+        });
+      });
+    }
 
     const paused = timeConductor.paused;
-    if (paused) return;
+    if (paused) return; // don't stream if paused
 
+    // subscribe to the datasource to stream that sweet sweet data
+    // data gets sent to downsampleBacklog
     let subIds: string[] = [];
     props.dataSources.forEach((source, index) => {
       // subscribe to new data from each source
@@ -164,7 +174,7 @@ export default function UPlotChart(props: UPlotChartProps) {
         source.unsubscribe(subIds[index]);
       });
     };
-  }, [props.dataSources, timeConductor]);
+  }, [props.dataSources, timeConductor, size]);
 
   const sourceToSeries = (source: DataSource, index: number) => {
     return {
