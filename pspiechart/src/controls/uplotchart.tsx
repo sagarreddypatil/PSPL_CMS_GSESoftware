@@ -21,7 +21,8 @@ export default function UPlotChart(props: UPlotChartProps) {
   const timeConductor = useContext(TimeConductorContext);
 
   // state for the size of the chart, using SizedDiv
-  const historicalSize = useRef({ width: 0, height: 0 });
+  const prevTc = useRef(timeConductor);
+  const prevSize = useRef({ width: 0, height: 0 });
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   // refs for creating and using the uplot stuff
@@ -73,9 +74,22 @@ export default function UPlotChart(props: UPlotChartProps) {
       backlog.clear();
     };
 
+    const removeOldData = () => {
+      // delete data points older than min
+      const min = timeStart.getTime() / 1000;
+
+      while (plotTimeRef.current[0] < min) {
+        plotTimeRef.current.shift();
+        for (const data of plotDataRef.current) {
+          data.shift();
+        }
+      }
+    };
+
     // plot data update, runs every animation frame
     const updatePlot = () => {
       updateData();
+      if (!timeConductor.paused) removeOldData();
 
       plotRef.current?.setData([plotTimeRef.current, ...plotDataRef.current]);
 
@@ -110,10 +124,10 @@ export default function UPlotChart(props: UPlotChartProps) {
     // historical data gets sent straight to plotTimeRef and plotDataRef
 
     // only refetch historical if size changes significantly (> 0.5 orders of magnitude)
-    const sizeChange = Math.log10(size.width / historicalSize.current.width);
-    if (sizeChange > 0.5) {
-      console.log("size change", size.width);
-      historicalSize.current = size;
+    const sizeChange = Math.log10(size.width / prevSize.current.width);
+    if (sizeChange > 0.5 || timeConductor != prevTc.current) {
+      prevTc.current = timeConductor;
+      prevSize.current = size;
 
       // map between time and array of data, which is indexed by data source
       const historicalData = new Map<number, number[]>(); // key is time, value is array indexed by local data source index
@@ -179,7 +193,7 @@ export default function UPlotChart(props: UPlotChartProps) {
   const sourceToSeries = (source: DataSource, index: number) => {
     return {
       label: source.identifier.name,
-      stroke: "#ff00ff",
+      stroke: props.colors[index],
       width: 2,
     };
   };

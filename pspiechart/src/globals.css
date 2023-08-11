@@ -20,3 +20,26 @@
 .u-cursor-y {
   @apply border-black border-opacity-75 dark:border-white dark:border-opacity-75 !important;
 }
+
+.my-color-picker .react-colorful {
+}
+
+.my-color-picker .react-colorful__saturation {
+  border-radius: 0px 0px 0 0;
+}
+
+.my-color-picker .react-colorful__saturation-pointer {
+  width: 12px;
+  height: 12px;
+  border-radius: 0;
+}
+
+.my-color-picker .react-colorful__hue {
+  border-radius: 0 0 0px 0px;
+}
+
+.my-color-picker .react-colorful__hue-pointer {
+  width: 1px;
+  height: 12px;
+  border-radius: 0;
+}

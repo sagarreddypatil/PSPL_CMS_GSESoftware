@@ -31,6 +31,8 @@ const useChartColors = create<ChartColorsState>((set) => ({
     })),
 }));
 
+const defaultColor = "#DAAA00";
+
 export function Chart({ item }: UserItemProps) {
   const { userItems } = useContext(UserItemsContext);
   const { dataSources } = useContext(IOContext);
@@ -65,7 +67,7 @@ export function Chart({ item }: UserItemProps) {
   }
 
   const myColors = sources.map(
-    (source) => colors[source?.id ?? ""]?.hex ?? "#000000"
+    (source) => colors[source?.id ?? ""]?.hex ?? defaultColor
   );
 
   return (
@@ -81,7 +83,7 @@ export function Chart({ item }: UserItemProps) {
 export function ChartChildTreeItem({ item }: UserItemProps) {
   const { colors, setColor } = useChartColors();
 
-  const myColor = colors[item.id]?.hex ?? "#000000";
+  const myColor = colors[item.id]?.hex ?? defaultColor;
 
   return (
     <>
@@ -100,6 +102,7 @@ export function ChartChildTreeItem({ item }: UserItemProps) {
         <div className="hidden group-focus-within:block overflow-visible absolute pl-8 z-50">
           <div className="p-4 px-8 border border-rush bg-white dark:bg-black">
             <HexColorPicker
+              className="my-color-picker"
               color={myColor}
               onChange={(newColor) => setColor(item.id, { hex: newColor })}
             />

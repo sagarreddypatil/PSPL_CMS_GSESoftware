@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserItemProps } from "./item-view-factory";
 import { DataPoint, IOContext } from "../contexts/io-context";
 import { useDebounce } from "@react-hook/debounce";
@@ -15,7 +15,8 @@ export default function DataSourceView({ item }: UserItemProps) {
       source.identifier.namespace === namespace && source.identifier.id === id
   );
 
-  const [value, setValue] = useDebounce<number>(NaN, 1000 / UPDATE_RATE);
+  // const [value, setValue] = useDebounce<number>(NaN, 1000 / UPDATE_RATE);
+  const [value, setValue] = useState(NaN);
   const { paused, fixed } = useContext(TimeConductorContext);
 
   useEffect(() => {

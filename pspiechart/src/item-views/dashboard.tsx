@@ -15,7 +15,7 @@ import Select from "../controls/select";
 import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { useDebounce } from "@react-hook/debounce";
 
-const COLS = 24;
+const COLS = 20;
 const ROWS = 14;
 const BASE_WIDTH = 3;
 
