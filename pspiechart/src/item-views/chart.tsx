@@ -5,6 +5,7 @@ import NotFound from "../not-found";
 import { DataSource, IOContext } from "../contexts/io-context";
 import UPlotChart from "../controls/uplotchart";
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { HexColorPicker } from "react-colorful";
 
 type Color = {
@@ -20,16 +21,35 @@ type ChartColorsState = {
   setColor: (id: string, color: Color) => void;
 };
 
-const useChartColors = create<ChartColorsState>((set) => ({
-  colors: {},
-  setColor: (id, color) =>
-    set((state) => ({
-      colors: {
-        ...state.colors,
-        [id]: color,
-      },
-    })),
-}));
+// const useChartColors = create<ChartColorsState>((set) => ({
+//   colors: {},
+//   setColor: (id, color) =>
+//     set((state) => ({
+//       colors: {
+//         ...state.colors,
+//         [id]: color,
+//       },
+//     })),
+// }));
+
+const useChartColors = create(
+  persist<ChartColorsState>(
+    (set) => ({
+      colors: {},
+      setColor: (id, color) =>
+        set((state) => ({
+          colors: {
+            ...state.colors,
+            [id]: color,
+          },
+        })),
+    }),
+    {
+      name: "chart-colors",
+      getStorage: () => createJSONStorage(() => localStorage),
+    }
+  )
+);
 
 const defaultColor = "#DAAA00";
 
