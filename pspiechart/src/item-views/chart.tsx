@@ -46,7 +46,7 @@ const useChartColors = create(
     }),
     {
       name: "chart-colors",
-      getStorage: () => createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );

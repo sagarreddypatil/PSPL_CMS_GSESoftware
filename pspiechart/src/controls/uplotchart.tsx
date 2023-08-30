@@ -5,7 +5,6 @@ import "uplot/dist/uPlot.min.css";
 import SizedDiv from "./sized-div";
 import { TimeConductorContext } from "../contexts/time-conductor-context";
 import { DarkModeContext } from "../App";
-import { useDebounce } from "@react-hook/debounce";
 
 interface UPlotChartProps {
   title?: string;
@@ -56,6 +55,13 @@ export default function UPlotChart(props: UPlotChartProps) {
     // downsample backlog into plot data, runs every animation frame when not paused
     const updateData = () => {
       const backlog = downsampleBacklog.current;
+      // const backlogTimes = Array.from(backlog.keys()).sort();
+
+      // const backlogDt = backlogTimes[backlogTimes.length - 1] - backlogTimes[0];
+      // const backlogPoints = backlogTimes.length;
+      // const backlogDtPerPoint = backlogDt / backlogPoints;
+
+      // const backlogPointsPerNewPoint = Math.ceil(dt / backlogDtPerPoint);
 
       for (const [timestamp, data] of backlog) {
         const time = timestamp / 1000; // uPlot uses seconds, unlike js which is ms

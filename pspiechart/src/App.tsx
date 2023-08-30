@@ -2,6 +2,7 @@ import IOContextProvider from "./contexts/io-context";
 import VertLayout from "./layouts/vert-layout";
 import Select from "./controls/select";
 import { FiMoon, FiSun } from "react-icons/fi";
+import { AiFillSetting } from "react-icons/ai";
 import { Outlet, useNavigate, useOutlet } from "react-router-dom";
 import Sidebar from "./components/sidebar";
 import { createContext, useEffect, useState } from "react";
@@ -12,6 +13,7 @@ import Logo from "./controls/logo";
 import Nav from "./controls/nav";
 import { Button } from "./controls/button";
 import UserItemsContextProvider from "./contexts/user-items-context";
+import { Dropdown, DropdownItem } from "./controls/dropdown";
 
 export const DarkModeContext = createContext(false);
 
@@ -59,9 +61,17 @@ function App() {
         </div>
         <div className="flex-1 flex justify-end">
           {/* <Button className="mr-2" name="Download" /> */}
-          <Select checked={darkMode} onChange={setDarkMode}>
+          <Select checked={darkMode} onChange={setDarkMode} className="mr-2">
             {darkMode ? <FiSun /> : <FiMoon />}
           </Select>
+          <Dropdown name="Settings" right={true}>
+            <DropdownItem onClick={() => navigate("/settings")}>
+              PSPC Settings
+            </DropdownItem>
+            <DropdownItem onClick={() => navigate("/sensornet")}>
+              SensorNet Settings
+            </DropdownItem>
+          </Dropdown>
         </div>
       </Nav>
       <div className="flex-1 overflow-auto">
