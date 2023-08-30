@@ -7,6 +7,7 @@ import { IconContext } from "react-icons";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import NotFound from "./not-found.tsx";
+import SensorNetSettings from "./sensornet/settings.tsx";
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { path: "/item/:id", element: <UserItemRoute /> },
+      { path: "/sensornet", element: <SensorNetSettings /> },
       { path: "*", element: <NotFound /> },
     ],
   },

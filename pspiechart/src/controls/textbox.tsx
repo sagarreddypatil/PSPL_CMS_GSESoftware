@@ -4,6 +4,7 @@ export default forwardRef(
   (
     {
       value,
+      placeholder,
       setValue,
       onSubmit,
       onBlur,
@@ -11,6 +12,7 @@ export default forwardRef(
     }: {
       className?: string;
       value?: string;
+      placeholder?: string;
       setValue?: (value: string) => void;
       onBlur?: () => void;
       onSubmit?: () => void;
@@ -20,8 +22,9 @@ export default forwardRef(
     return (
       <input
         type="text"
-        className={`rounded-none border border-rush dark:bg-night-sky ${className}`}
+        className={`rounded-none border border-rush dark:bg-night-sky px-2 ${className}`}
         value={value}
+        placeholder={placeholder}
         onChange={(e) => {
           e.preventDefault();
           setValue?.(e.target.value);
