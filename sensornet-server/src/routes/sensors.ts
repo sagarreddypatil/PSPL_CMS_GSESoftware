@@ -1,6 +1,8 @@
+import cors from "cors";
 import { Router } from "hyper-express";
 import {
   getSensors,
+  bulkSensors,
   getSensor,
   addSensor,
   updateSensor,
@@ -32,10 +34,21 @@ sensorsRouter.post("/", async (req, res) => {
   }
 });
 
-sensorsRouter.put("/", async (req, res) => {
+sensorsRouter.post("/bulk", async (req, res) => {
   try {
     const json = await req.json();
-    const ok = await updateSensor(json);
+    const ok = await bulkSensors(json);
+    if (ok) res.status(201).send("Sensors updating");
+    else res.status(500).send("Error updating sensors");
+  } catch (err: any) {
+    return res.status(err.status).json({ error: err.message });
+  }
+});
+
+sensorsRouter.put("/:id", async (req, res) => {
+  try {
+    const json = await req.json();
+    const ok = await updateSensor(req.path_parameters.id, json);
     if (ok) res.status(200).send("Sensor updated");
     else res.status(500).send("Error updating sensor");
   } catch (err: any) {
