@@ -14,7 +14,7 @@ Run `yarn build` to run a test production build.
 
 ### SensorNet Server
 
-Connection to SensorNet server implemented in `src/io-plugins/sensornet.tsx`
+Connection to SensorNet server implemented in `src/sensornet/sensornet.tsx`
 
 Server location temporarily hardcoded to `localhost:8080`, needs to be changed for Docker usage
 
