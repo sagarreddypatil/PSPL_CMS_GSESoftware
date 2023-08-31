@@ -62,6 +62,7 @@ def cmdnet_send(cmd):
             continue
 
     message = msgpack.packb(cmd)
+    print(message)
     sock.send(message)
 
     recvd = b""
