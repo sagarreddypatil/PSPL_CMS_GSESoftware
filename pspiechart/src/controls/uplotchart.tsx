@@ -1,4 +1,4 @@
-import { DataSource, DataPoint } from "../contexts/io-context";
+import { DataSource } from "../contexts/io-context";
 import { useContext, useEffect, useRef, useState } from "react";
 import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";

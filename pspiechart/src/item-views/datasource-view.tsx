@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { UserItemProps } from "./item-view-factory";
 import { DataPoint, IOContext } from "../contexts/io-context";
-import { useDebounce } from "@react-hook/debounce";
+// import { useDebounce } from "@react-hook/debounce";
 import { TimeConductorContext } from "../contexts/time-conductor-context";
 
-const UPDATE_RATE = 100;
+// const UPDATE_RATE = 100;
 
 export default function DataSourceView({ item }: UserItemProps) {
   const { dataSources } = useContext(IOContext);

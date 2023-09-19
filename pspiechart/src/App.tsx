@@ -2,7 +2,6 @@ import IOContextProvider from "./contexts/io-context";
 import VertLayout from "./layouts/vert-layout";
 import Select from "./controls/select";
 import { FiMoon, FiSun } from "react-icons/fi";
-import { AiFillSetting } from "react-icons/ai";
 import { Outlet, useNavigate, useOutlet } from "react-router-dom";
 import Sidebar from "./components/sidebar";
 import { createContext, useEffect, useState } from "react";
@@ -11,7 +10,6 @@ import TimeConductorProvider from "./contexts/time-conductor-context";
 import TimeConductorView from "./components/time-conductor";
 import Logo from "./controls/logo";
 import Nav from "./controls/nav";
-import { Button } from "./controls/button";
 import UserItemsContextProvider from "./contexts/user-items-context";
 import { Dropdown, DropdownItem } from "./controls/dropdown";
 
