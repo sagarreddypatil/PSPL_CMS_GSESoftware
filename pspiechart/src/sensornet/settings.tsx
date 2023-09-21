@@ -1,6 +1,5 @@
 import { CellBase, Matrix, Spreadsheet } from "react-spreadsheet";
 import { Button } from "../controls/button";
-import Textbox from "../controls/textbox";
 import { useEffect, useState } from "react";
 
 type Sensor = {
@@ -63,13 +62,6 @@ export default function SensorNetSettings() {
     <div className="flex flex-col p-4">
       <label className="text-2xl">SensorNet Settings</label>
       <hr className="mt-2 mb-4" />
-
-      <div className="flex flex-row">
-        <Textbox placeholder="Server IP" />
-        <Button name="Connect" className="mx-2" />
-      </div>
-
-      <div className="my-4"></div>
 
       <label className="text-xl mb-2">Configure Sensors</label>
       <Spreadsheet

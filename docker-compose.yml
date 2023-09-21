@@ -3,8 +3,8 @@ version: "3"
 services:
   influxdb:
     image: influxdb:latest
-    ports:
-      - 8086:8086
+    # ports:
+    #   - 8086:8086
     volumes:
       - ./data/influxdb:/var/lib/influxdb
     environment:
@@ -20,6 +20,9 @@ services:
     build: ./pspiechart
     ports:
       - 4173:4173
+    environment:
+      - VIRTUAL_HOST=pspc.*
+      - VIRTUAL_PORT=4173
     restart: always
 
   sensornet-server:
@@ -30,6 +33,9 @@ services:
       - INFLUXDB_BUCKET=sensornet
       - INFLUXDB_TOKEN=super-secret-influx-token
       - DB_PATH=/data
+
+      - VIRTUAL_HOST=sensornet.*
+      - VIRTUAL_PORT=8080
     volumes:
       - ./data/sensornet-server:/data
     ports:
@@ -42,3 +48,10 @@ services:
       retries: 3
       start_period: 40s
     restart: always
+
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
