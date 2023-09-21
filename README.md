@@ -22,7 +22,7 @@
 Currently, PSPieChart has not yet been integrated with CommandNet, only SensorNet.
 Follow further development instructions in the respective READMEs.
 
-## Deployment
+## Runtime
 
 ### Dependencies
 
@@ -30,4 +30,8 @@ Follow further development instructions in the respective READMEs.
 
 ### Setup
 
-Use `docker-compose`
+1. Clone this repository
+1. Open a terminal in the cloned repo
+1. Run `docker-compose build` to compile everything
+1. Run `docker-compose up -d` to start all the processes in the background
+1. You can now access PSPieChart on http://localhost:4173
