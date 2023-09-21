@@ -10,7 +10,7 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function Login() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const admin = searchParams.get("admin") != undefined;
 
   const [username, setUsername] = useState("");
