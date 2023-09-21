@@ -16,6 +16,16 @@ services:
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=super-secret-influx-token
     restart: always
 
+  pocketbase:
+    build: ./pocketbase
+    ports:
+      - 8093:8093
+    volumes:
+      - ./data/pocketbase:/pb/pb_data
+    environment:
+      - VIRTUAL_HOST=pb.*
+      - VIRTUAL_PORT=8093
+
   pspiechart:
     build:
       context: ./pspiechart
@@ -24,6 +34,9 @@ services:
       - 5173:5173
     volumes:
       - ./pspiechart:/app
+    environment:
+      - VIRTUAL_HOST=pspc.*
+      - VIRTUAL_PORT=5173
     restart: always
 
   sensornet-server:
@@ -36,6 +49,9 @@ services:
       - INFLUXDB_BUCKET=sensornet
       - INFLUXDB_TOKEN=super-secret-influx-token
       - DB_PATH=/data
+
+      - VIRTUAL_HOST=sensornet.*
+      - VIRTUAL_PORT=8080
     volumes:
       - ./data/sensornet-server:/data
       - ./sensornet-server:/app
@@ -43,3 +59,10 @@ services:
       - 8080:8080
       - 5001:5001/udp
     restart: always
+
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro

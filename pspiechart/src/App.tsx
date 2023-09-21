@@ -12,12 +12,25 @@ import Logo from "./controls/logo";
 import Nav from "./controls/nav";
 import UserItemsContextProvider from "./contexts/user-items-context";
 import { Dropdown, DropdownItem } from "./controls/dropdown";
+import { pb } from "./Login";
+import { Button } from "./controls/button";
 
 export const DarkModeContext = createContext(false);
 
 function App() {
   const outlet = useOutlet();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!pb.authStore.isValid) {
+      navigate("/login");
+    }
+  });
+
+  const logout = () => {
+    pb.authStore.clear();
+    navigate("/login");
+  };
 
   useEffect(() => {
     if (!outlet) {
@@ -57,9 +70,9 @@ function App() {
         <div className="">
           <TimeConductorView />
         </div>
-        <div className="flex-1 flex justify-end">
+        <div className="flex-1 flex justify-end gap-2">
           {/* <Button className="mr-2" name="Download" /> */}
-          <Select checked={darkMode} onChange={setDarkMode} className="mr-2">
+          <Select checked={darkMode} onChange={setDarkMode}>
             {darkMode ? <FiSun /> : <FiMoon />}
           </Select>
           <Dropdown name="Settings" right={true}>
@@ -70,6 +83,7 @@ function App() {
               SensorNet Settings
             </DropdownItem>
           </Dropdown>
+          <Button onClick={logout}>Logout</Button>
         </div>
       </Nav>
       <div className="flex-1 overflow-auto">

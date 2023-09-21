@@ -8,6 +8,7 @@ import { IconContext } from "react-icons";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import NotFound from "./not-found.tsx";
 import SensorNetSettings from "./sensornet/settings.tsx";
+import Login from "./Login.tsx";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
       { path: "/sensornet", element: <SensorNetSettings /> },
       { path: "*", element: <NotFound /> },
     ],
+  },
+  {
+    path: "/login",
+    element: <Login />,
   },
 ]);
 
