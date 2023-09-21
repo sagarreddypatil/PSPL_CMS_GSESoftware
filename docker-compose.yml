@@ -16,6 +16,16 @@ services:
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=super-secret-influx-token
     restart: always
 
+  pocketbase:
+    build: ./pocketbase
+    ports:
+      - 8093:8093
+    volumes:
+      - ./data/pocketbase:/pb/pb_data
+    environment:
+      - VIRTUAL_HOST=pb.*
+      - VIRTUAL_PORT=8093
+
   pspiechart:
     build: ./pspiechart
     ports:
