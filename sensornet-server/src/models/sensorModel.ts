@@ -6,8 +6,7 @@ interface Calibration {
   unit: string; // Unit of measurement
 
   // Calibration
-  offset: number;
-  gain: number;
+  calibrationExpression: string; // Expression to convert raw data to calibrated data
 
   // PouchDB stuff
   _id?: string; // PouchDB ID, same as `id`
