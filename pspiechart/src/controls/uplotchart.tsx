@@ -54,14 +54,12 @@ export default function UPlotChart(props: UPlotChartProps) {
 
     // downsample backlog into plot data, runs every animation frame when not paused
     const updateData = () => {
+      if (timeConductor.paused) {
+        downsampleBacklog.current.clear();
+        return;
+      }
+
       const backlog = downsampleBacklog.current;
-      // const backlogTimes = Array.from(backlog.keys()).sort();
-
-      // const backlogDt = backlogTimes[backlogTimes.length - 1] - backlogTimes[0];
-      // const backlogPoints = backlogTimes.length;
-      // const backlogDtPerPoint = backlogDt / backlogPoints;
-
-      // const backlogPointsPerNewPoint = Math.ceil(dt / backlogDtPerPoint);
 
       for (const [timestamp, data] of backlog) {
         const time = timestamp / 1000; // uPlot uses seconds, unlike js which is ms
@@ -97,6 +95,7 @@ export default function UPlotChart(props: UPlotChartProps) {
       updateData();
       if (!timeConductor.paused) removeOldData();
 
+      console.log(plotTimeRef.current.length);
       plotRef.current?.setData([plotTimeRef.current, ...plotDataRef.current]);
 
       // timeStart and timeEnd only update every render
