@@ -23,7 +23,9 @@ packet_format = "<4s H 2x Q Q q"
 fmt_compiled = struct.Struct(packet_format)
 
 
-def make_packet(header: bytes, sensor_id: int, timestamp: int, counter: int, data: int) -> bytes:
+def make_packet(
+    header: bytes, sensor_id: int, timestamp: int, counter: int, data: int
+) -> bytes:
     return fmt_compiled.pack(header, sensor_id, timestamp, counter, data)
 
 
@@ -34,9 +36,9 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_ip = "127.0.0.1"
 server_port = 5001
 
-ids = list(range(0, 6))
-counters = [0 for a in ids]
-datas = [0 for a in ids]
+ids = list(range(1, 3))
+counters = [0 for a in range(ids[-1] + 1)]
+datas = [0 for a in range(ids[-1] + 1)]
 
 rate = 1000  # Hz
 
