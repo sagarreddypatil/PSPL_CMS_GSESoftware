@@ -76,9 +76,9 @@ function App() {
             {darkMode ? <FiSun /> : <FiMoon />}
           </Select>
           <Dropdown name="Settings" right={true}>
-            <DropdownItem onClick={() => navigate("/settings")}>
+            {/* <DropdownItem onClick={() => navigate("/settings")}>
               PSPC Settings
-            </DropdownItem>
+            </DropdownItem> */}
             <DropdownItem onClick={() => navigate("/sensornet")}>
               SensorNet Settings
             </DropdownItem>

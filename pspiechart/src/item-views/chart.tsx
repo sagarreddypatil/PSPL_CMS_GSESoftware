@@ -7,6 +7,7 @@ import UPlotChart from "../controls/uplotchart";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { HexColorPicker } from "react-colorful";
+import ChartJSPlot from "../controls/chartjsplot/chartjsplot";
 
 type Color = {
   hex: string;
@@ -91,11 +92,17 @@ export function Chart({ item }: UserItemProps) {
   );
 
   return (
-    <UPlotChart
+    // <UPlotChart
+    //   dataSources={myDataSources}
+    //   pointsPerPixel={1}
+    //   title={item.name}
+    //   colors={myColors}
+    // />
+    <ChartJSPlot
       dataSources={myDataSources}
       pointsPerPixel={1}
-      title={item.name}
       colors={myColors}
+      title={item.name}
     />
   );
 }

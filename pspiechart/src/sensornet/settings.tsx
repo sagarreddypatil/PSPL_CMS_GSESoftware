@@ -8,14 +8,15 @@ type Sensor = {
   unit: string; // Unit of measurement
 
   // Calibration
-  offset: number;
-  gain: number;
+  calibration: string;
 };
 
 const SENSORNET_SERVER = "localhost:8080";
 
 export default function SensorNetSettings() {
   const [data, setData] = useState<Sensor[]>([]);
+
+  const [updateFailed, setUpdateFailed] = useState(false);
 
   useEffect(() => {
     fetch(`http://${SENSORNET_SERVER}/sensors`)
@@ -29,19 +30,17 @@ export default function SensorNetSettings() {
     { value: sensor.id },
     { value: sensor.name },
     { value: sensor.unit },
-    { value: sensor.offset },
-    { value: sensor.gain },
+    { value: sensor.calibration },
   ]);
 
   const onSpreadsheetChange = (data: Matrix<CellBase>) => {
     const newData = data.map((row) => {
-      const [id, name, unit, offset, gain] = row;
+      const [id, name, unit, calibration] = row;
       return {
         id: id!.value,
         name: name!.value,
         unit: unit!.value,
-        offset: offset!.value,
-        gain: gain!.value,
+        calibration: calibration!.value,
       };
     });
 
@@ -55,6 +54,14 @@ export default function SensorNetSettings() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
+    }).then((res) => {
+      if (res.status === 201) {
+        // refresh the page
+        window.location.reload();
+      } else {
+        setUpdateFailed(true);
+        console.log(res);
+      }
     });
   };
 
@@ -65,12 +72,17 @@ export default function SensorNetSettings() {
 
       <label className="text-xl mb-2">Configure Sensors</label>
       <Spreadsheet
-        columnLabels={["ID", "Name", "Unit", "Offset", "Gain"]}
+        columnLabels={["ID", "Name", "Unit", "Calibration"]}
         hideRowIndicators={true}
         data={spreadsheetData}
         onChange={onSpreadsheetChange}
       />
       <Button name="Submit" className="my-2" onClick={submitSensors} />
+      {updateFailed ? (
+        <label className="text-red-500">Update failed</label>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }
