@@ -20,9 +20,7 @@ export default function UPlotChart(props: UPlotChartProps) {
   const timeConductor = useContext(TimeConductorContext);
 
   // state for the size of the chart, using SizedDiv
-  const prevTc = useRef(timeConductor);
-  const prevSize = useRef({ width: 0, height: 0 });
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  const [size, setSize] = useState({ width: 1000, height: 0 });
 
   // refs for creating and using the uplot stuff
   const divRef = useRef<HTMLDivElement | null>(null);
@@ -95,7 +93,6 @@ export default function UPlotChart(props: UPlotChartProps) {
       updateData();
       if (!timeConductor.paused) removeOldData();
 
-      console.log(plotTimeRef.current.length);
       plotRef.current?.setData([plotTimeRef.current, ...plotDataRef.current]);
 
       // timeStart and timeEnd only update every render
@@ -129,44 +126,39 @@ export default function UPlotChart(props: UPlotChartProps) {
     // historical data gets sent straight to plotTimeRef and plotDataRef
 
     // only refetch historical if size changes significantly (> 0.5 orders of magnitude)
-    const sizeChange = Math.log10(size.width / prevSize.current.width);
-    if (sizeChange > 0.5 || timeConductor != prevTc.current) {
-      prevTc.current = timeConductor;
-      prevSize.current = size;
 
-      // map between time and array of data, which is indexed by data source
-      const historicalData = new Map<number, number[]>(); // key is time, value is array indexed by local data source index
-      const promises: Promise<void>[] = [];
+    // map between time and array of data, which is indexed by data source
+    const historicalData = new Map<number, number[]>(); // key is time, value is array indexed by local data source index
+    const promises: Promise<void>[] = [];
 
-      props.dataSources.forEach((source, index) => {
-        const promise = source
-          .historical(timeStart, timeEnd, dt / 1000) // historical wants dt in seconds
-          .then((data) => {
-            data.forEach((point) => {
-              const timestamp = point.timestamp.getTime();
+    props.dataSources.forEach((source, index) => {
+      const promise = source
+        .historical(timeStart, timeEnd, dt / 1000) // historical wants dt in seconds
+        .then((data) => {
+          data.forEach((point) => {
+            const timestamp = point.timestamp.getTime();
 
-              const current = historicalData.get(timestamp) ?? [];
-              current[index] = point.value;
-              historicalData.set(timestamp, current);
-            });
+            const current = historicalData.get(timestamp) ?? [];
+            current[index] = point.value;
+            historicalData.set(timestamp, current);
           });
-
-        promises.push(promise);
-      });
-
-      Promise.all(promises).then(() => {
-        plotTimeRef.current.length = 0;
-        plotDataRef.current.length = 0;
-        historicalData.forEach((data, timestamp) => {
-          plotTimeRef.current.push(timestamp / 1000); // uplot uses seconds, not ms unlike js
-          for (let i = 0; i < props.dataSources.length; i++) {
-            const newVal = data[i] ?? NaN;
-            if (!plotDataRef.current[i]) plotDataRef.current[i] = [];
-            plotDataRef.current[i].push(newVal);
-          }
         });
+
+      promises.push(promise);
+    });
+
+    Promise.all(promises).then(() => {
+      plotTimeRef.current.length = 0;
+      plotDataRef.current.length = 0;
+      historicalData.forEach((data, timestamp) => {
+        plotTimeRef.current.push(timestamp / 1000); // uplot uses seconds, not ms unlike js
+        for (let i = 0; i < props.dataSources.length; i++) {
+          const newVal = data[i] ?? NaN;
+          if (!plotDataRef.current[i]) plotDataRef.current[i] = [];
+          plotDataRef.current[i].push(newVal);
+        }
       });
-    }
+    });
 
     const paused = timeConductor.paused;
     if (paused) return; // don't stream if paused

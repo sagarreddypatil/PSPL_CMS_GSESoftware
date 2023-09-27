@@ -79,7 +79,7 @@ export default function ChartJSPlot(props: ChartJSPlotProps) {
       const newColor = makeDatasetColor(props.colors[i]);
 
       dataset.borderColor = newColor.borderColor;
-      dataset.backgroundColor = newColor.backgroundColor;
+      // dataset.backgroundColor = newColor.backgroundColor;
     });
   }, [props.colors]);
 

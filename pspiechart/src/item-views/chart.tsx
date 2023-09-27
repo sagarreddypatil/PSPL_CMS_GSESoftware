@@ -92,18 +92,18 @@ export function Chart({ item }: UserItemProps) {
   );
 
   return (
-    // <UPlotChart
-    //   dataSources={myDataSources}
-    //   pointsPerPixel={1}
-    //   title={item.name}
-    //   colors={myColors}
-    // />
-    <ChartJSPlot
+    <UPlotChart
       dataSources={myDataSources}
       pointsPerPixel={1}
-      colors={myColors}
       title={item.name}
+      colors={myColors}
     />
+    // <ChartJSPlot
+    //   dataSources={myDataSources}
+    //   pointsPerPixel={1}
+    //   colors={myColors}
+    //   title={item.name}
+    // />
   );
 }
 
