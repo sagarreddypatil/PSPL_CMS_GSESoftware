@@ -1,5 +1,4 @@
 import { useCallback, useContext, useEffect } from "react";
-import useLocalStorage from "use-local-storage";
 import { create } from "zustand";
 
 import { Responsive, Layout, Layouts } from "react-grid-layout";
@@ -44,12 +43,6 @@ export function Dashboard({ item }: UserItemProps) {
     item.id
   );
   const myLayout = layout?.layout ?? [];
-
-  // const [allLayouts, setAllLayouts] = useLocalStorage<{
-  //   [key: string]: Layout[];
-  // }>(`layouts`, {});
-
-  // const myLayout = allLayouts[item.id] ?? [];
 
   const { userItems } = useContext(UserItemsContext);
 

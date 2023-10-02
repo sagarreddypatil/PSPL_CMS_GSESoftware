@@ -95,6 +95,11 @@ function BaseTreeItemFactory({ item }: UserItemProps) {
   return <></>;
 }
 
+export type ChildTreeItemProps = {
+  item: UserItem;
+  parent: UserItem;
+};
+
 function ChildTreeItemFactory({
   parent,
   item,
@@ -104,7 +109,7 @@ function ChildTreeItemFactory({
 }) {
   switch (parent.type) {
     case ItemViewType.Chart:
-      return <ChartChildTreeItem item={item} />;
+      return <ChartChildTreeItem item={item} parent={parent} />;
   }
 
   return <></>;

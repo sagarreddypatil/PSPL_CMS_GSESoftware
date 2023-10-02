@@ -1,63 +1,32 @@
 import { useContext } from "react";
-import { UserItemProps } from "./item-view-factory";
+import { ChildTreeItemProps, UserItemProps } from "./item-view-factory";
 import { UserItemsContext } from "../contexts/user-items-context";
 import NotFound from "../not-found";
 import { DataSource, IOContext } from "../contexts/io-context";
 import UPlotChart from "../controls/uplotchart";
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
 import { HexColorPicker } from "react-colorful";
-import ChartJSPlot from "../controls/chartjsplot/chartjsplot";
+// import ChartJSPlot from "../controls/chartjsplot/chartjsplot";
+import { usePbRecord } from "../hooks/pocketbase";
 
 type Color = {
   hex: string;
 };
 
-type ChartColors = {
-  [key: string]: Color;
+type ChartColorRecord = {
+  id: string;
+  colors: {
+    [key: string]: Color;
+  };
 };
-
-type ChartColorsState = {
-  colors: ChartColors;
-  setColor: (id: string, color: Color) => void;
-};
-
-// const useChartColors = create<ChartColorsState>((set) => ({
-//   colors: {},
-//   setColor: (id, color) =>
-//     set((state) => ({
-//       colors: {
-//         ...state.colors,
-//         [id]: color,
-//       },
-//     })),
-// }));
-
-const useChartColors = create(
-  persist<ChartColorsState>(
-    (set) => ({
-      colors: {},
-      setColor: (id, color) =>
-        set((state) => ({
-          colors: {
-            ...state.colors,
-            [id]: color,
-          },
-        })),
-    }),
-    {
-      name: "chart-colors",
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
-);
 
 const defaultColor = "#DAAA00";
 
 export function Chart({ item }: UserItemProps) {
   const { userItems } = useContext(UserItemsContext);
   const { dataSources } = useContext(IOContext);
-  const { colors } = useChartColors();
+
+  const [_colors] = usePbRecord<ChartColorRecord>("chartColors", item.id);
+  const colors = _colors?.colors ?? {};
 
   if (!item.childIds) {
     console.log("No child ids");
@@ -107,8 +76,13 @@ export function Chart({ item }: UserItemProps) {
   );
 }
 
-export function ChartChildTreeItem({ item }: UserItemProps) {
-  const { colors, setColor } = useChartColors();
+export function ChartChildTreeItem({ item, parent }: ChildTreeItemProps) {
+  // const { colors, setColor } = useChartColors();
+  const [_colors, setColors] = usePbRecord<ChartColorRecord>(
+    "chartColors",
+    parent.id
+  );
+  const colors = _colors?.colors ?? {};
 
   const myColor = colors[item.id]?.hex ?? defaultColor;
 
@@ -131,7 +105,17 @@ export function ChartChildTreeItem({ item }: UserItemProps) {
             <HexColorPicker
               className="my-color-picker"
               color={myColor}
-              onChange={(newColor) => setColor(item.id, { hex: newColor })}
+              onChange={(newColor) => {
+                setColors({
+                  id: parent.id,
+                  colors: {
+                    ...colors,
+                    [item.id]: {
+                      hex: newColor,
+                    },
+                  },
+                });
+              }}
             />
           </div>
         </div>
