@@ -14,7 +14,7 @@ import Select from "../controls/select";
 
 import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { useDebounce } from "@react-hook/debounce";
-import { useRecord } from "../hooks/pocketbase";
+import { usePbRecord } from "../hooks/pocketbase";
 
 const COLS = 20;
 const ROWS = 14;
@@ -39,7 +39,7 @@ export function Dashboard({ item }: UserItemProps) {
   const [size, setSize] = useDebounce({ width: 0, height: 0 }, 100);
   const editMode = useEditMode((state) => state.editMode);
 
-  const [layout, setLayout] = useRecord<SavedLayout>(
+  const [layout, setLayout] = usePbRecord<SavedLayout>(
     "dashboardLayouts",
     item.id
   );

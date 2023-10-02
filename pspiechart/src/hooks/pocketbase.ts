@@ -7,7 +7,7 @@ export type RecordBase = {
   updated?: Date;
 };
 
-export function useRecord<Type extends RecordBase>(
+export function usePbRecord<Type extends RecordBase>(
   collection: string,
   id: string
 ) {
@@ -60,7 +60,7 @@ export function useRecord<Type extends RecordBase>(
   return [record, setRecord] as const;
 }
 
-export function useRecords<Type extends RecordBase>(collection: string) {
+export function usePbRecords<Type extends RecordBase>(collection: string) {
   const [records, _setRecords] = useState<Type[]>([]);
 
   useEffect(() => {

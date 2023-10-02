@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { UserItem, ItemViewType } from "../item-views/item-view-factory";
-import { useRecord, useRecords } from "../hooks/pocketbase";
+import { usePbRecord, usePbRecords } from "../hooks/pocketbase";
 import { set } from "date-fns";
 
 export type UserItemsContextType = {
@@ -59,12 +59,12 @@ export default function UserItemsContextProvider({
     return map;
   };
 
-  const [storedRootItem, setStoredRootItem] = useRecord<RootItem>(
+  const [storedRootItem, setStoredRootItem] = usePbRecord<RootItem>(
     "projects",
     "edvfpfakwyydd9i"
   ); // hardcoded project id, TODO: make it dynamic
   const [storedItems, createStoredItem, updateStoredItem, deleteStoredItem] =
-    useRecords<UserItem>("userItems");
+    usePbRecords<UserItem>("userItems");
   const [staticUserItems, setStaticUserItems] = useState<Map<string, UserItem>>(
     fromList([
       {
