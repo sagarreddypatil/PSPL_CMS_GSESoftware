@@ -1,4 +1,4 @@
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import useLocalStorage from "use-local-storage";
 import { create } from "zustand";
 
@@ -14,6 +14,7 @@ import Select from "../controls/select";
 
 import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { useDebounce } from "@react-hook/debounce";
+import { useRecord } from "../hooks/pocketbase";
 
 const COLS = 20;
 const ROWS = 14;
@@ -22,6 +23,11 @@ const BASE_WIDTH = 3;
 type EditModeState = {
   editMode: boolean;
   setEditMode: (editMode: boolean) => void;
+};
+
+type SavedLayout = {
+  id: string;
+  layout: Layout[];
 };
 
 const useEditMode = create<EditModeState>((set) => ({
@@ -33,11 +39,17 @@ export function Dashboard({ item }: UserItemProps) {
   const [size, setSize] = useDebounce({ width: 0, height: 0 }, 100);
   const editMode = useEditMode((state) => state.editMode);
 
-  const [allLayouts, setAllLayouts] = useLocalStorage<{
-    [key: string]: Layout[];
-  }>(`layouts`, {});
+  const [layout, setLayout] = useRecord<SavedLayout>(
+    "dashboardLayouts",
+    item.id
+  );
+  const myLayout = layout?.layout ?? [];
 
-  const myLayout = allLayouts[item.id] ?? [];
+  // const [allLayouts, setAllLayouts] = useLocalStorage<{
+  //   [key: string]: Layout[];
+  // }>(`layouts`, {});
+
+  // const myLayout = allLayouts[item.id] ?? [];
 
   const { userItems } = useContext(UserItemsContext);
 
@@ -65,11 +77,15 @@ export function Dashboard({ item }: UserItemProps) {
   }, []);
 
   const onLayoutChange = (_: Layout[], allLayouts: Layouts) => {
-    setAllLayouts((oldAllLayouts) => {
-      return {
-        ...oldAllLayouts,
-        [item.id]: allLayouts.lg,
-      };
+    // setAllLayouts((oldAllLayouts) => {
+    //   return {
+    //     ...oldAllLayouts,
+    //     [item.id]: allLayouts.lg,
+    //   };
+    // });
+    setLayout({
+      id: item.id,
+      layout: allLayouts.lg,
     });
   };
 

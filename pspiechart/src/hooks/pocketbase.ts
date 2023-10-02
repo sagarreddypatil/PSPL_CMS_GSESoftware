@@ -20,6 +20,7 @@ export function useRecord<Type extends RecordBase>(
         _setRecord(res);
       })
       .catch((err) => {
+        _setRecord(null);
         console.error(err);
       });
 
@@ -37,10 +38,20 @@ export function useRecord<Type extends RecordBase>(
     };
   }, [collection, id]);
 
-  const setRecord = (record: Type) => {
+  const setRecord = (newRecord: Type) => {
+    // create if doesn't exist
+    if (!record) {
+      return pb
+        .collection(collection)
+        .create<Type>(newRecord as { [key: string]: any })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+
     return pb
       .collection(collection)
-      .update<Type>(id, record as { [key: string]: any })
+      .update<Type>(id, newRecord as { [key: string]: any })
       .catch((err) => {
         console.error(err);
       });
