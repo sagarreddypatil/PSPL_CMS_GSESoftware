@@ -63,6 +63,16 @@ export default function UserItemsContextProvider({
     "projects",
     "edvfpfakwyydd9i"
   ); // hardcoded project id, TODO: make it dynamic
+  useEffect(() => {
+    if (!storedRootItem) {
+      // create one
+      setStoredRootItem({
+        id: "edvfpfakwyydd9i",
+        childIds: [],
+      });
+    }
+  }, [storedRootItem]);
+
   const [storedItems, createStoredItem, updateStoredItem, deleteStoredItem] =
     usePbRecords<UserItem>("userItems");
   const [staticUserItems, setStaticUserItems] = useState<Map<string, UserItem>>(
