@@ -22,6 +22,7 @@ services:
       - 8093:8093
     volumes:
       - ./data/pocketbase:/pb/pb_data
+      - ./pocketbase/migrations:/pb/pb_migrations
     environment:
       - VIRTUAL_HOST=pb.*
       - VIRTUAL_PORT=8093
