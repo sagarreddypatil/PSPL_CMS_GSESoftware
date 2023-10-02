@@ -1,18 +1,51 @@
 import { createContext, useEffect, useState } from "react";
 import { UserItem, ItemViewType } from "../item-views/item-view-factory";
+import { useRecord, useRecords } from "../hooks/pocketbase";
+import { set } from "date-fns";
 
 export type UserItemsContextType = {
   userItems: Map<string, UserItem>;
-  setUserItems: React.Dispatch<React.SetStateAction<Map<string, UserItem>>>;
+  // setUserItems: React.Dispatch<React.SetStateAction<Map<string, UserItem>>>;
+  createStoredItem: (item: UserItem) => Promise<UserItem | void>;
+  updateStoredItem: (item: UserItem) => Promise<UserItem | void>;
+  deleteStoredItem: (id: string) => Promise<boolean | void>;
+  setStaticUserItems: React.Dispatch<
+    React.SetStateAction<Map<string, UserItem>>
+  >;
+  setRootItem: (item: RootItem) => Promise<RootItem | void>;
 };
+
+function EmptyPromise<T>() {
+  return new Promise<T>((_, reject) => {
+    reject();
+  });
+}
 
 export const UserItemsContext = createContext<UserItemsContextType>({
   userItems: new Map(),
-  setUserItems: () => {},
+  // setUserItems: () => {},
+  createStoredItem: () => {
+    return EmptyPromise();
+  },
+  updateStoredItem: () => {
+    return EmptyPromise();
+  },
+  deleteStoredItem: () => {
+    return EmptyPromise();
+  },
+  setStaticUserItems: () => {},
+  setRootItem: () => {
+    return EmptyPromise();
+  },
 });
 
 type UserItemsContextProviderProps = {
   children: React.ReactNode;
+};
+
+type RootItem = {
+  id: string;
+  childIds: string[];
 };
 
 export default function UserItemsContextProvider({
@@ -26,93 +59,63 @@ export default function UserItemsContextProvider({
     return map;
   };
 
-  const [userItems, setUserItems] = useState<Map<string, UserItem>>(
-    fromList([])
+  const [storedRootItem, setStoredRootItem] = useRecord<RootItem>(
+    "projects",
+    "edvfpfakwyydd9i"
+  ); // hardcoded project id, TODO: make it dynamic
+  const [storedItems, createStoredItem, updateStoredItem, deleteStoredItem] =
+    useRecords<UserItem>("userItems");
+  const [staticUserItems, setStaticUserItems] = useState<Map<string, UserItem>>(
+    fromList([
+      {
+        id: "root",
+        name: "Root",
+        type: ItemViewType.Folder,
+        childIds: [],
+      },
+    ])
   );
 
-  useEffect(() => {
-    // load from local storage
+  // const [userItems, setUserItems] = useState<Map<string, UserItem>>(
+  //   fromList([])
+  // );
 
-    const storedItemsStr = localStorage.getItem("userItems") ?? "[]";
+  // static items + stored items
+  const rootItem = {
+    id: "root",
+    name: "Root",
+    type: ItemViewType.Folder,
+    childIds: [
+      ...(staticUserItems.get("root")?.childIds ?? []),
+      ...(storedRootItem?.childIds ?? []),
+    ],
+  };
 
-    const defaultRootItem: UserItem = {
-      id: "root",
-      name: "Root",
-      type: ItemViewType.Folder,
-      childIds: [],
+  const setRootItem = async (item: RootItem) => {
+    // filter out items in staticUserItems
+    const newRootItem = {
+      id: storedRootItem!.id,
+      childIds: item.childIds.filter((id) => !staticUserItems.has(id)),
     };
+    return setStoredRootItem(newRootItem);
+  };
 
-    let storedItems = JSON.parse(storedItemsStr) as UserItem[];
-
-    if (storedItems.length === 0) {
-      storedItems = [defaultRootItem];
-    }
-
-    console.log("loading", storedItems);
-
-    setUserItems(fromList(storedItems));
-  }, []);
-
-  useEffect(() => {
-    // save to local storage
-
-    // filter out items with noStore
-    const items = Array.from(userItems.values()).filter(
-      (item) => !item.noStore
-    );
-
-    console.log("saving", items);
-    localStorage.setItem("userItems", JSON.stringify(items));
-  }, [userItems]);
-
-  useEffect(() => {
-    // garbage collection, delete items with no references
-    // reference is when another item has this item as a child
-
-    setUserItems((items) => {
-      const newItems = new Map(items);
-      const referenceCounts = new Map<string, number>();
-
-      Array.from(newItems.keys()).forEach((key) => {
-        if (key === "root") return;
-        referenceCounts.set(key, 0);
-      });
-
-      // reference counting
-      items.forEach((item) => {
-        if (!item.childIds) return;
-
-        item.childIds.forEach((childId) => {
-          const count = referenceCounts.get(childId) ?? 0;
-          referenceCounts.set(childId, count + 1);
-        });
-      });
-
-      console.log("gc ref counts", referenceCounts);
-
-      // delete items with no references
-      referenceCounts.forEach((count, key) => {
-        if (count === 0) {
-          const item = newItems.get(key);
-          if (item?.noStore) return; // don't gc noStore items
-          newItems.delete(key);
-        }
-      });
-
-      // preventing infinite loop of rerenders
-      if (newItems.size !== items.size) {
-        return newItems;
-      }
-
-      return items;
-    });
-  }, [userItems]);
+  const userItems = new Map([
+    ...staticUserItems,
+    ...fromList(storedItems),
+    ...fromList([rootItem]),
+  ]);
 
   return (
     <UserItemsContext.Provider
       value={{
         userItems,
-        setUserItems,
+        createStoredItem,
+        updateStoredItem,
+        deleteStoredItem,
+        setStaticUserItems,
+        setRootItem,
+        // setUserItems,
       }}
     >
       {children}

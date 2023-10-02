@@ -35,7 +35,7 @@ function TreeItemContent({
   const [editMode, setEditMode] = useState(false);
   const [renameValue, setRenameValue] = useState(item.name);
 
-  const { setUserItems } = useContext(UserItemsContext);
+  const { updateStoredItem } = useContext(UserItemsContext);
   const renameRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -51,14 +51,7 @@ function TreeItemContent({
 
   const saveRename = () => {
     setEditMode(false);
-    setUserItems((items) => {
-      const newItems = new Map(items);
-
-      const newItem = { ...item, name: renameValue };
-      newItems.set(item.id, newItem);
-
-      return newItems;
-    });
+    updateStoredItem({ ...item, name: renameValue });
   };
 
   if (editMode) {

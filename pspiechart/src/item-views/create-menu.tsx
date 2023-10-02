@@ -3,8 +3,14 @@ import { Dropdown, DropdownItem } from "../controls/dropdown";
 import { DefaultUserItem, ItemViewType, UserItem } from "./item-view-factory";
 import { UserItemsContext } from "../contexts/user-items-context";
 
+function _randomId() {
+  return Math.random().toString(36).substring(2, 10);
+}
+
 function randomId() {
-  return Math.random().toString(36).substr(2, 9);
+  const fullId = _randomId() + _randomId();
+  const id15 = fullId.substring(0, 15);
+  return id15;
 }
 
 const defaultFolder: DefaultUserItem = {
@@ -32,7 +38,8 @@ const typeDefaults = new Map<ItemViewType, DefaultUserItem>([
 ]);
 
 export default function CreateMenu() {
-  const { setUserItems } = useContext(UserItemsContext);
+  const { userItems, createStoredItem, setRootItem } =
+    useContext(UserItemsContext);
 
   const addItem = (type: ItemViewType) => {
     if (!typeDefaults.get(type)) {
@@ -40,26 +47,18 @@ export default function CreateMenu() {
       return;
     }
 
-    setUserItems((items) => {
-      const newItems = new Map(items);
+    const id = randomId();
+    createStoredItem({
+      id: id,
+      ...typeDefaults.get(type)!!,
+    });
 
-      const id = randomId();
-      const newItem: UserItem = {
-        id,
-        ...typeDefaults.get(type)!!,
-      };
-
-      newItems.set(id, newItem);
-
-      const root = newItems.get("root");
-      if (!root) {
-        console.error("Should be unreachable", root);
-        return items;
-      }
-
-      root.childIds?.push(id);
-
-      return newItems;
+    // add to root
+    const root = userItems.get("root");
+    const newRootChildIds = [...(root?.childIds ?? []), id];
+    setRootItem({
+      id: "doesntmatter", // TODO: fix for multiple projects
+      childIds: newRootChildIds,
     });
   };
 

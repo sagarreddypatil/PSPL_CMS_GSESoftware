@@ -55,45 +55,47 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { userItems, setUserItems } = useContext(UserItemsContext);
+  const { userItems, updateStoredItem, setRootItem } =
+    useContext(UserItemsContext);
   const [selected, setSeleced] = useState<string[]>([]);
 
   // deleting items
   useHotkeys(
     "delete",
     () => {
-      setUserItems((items) => {
-        let newItems = new Map(items);
+      selected.forEach((index) => {
+        const { id, parentId } = fromIndex(index);
+        if (!parentId) return; // tried to delete root?
 
-        selected.forEach((index) => {
-          const { id, parentId } = fromIndex(index);
+        // don't delete if parent is read-only (noStore)
+        const oldParent = userItems.get(parentId);
+        if (oldParent?.noStore) return;
 
-          if (!parentId) return; // tried to delete root?
+        // don't delete if item is read-only (noStore) and parent is root
+        const child = userItems.get(id);
+        if (oldParent?.id === "root" && child?.noStore) return;
 
-          // don't delete if parent is read-only (noStore)
-          const oldParent = newItems.get(parentId);
-          if (oldParent?.noStore) return;
+        if (!oldParent) {
+          console.error("Should be unreachable", oldParent);
+          return;
+        }
 
-          // don't delete if item is read-only (noStore) and parent is root
-          const child = newItems.get(id);
-          if (oldParent?.id === "root" && child?.noStore) return;
+        const newChildren = oldParent.childIds?.filter(
+          (childId) => childId != id
+        );
 
-          if (!oldParent) {
-            console.error("Should be unreachable", oldParent);
-            return;
-          }
-
-          const newChildren = oldParent.childIds?.filter(
-            (childId) => childId != id
-          );
-
-          newItems.set(parentId, {
-            ...oldParent,
-            childIds: newChildren,
+        if (oldParent?.id === "root") {
+          setRootItem({
+            id: "doesnt matter", // TODO: fix for multiple projects
+            childIds: newChildren ?? [],
           });
-        });
+          return;
+        }
 
-        return newItems;
+        updateStoredItem({
+          ...oldParent,
+          childIds: newChildren,
+        });
       });
     },
     [selected]
@@ -147,34 +149,27 @@ export default function Sidebar() {
     // if (parentId == "root") parentId = items.root.index.toString();
     parentId = fromIndex(parentId).id;
 
-    setUserItems((userItems) => {
-      const parent = userItems.get(parentId);
-      if (!parent) {
-        console.error(`Parent not found: ${parentId}`);
-        return userItems;
-      }
-      if (!parent.childIds) {
-        console.error(`Parent is not a folder: ${parentId}`);
-        return userItems;
-      }
+    const parent = userItems.get(parentId);
+    if (!parent) {
+      console.error(`Parent not found: ${parentId}`);
+      return userItems;
+    }
+    if (!parent.childIds) {
+      console.error(`Parent is not a folder: ${parentId}`);
+      return userItems;
+    }
 
-      const addChildIds = childItems
-        .map((item) => item.id)
-        .filter((id) => !parent.childIds?.includes(id));
-      if (pos < 0) pos = parent.childIds.length;
+    const addChildIds = childItems
+      .map((item) => item.id)
+      .filter((id) => !parent.childIds?.includes(id));
+    if (pos < 0) pos = parent.childIds.length;
 
-      let newChildIds = parent.childIds.slice();
-      newChildIds.splice(pos, 0, ...addChildIds);
+    let newChildIds = parent.childIds.slice();
+    newChildIds.splice(pos, 0, ...addChildIds);
 
-      const newParent = {
-        ...parent,
-        childIds: newChildIds,
-      };
-
-      let newItems = new Map(userItems);
-      newItems.set(parentId, newParent);
-
-      return newItems;
+    updateStoredItem({
+      ...parent,
+      childIds: newChildIds,
     });
   };
 
