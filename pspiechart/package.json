@@ -27,6 +27,7 @@
     "react-router-dom": "^6.13.0",
     "react-spreadsheet": "^0.9.2",
     "react-use-websocket": "^4.3.1",
+    "timechart": "^0.5.2",
     "uplot": "^1.6.24",
     "use-local-storage": "^3.0.0",
     "use-resize-observer": "^9.1.0",

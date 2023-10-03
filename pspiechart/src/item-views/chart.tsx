@@ -7,6 +7,7 @@ import UPlotChart from "../controls/uplotchart";
 import { HexColorPicker } from "react-colorful";
 // import ChartJSPlot from "../controls/chartjsplot/chartjsplot";
 import { usePbRecord } from "../hooks/pocketbase";
+import TimeChartPlot from "../controls/timechart/timechart";
 
 type Color = {
   hex: string;
@@ -61,18 +62,24 @@ export function Chart({ item }: UserItemProps) {
   );
 
   return (
-    <UPlotChart
-      dataSources={myDataSources}
-      pointsPerPixel={1}
-      title={item.name}
-      colors={myColors}
-    />
+    // <UPlotChart
+    //   dataSources={myDataSources}
+    //   pointsPerPixel={1}
+    //   title={item.name}
+    //   colors={myColors}
+    // />
     // <ChartJSPlot
     //   dataSources={myDataSources}
     //   pointsPerPixel={1}
     //   colors={myColors}
     //   title={item.name}
     // />
+    <TimeChartPlot
+      dataSources={myDataSources}
+      pointsPerPixel={1}
+      colors={myColors}
+      title={item.name}
+    />
   );
 }
 

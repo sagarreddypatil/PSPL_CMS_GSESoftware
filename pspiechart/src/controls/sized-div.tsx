@@ -15,7 +15,7 @@ export default function SizedDiv(props: SizedDivProps) {
   });
 
   return (
-    <div className={`h-full w-full ${props.className}`} ref={ref}>
+    <div className={`h-full w-full ${props.className ?? ""}`} ref={ref}>
       {props.children}
     </div>
   );
