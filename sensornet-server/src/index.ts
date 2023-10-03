@@ -1,6 +1,6 @@
 import { Server } from "hyper-express";
-import cors from "cors";
-import myCORS from "./myCORS";
+// import cors from "cors";
+import useCORS from "./myCORS";
 import dgram from "node:dgram";
 import { InfluxDB, Point } from "@influxdata/influxdb-client";
 import { packetParser } from "./packets";
@@ -135,18 +135,23 @@ webServer.get("*", (req, res) => {
   res.status(404).send(`Route ${req.url} not found`);
 });
 
+// webServer.options(
+// "*",
+//   myCORS({
+//     origin: "*",
+//   })
+// );
+
 webServer.options(
-  "*",
-  myCORS({
+  "/*",
+  useCORS({
     origin: "*",
+    credentials: true,
+    optionsRoute: true,
   })
 );
 
-webServer.use(
-  cors({
-    origin: "*",
-  })
-);
+webServer.use(useCORS({ origin: "*", credentials: true }));
 
 webServer
   .listen(8080, "0.0.0.0")
