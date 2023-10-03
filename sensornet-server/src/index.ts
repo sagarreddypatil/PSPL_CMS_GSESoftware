@@ -9,6 +9,7 @@ import { getSources } from "./models/sourcesModel";
 import { closeAll } from "./models/db";
 import dotenv from "dotenv";
 import sensorsRouter from "./routes/sensors";
+import { sensors } from "./models/sensorModel";
 
 dotenv.config();
 
@@ -86,12 +87,38 @@ interface HistoricalReq {
   dt: number; // seconds
 }
 
+const sensorCalibrations = new Map<string, Function>(); // TODO: make this an LRU cache
+function getOrCreateCalibration(sensorId?: string) {
+  const defaultCalibration = "x"; // default expression if one doesn't exist
+
+  const calibString = sensorId
+    ? sensors.get(sensorId)?.calibration ?? defaultCalibration
+    : defaultCalibration; // default to x
+
+  if (!sensorCalibrations.has(calibString)) {
+    const calibFunc = new Function("x", `return ${calibString}`);
+    sensorCalibrations.set(calibString, calibFunc);
+    return calibFunc;
+  }
+
+  const outFunc = sensorCalibrations.get(calibString);
+  if (!outFunc) return (x: number) => x;
+  return outFunc;
+}
+
 webServer.get("/historical/:id", async (req, res) => {
   const options = req.query as unknown as HistoricalReq;
   if (!options.start || !options.end || !options.dt) {
     res.status(400).send("Invalid query parameters");
     return;
   }
+
+  if (!sensors.has(req.params.id)) {
+    res.status(404).send(`Sensor ${req.params.id} not found`);
+    return;
+  }
+
+  const calibFunc = getOrCreateCalibration(req.params.id);
 
   // rounding bounds because influxdb
   const start_us = Math.floor(options.start * 1000000);
@@ -127,7 +154,10 @@ webServer.get("/historical/:id", async (req, res) => {
     .map((a: any) => {
       return { id: a.id, value: a.value, timestamp: a.time_us };
     })
-    .filter((a: any) => a.value !== null);
+    .filter((a) => a.value !== null)
+    .map((a) => {
+      return { ...a, value: calibFunc(a.value) };
+    });
   return res.json(rows);
 });
 
@@ -182,16 +212,27 @@ udpSocket.on("message", async (msg) => {
       .timestamp(Number(packet.time_us));
     influxWriter.writePoint(influxPoint);
 
+    if (!sensors.has(packet.id.toString())) {
+      return; // don't write to WebSocket if sensor doesn't exist
+    }
+
     // Writing to WebSocket, ratelimited
     const idStr = packet.id.toString();
     const timestamp_s = Number(packet.time_us) / 1000000;
     if (!lastPacketTimestamps[idStr]) lastPacketTimestamps[idStr] = 0;
 
     if (timestamp_s - lastPacketTimestamps[idStr] > 1 / outRate) {
+      // get the calibration function
+
+      const calibratedValue = getOrCreateCalibration(idStr)(
+        Number(packet.value)
+      );
+
       const wsPoint = {
         id: packet.id.toString(),
         timestamp: Number(packet.time_us),
-        value: Number(packet.value),
+        // value: Number(packet.value),
+        value: calibratedValue,
       };
       webServer.publish(wsPoint.id, JSON.stringify(wsPoint));
       lastPacketTimestamps[idStr] = timestamp_s;

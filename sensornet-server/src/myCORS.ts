@@ -1,3 +1,6 @@
+// From https://github.com/neo773/hyper-express-cors
+// MIT License, as mentioned in its package.json
+
 import HyperExpress from "hyper-express";
 
 interface CORSOptions {
