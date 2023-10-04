@@ -94,7 +94,11 @@ export default function TimeConductorView() {
         checked={timeConductor.paused}
         onChange={(value) => timeConductor.setPaused(value)}
       >
-        <span>{timeConductor.paused ? <ImPause2 /> : <ImPlay3 />}</span>
+        <span
+          className={`${timeConductor.paused ? "text-black" : "text-rush"}`}
+        >
+          {timeConductor.paused ? <ImPlay3 /> : <ImPause2 />}
+        </span>
       </Select>
       <div className="m-1"></div>
       {timeConductor.paused ? <FixedConductorView /> : <MovingConductorView />}
