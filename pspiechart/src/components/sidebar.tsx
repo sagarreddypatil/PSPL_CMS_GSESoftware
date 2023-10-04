@@ -63,17 +63,34 @@ export default function Sidebar() {
   useHotkeys(
     "delete",
     () => {
+      const selectedNames = selected
+        .map((index) => {
+          const { id, parentId } = fromIndex(index);
+
+          if (!parentId) return; // tried to delete root?
+
+          // don't delete if parent is read-only (noStore)
+          const oldParent = userItems.get(parentId);
+          if (oldParent?.noStore) return;
+
+          // don't delete if item is read-only (noStore) and parent is root
+          const child = userItems.get(id);
+          if (oldParent?.id === "root" && child?.noStore) return;
+
+          return userItems.get(id)?.name;
+        })
+        .filter((name) => name);
+
+      if (selectedNames.length === 0) return;
+
+      const resp = confirm(`Do you want to remove ${selectedNames}?`);
+      if (!resp) {
+        return;
+      }
+
       selected.forEach((index) => {
         const { id, parentId } = fromIndex(index);
-        if (!parentId) return; // tried to delete root?
-
-        // don't delete if parent is read-only (noStore)
-        const oldParent = userItems.get(parentId);
-        if (oldParent?.noStore) return;
-
-        // don't delete if item is read-only (noStore) and parent is root
-        const child = userItems.get(id);
-        if (oldParent?.id === "root" && child?.noStore) return;
+        const oldParent = userItems.get(parentId!);
 
         if (!oldParent) {
           console.error("Should be unreachable", oldParent);

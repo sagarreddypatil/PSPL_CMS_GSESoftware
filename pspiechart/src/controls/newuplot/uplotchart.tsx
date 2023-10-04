@@ -251,7 +251,6 @@ export default function UPlotChart({
         currentTimeEnd - timeConductor.moving.timespan / 1000;
 
       if (!timeConductor.paused) removeOldData(currentTimeStart);
-      console.log(dataRef.current);
       plotRef.current?.setData(dataRef.current, false);
 
       if (timeConductor.paused) {
