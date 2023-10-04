@@ -41,6 +41,29 @@ export default function Login() {
         value={password}
         setValue={setPassword}
       />
+      <div className="-mt-4">
+        {admin ? (
+          <a
+            className="text-sm text-rush underline"
+            href="#"
+            onClick={() => {
+              navigate("/login");
+            }}
+          >
+            Normal Login
+          </a>
+        ) : (
+          <a
+            className="text-sm text-rush underline"
+            href="#"
+            onClick={() => {
+              navigate("/login?admin");
+            }}
+          >
+            Admin Login
+          </a>
+        )}
+      </div>
       <Button onClick={login}>Login</Button>
     </FullpageForm>
   );
