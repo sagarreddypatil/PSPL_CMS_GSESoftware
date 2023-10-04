@@ -1,10 +1,26 @@
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { DataSource } from "../contexts/io-context";
-import { useContext, useEffect, useRef, useState } from "react";
+import SizedDiv from "./sized-div";
 import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";
-import SizedDiv from "./sized-div";
 import { TimeConductorContext } from "../contexts/time-conductor-context";
 import { DarkModeContext } from "../App";
+
+/*
+ * The chart aligns the right side of the chart to the current time. However, if
+ * there's a large descripancy between the latest point's timestamp and the
+ * current time, then the latest data points wont be visible on the chart. To
+ * account for this, we use the below variable. If the time difference between
+ * the latest point's timestamp and the current time is larger than this value,
+ * the chart will be aligned to the latest point's timestamp rather than the
+ * current time.
+ *
+ * Try setting it to zero to see what happens. You should notice the chart being
+ * more jittery as the incoming points are only accepted if the difference
+ * between the previous point and the new point is large enough to fill a
+ * horizontal pixel.
+ */
+const DISCREPANCY_FOR_LATEST_POINT_FOLLOWING = 1; // seconds
 
 interface UPlotChartProps {
   title?: string;
@@ -14,207 +30,66 @@ interface UPlotChartProps {
   colors: string[];
 }
 
-export default function UPlotChart(props: UPlotChartProps) {
-  // chart references
+type ChartDataType = [
+  xValues: number[],
+  ...yValues: (number | null | undefined)[][]
+];
+
+export default function UPlotChart({
+  // title,
+  dataSources,
+  colors,
+}: UPlotChartProps) {
   const darkMode = useContext(DarkModeContext);
   const timeConductor = useContext(TimeConductorContext);
-
-  // state for the size of the chart, using SizedDiv
-  const [size, setSize] = useState({ width: 1000, height: 0 });
-
-  // refs for creating and using the uplot stuff
-  const divRef = useRef<HTMLDivElement | null>(null);
-  const plotRef = useRef<uPlot | null>(null);
-
-  // ref to data, directly plotted
-  const plotTimeRef = useRef<number[]>([]);
-  const plotDataRef = useRef<number[][]>([]);
-
-  // stuff to downsample into the plot data
-  const downsampleBacklog = useRef<Map<number, number[]>>(new Map()); // key is time, value is array indexed by local data source index
-
-  // animation ref for plot updates
-  const animationRef = useRef<number>(0);
-
-  // one stop shop for getting time related stuff
-  const timeStart = timeConductor.paused
-    ? timeConductor.fixed.start
-    : new Date(Date.now() - timeConductor.moving.timespan);
-  const timeEnd = timeConductor.paused ? timeConductor.fixed.end : new Date();
-  const dt =
-    (timeEnd.getTime() - timeStart.getTime()) /
-    (size.width * (props.pointsPerPixel ?? 1));
-
+  const pausedRef = useRef<boolean>(false);
   useEffect(() => {
-    // where the magic happens
-    // downsample backlog into plot data
-    // then update the plot
+    pausedRef.current = timeConductor.paused;
+  }, [timeConductor.paused]);
 
-    // downsample backlog into plot data, runs every animation frame when not paused
-    const updateData = () => {
-      if (timeConductor.paused) {
-        downsampleBacklog.current.clear();
-        return;
-      }
-
-      const backlog = downsampleBacklog.current;
-
-      for (const [timestamp, data] of backlog) {
-        const time = timestamp / 1000; // uPlot uses seconds, unlike js which is ms
-
-        // add time to plotTimeRef
-        plotTimeRef.current.push(time);
-
-        // add data to plotDataRef
-        for (let i = 0; i < props.dataSources.length; i++) {
-          const newVal = data[i] ?? null;
-          if (!plotDataRef.current[i]) plotDataRef.current[i] = [];
-          plotDataRef.current[i].push(newVal);
-        }
-      }
-
-      backlog.clear();
-    };
-
-    const removeOldData = () => {
-      // delete data points older than min
-      const min = timeStart.getTime() / 1000;
-
-      while (plotTimeRef.current[0] < min) {
-        plotTimeRef.current.shift();
-        for (const data of plotDataRef.current) {
-          data.shift();
-        }
-      }
-    };
-
-    // plot data update, runs every animation frame
-    const updatePlot = () => {
-      updateData();
-      if (!timeConductor.paused) removeOldData();
-
-      plotRef.current?.setData([plotTimeRef.current, ...plotDataRef.current]);
-
-      // timeStart and timeEnd only update every render
-      const currentTimeEnd = Date.now();
-      const currentTimeStart = currentTimeEnd - timeConductor.moving.timespan;
-
-      if (timeConductor.paused) {
-        plotRef.current?.setScale("x", {
-          min: timeStart.getTime() / 1000,
-          max: timeEnd.getTime() / 1000,
-        });
-      } else {
-        plotRef.current?.setScale("x", {
-          min: currentTimeStart / 1000,
-          max: currentTimeEnd / 1000,
-        });
-      }
-
-      animationRef.current = requestAnimationFrame(updatePlot);
-    };
-
-    updatePlot();
-
-    return () => {
-      window.cancelAnimationFrame(animationRef.current);
-    };
-  }, [timeConductor, props.pointsPerPixel, size]);
-
+  // size and dt stuff
+  const [size, setSize] = useState({ width: 1000, height: 0 }); // default is 1000 to avoid divide by zero and other wonkiness
+  const chartSizeRef = useRef({ width: 1000, height: 0 });
+  const chartSize = useMemo(
+    () => ({
+      width: size.width,
+      height: size.height - 35, // to fit the legend at the bottom
+    }),
+    [size]
+  );
   useEffect(() => {
-    // fetch historical data and subscribe to new data
-    // historical data gets sent straight to plotTimeRef and plotDataRef
-
-    // only refetch historical if size changes significantly (> 0.5 orders of magnitude)
-
-    // map between time and array of data, which is indexed by data source
-    const historicalData = new Map<number, number[]>(); // key is time, value is array indexed by local data source index
-    const promises: Promise<void>[] = [];
-
-    props.dataSources.forEach((source, index) => {
-      const promise = source
-        .historical(timeStart, timeEnd, dt / 1000) // historical wants dt in seconds
-        .then((data) => {
-          data.forEach((point) => {
-            const timestamp = point.timestamp.getTime();
-
-            const current = historicalData.get(timestamp) ?? [];
-            current[index] = point.value;
-            historicalData.set(timestamp, current);
-          });
-        });
-
-      promises.push(promise);
-    });
-
-    Promise.all(promises).then(() => {
-      plotTimeRef.current.length = 0;
-      plotDataRef.current.length = 0;
-      historicalData.forEach((data, timestamp) => {
-        plotTimeRef.current.push(timestamp / 1000); // uplot uses seconds, not ms unlike js
-        for (let i = 0; i < props.dataSources.length; i++) {
-          const newVal = data[i] ?? NaN;
-          if (!plotDataRef.current[i]) plotDataRef.current[i] = [];
-          plotDataRef.current[i].push(newVal);
-        }
-      });
-    });
-
-    const paused = timeConductor.paused;
-    if (paused) return; // don't stream if paused
-
-    // subscribe to the datasource to stream that sweet sweet data
-    // data gets sent to downsampleBacklog
-    let subIds: string[] = [];
-    props.dataSources.forEach((source, index) => {
-      // subscribe to new data from each source
-      const subId = source.subscribe((data) => {
-        const timestamp = data.timestamp.getTime();
-
-        const current = downsampleBacklog.current.get(timestamp) ?? [];
-        current[index] = data.value;
-        downsampleBacklog.current.set(timestamp, current);
-      });
-
-      subIds.push(subId);
-    });
-
-    return () => {
-      // unsubscribe from all sources
-      props.dataSources.forEach((source, index) => {
-        source.unsubscribe(subIds[index]);
-      });
-    };
-  }, [props.dataSources, timeConductor, size]);
-
-  const sourceToSeries = (source: DataSource, index: number) => {
-    return {
-      label: source.identifier.name,
-      stroke: props.colors[index],
-      width: 2,
-    };
-  };
-
-  const genSeries = () => {
-    return [
-      {},
-      ...props.dataSources.map((source, index) =>
-        sourceToSeries(source, index)
-      ),
-    ];
-  };
-
+    chartSizeRef.current = chartSize;
+  }, [chartSize]);
+  const pointDtRef = useRef<number>(0);
+  const pointDt = useMemo(() => {
+    let timeSpan = -1;
+    if (timeConductor.paused) {
+      timeSpan =
+        timeConductor.fixed.end.getTime() - timeConductor.fixed.start.getTime();
+    } else {
+      timeSpan = timeConductor.moving.timespan;
+    }
+    // only accept every dt
+    return timeSpan / 1000 / chartSize.width;
+  }, [timeConductor, size.width]);
   useEffect(() => {
+    pointDtRef.current = pointDt;
+  }, [pointDt]);
+
+  // chart-related refs
+  const divRef = useRef<HTMLDivElement>(null);
+  const plotRef = useRef<uPlot>();
+  const dataRef = useRef<ChartDataType>([[]]);
+  const animRef = useRef<number>(0);
+  const acceptDataRef = useRef<boolean>(true);
+
+  // Main useEffect, sets up graph and subscribes to data sources
+  useEffect(() => {
+    dataRef.current = [[], ...dataSources.map(() => [])]; // time + data
     const opts: Options = {
-      title: "",
-      width: size.width ?? 1,
-      height: size.height - 60 ?? 1, // need to subtract 60 for some reason
-      tzDate: (ts) => uPlot.tzDate(new Date(ts * 1e3), "UTC"),
+      width: chartSizeRef.current.width,
+      height: chartSizeRef.current.height,
       pxAlign: false,
-      cursor: {
-        y: false,
-        lock: true,
-      },
       scales: {
         x: {
           auto: false,
@@ -223,13 +98,17 @@ export default function UPlotChart(props: UPlotChartProps) {
           auto: true,
         },
       },
+      cursor: {
+        y: false,
+        lock: true,
+      },
       axes: [
         {
           font: "12px IBM Plex Mono",
           labelFont: "bold 12px IBM Plex Mono",
           stroke: darkMode ? "#fff" : "#000",
           grid: {
-            stroke: "#80808080",
+            stroke: darkMode ? "#ffffff20" : "#00000010",
           },
           ticks: {
             show: true,
@@ -243,7 +122,7 @@ export default function UPlotChart(props: UPlotChartProps) {
           size: 65,
           stroke: darkMode ? "#fff" : "#000",
           grid: {
-            stroke: "#80808080",
+            stroke: darkMode ? "#ffffff20" : "#00000010",
           },
           ticks: {
             show: true,
@@ -251,7 +130,14 @@ export default function UPlotChart(props: UPlotChartProps) {
           },
         },
       ],
-      series: genSeries(),
+      series: [
+        {},
+        ...dataSources.map((ds, idx) => ({
+          label: ds.identifier.name + " (" + ds.unit + ")",
+          stroke: colors[idx],
+          width: 1.2,
+        })),
+      ],
       hooks: {
         init: [
           (u) => {
@@ -262,7 +148,7 @@ export default function UPlotChart(props: UPlotChartProps) {
         ],
         setSelect: [
           (u) => {
-            if (!timeConductor.paused) return;
+            if (!pausedRef) return;
             if (u.select.width <= 0) return;
 
             const min = u.posToVal(u.select.left, "x");
@@ -287,26 +173,162 @@ export default function UPlotChart(props: UPlotChartProps) {
       },
     };
 
-    plotRef.current = new uPlot(opts, [[], []], divRef.current ?? undefined);
+    plotRef.current = new uPlot(opts, dataRef.current, divRef.current!);
+
+    const subIds: string[] = [];
+    dataSources.forEach((ds, idx) => {
+      const subId = ds.subscribe((newPoint) => {
+        if (!acceptDataRef.current) return;
+
+        // add new point to the chart
+        const pointTime = newPoint.timestamp.getTime() / 1000; // uPlot uses seconds
+        const pointValue = newPoint.value;
+
+        // if last time point is the same as this one, replace it
+        const lastIndex = dataRef.current[0].length - 1;
+        if (dataRef.current[0][lastIndex] === pointTime) {
+          dataRef.current[idx + 1][lastIndex] = pointValue;
+          return;
+        }
+
+        // if the new time is before the last one, skip it
+        if (dataRef.current[0][lastIndex] > pointTime) {
+          return;
+        }
+
+        // if new point is less than a dt away, replace it
+        const lastTime = dataRef.current[0][lastIndex];
+        if (pointTime - lastTime < pointDtRef.current) {
+          dataRef.current[idx + 1][lastIndex] = pointValue;
+          return;
+        }
+
+        // otherwise, push it to the end, push null on all other sources
+        dataRef.current[0].push(pointTime);
+        dataRef.current[idx + 1].push(pointValue);
+        for (let i = 1; i < dataRef.current.length; i++) {
+          if (i === idx + 1) continue;
+          (dataRef.current[i] as (number | null | undefined)[]).push(null);
+        }
+      });
+      subIds.push(subId);
+    });
 
     return () => {
+      dataSources.forEach((source, idx) => {
+        source.unsubscribe(subIds[idx]);
+      });
       plotRef.current?.destroy();
     };
-  }, [props.dataSources, props.title, timeConductor]);
+  }, [dataSources, darkMode]);
 
+  // Fetch historical on time conductor change
   useEffect(() => {
-    if (!plotRef.current) return;
+    const endTime = timeConductor.paused ? timeConductor.fixed.end : new Date();
+    const startTime = timeConductor.paused
+      ? timeConductor.fixed.start
+      : new Date(endTime.getTime() - timeConductor.moving.timespan);
 
-    // for some reason, need to subtract 60 for uPlot to actually fit
-    plotRef.current.setSize({ width: size.width, height: size.height - 60 });
-  }, [size]);
+    const newData: ChartDataType = [[], ...dataSources.map(() => [])];
+
+    const promises = dataSources.map((source, srcIdx) => {
+      return source.historical(startTime, endTime, pointDt).then((data) => {
+        data.forEach((point, pointIdx) => {
+          newData[0][pointIdx] = point.timestamp.getTime() / 1000;
+          newData[srcIdx + 1][pointIdx] = point.value;
+        });
+      });
+    });
+
+    // swap out data after all promises resolve
+    Promise.all(promises).then(() => {
+      acceptDataRef.current = false;
+      dataRef.current = newData;
+      // only reaccept data if we're not paused
+      if (!timeConductor.paused) acceptDataRef.current = true;
+    });
+  }, [dataSources, timeConductor]);
+
+  // Update chart, animation loop
+  useEffect(() => {
+    const removeOldData = (before: number) => {
+      // delete all data before (seconds)
+      const firstIndex = dataRef.current[0].findIndex((x) => x > before);
+      if (firstIndex === -1) return;
+
+      for (let i = 0; i < dataRef.current.length; i++) {
+        dataRef.current[i].splice(0, firstIndex);
+      }
+    };
+
+    const pruneNulls = () => {
+      // if null for all sources, remove
+      const nullIndices: number[] = [];
+      for (let i = 0; i < dataRef.current[0].length; i++) {
+        let allNull = true;
+        for (let j = 1; j < dataRef.current.length; j++) {
+          if (dataRef.current[j][i] !== null) {
+            allNull = false;
+            break;
+          }
+        }
+        if (allNull) nullIndices.push(i);
+      }
+
+      // reverse so we don't have to worry about indices changing
+      nullIndices.reverse().forEach((idx) => {
+        for (let i = 0; i < dataRef.current.length; i++) {
+          dataRef.current[i].splice(idx, 1);
+        }
+      });
+    };
+
+    const updateChart = () => {
+      const rightNow = Date.now() / 1000;
+      let currentTimeEnd = dataRef.current[0][dataRef.current[0].length - 1]; // ensure latest point is visible
+      if (
+        Math.abs(currentTimeEnd - rightNow) <
+        DISCREPANCY_FOR_LATEST_POINT_FOLLOWING
+      ) {
+        currentTimeEnd = rightNow;
+      }
+      const currentTimeStart =
+        currentTimeEnd - timeConductor.moving.timespan / 1000;
+
+      if (!timeConductor.paused) removeOldData(currentTimeStart);
+      if (timeConductor.paused) pruneNulls(); // this is only an issue when paused
+      plotRef.current?.setData(dataRef.current, false);
+
+      if (timeConductor.paused) {
+        plotRef.current?.setScale("x", {
+          min: timeConductor.fixed.start.getTime() / 1000,
+          max: timeConductor.fixed.end.getTime() / 1000,
+        });
+      } else {
+        plotRef.current?.setScale("x", {
+          min: currentTimeStart,
+          max: currentTimeEnd,
+        });
+      }
+
+      animRef.current = requestAnimationFrame(updateChart);
+    };
+
+    updateChart();
+
+    return () => {
+      cancelAnimationFrame(animRef.current);
+    };
+  }, [timeConductor]);
+
+  // Size update
+  useEffect(() => {
+    plotRef.current?.setSize(chartSize);
+  }, [chartSize]);
 
   return (
-    <SizedDiv onResize={(width, height) => setSize({ width, height })}>
-      <div
-        ref={divRef}
-        className="h-full flex items-center justify-center"
-      ></div>
+    <SizedDiv onResize={(w, h) => setSize({ width: w, height: h })}>
+      <div ref={divRef}></div>
     </SizedDiv>
   );
 }

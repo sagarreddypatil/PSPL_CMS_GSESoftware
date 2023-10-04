@@ -4,7 +4,7 @@ import { UserItemsContext } from "../contexts/user-items-context";
 import NotFound from "../not-found";
 import { DataSource, IOContext } from "../contexts/io-context";
 // import UPlotChart from "../controls/uplotchart";
-import UPlotChart from "../controls/newuplot/uplotchart";
+import UPlotChart from "../controls/uplotchart";
 import { HexColorPicker } from "react-colorful";
 // import ChartJSPlot from "../controls/chartjsplot/chartjsplot";
 import { usePbRecord } from "../hooks/pocketbase";
