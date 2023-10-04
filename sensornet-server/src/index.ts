@@ -45,7 +45,7 @@ const influxWriter = influxClient.getWriteApi(
   {
     // batchSize: 10000,
     flushInterval: 1000,
-    retryJitter: 100,
+    // retryJitter: 100,
   }
 );
 const influxReader = influxClient.getQueryApi(

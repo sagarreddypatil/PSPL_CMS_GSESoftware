@@ -1,10 +1,9 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { DataSource } from "../../contexts/io-context";
 import SizedDiv from "../sized-div";
-import uPlot from "uplot";
+import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";
 import { TimeConductorContext } from "../../contexts/time-conductor-context";
-import { Chart, ChartData } from "chart.js";
 import { DarkModeContext } from "../../App";
 
 interface UPlotChartProps {
@@ -27,6 +26,10 @@ export default function UPlotChart({
 }: UPlotChartProps) {
   const darkMode = useContext(DarkModeContext);
   const timeConductor = useContext(TimeConductorContext);
+  const pausedRef = useRef<boolean>(false);
+  useEffect(() => {
+    pausedRef.current = timeConductor.paused;
+  }, [timeConductor.paused]);
 
   // size and dt stuff
   const [size, setSize] = useState({ width: 1000, height: 0 }); // default is 1000 to avoid divide by zero and other wonkiness
@@ -42,12 +45,17 @@ export default function UPlotChart({
     chartSizeRef.current = chartSize;
   }, [chartSize]);
   const pointDtRef = useRef<number>(0);
-  const pointDt = useMemo(
-    () =>
-      // only accept every dt
-      timeConductor.moving.timespan / 1000 / chartSize.width,
-    [timeConductor, size.width]
-  );
+  const pointDt = useMemo(() => {
+    let timeSpan = -1;
+    if (timeConductor.paused) {
+      timeSpan =
+        timeConductor.fixed.end.getTime() - timeConductor.fixed.start.getTime();
+    } else {
+      timeSpan = timeConductor.moving.timespan;
+    }
+    // only accept every dt
+    return timeSpan / 1000 / chartSize.width;
+  }, [timeConductor, size.width]);
   useEffect(() => {
     pointDtRef.current = pointDt;
   }, [pointDt]);
@@ -62,7 +70,7 @@ export default function UPlotChart({
   // Main useEffect, sets up graph and subscribes to data sources
   useEffect(() => {
     dataRef.current = [[], ...dataSources.map(() => [])]; // time + data
-    const opts = {
+    const opts: Options = {
       width: chartSizeRef.current.width,
       height: chartSizeRef.current.height,
       pxAlign: false,
@@ -73,6 +81,10 @@ export default function UPlotChart({
         y: {
           auto: true,
         },
+      },
+      cursor: {
+        y: false,
+        lock: true,
       },
       axes: [
         {
@@ -110,6 +122,39 @@ export default function UPlotChart({
           width: 1,
         })),
       ],
+      hooks: {
+        init: [
+          (u) => {
+            u.over.ondblclick = () => {
+              timeConductor.setPaused(false);
+            };
+          },
+        ],
+        setSelect: [
+          (u) => {
+            if (!pausedRef) return;
+            if (u.select.width <= 0) return;
+
+            const min = u.posToVal(u.select.left, "x");
+            const max = u.posToVal(u.select.left + u.select.width, "x");
+
+            timeConductor.setFixed({
+              start: new Date(min * 1e3),
+              end: new Date(max * 1e3),
+            });
+
+            u.setSelect(
+              {
+                left: 0,
+                width: 0,
+                top: 0,
+                height: 0,
+              },
+              false
+            );
+          },
+        ],
+      },
     };
 
     plotRef.current = new uPlot(opts, dataRef.current, divRef.current!);
@@ -206,6 +251,7 @@ export default function UPlotChart({
         currentTimeEnd - timeConductor.moving.timespan / 1000;
 
       if (!timeConductor.paused) removeOldData(currentTimeStart);
+      console.log(dataRef.current);
       plotRef.current?.setData(dataRef.current, false);
 
       if (timeConductor.paused) {
