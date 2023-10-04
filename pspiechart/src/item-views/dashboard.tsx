@@ -91,7 +91,7 @@ export function Dashboard({ item }: UserItemProps) {
         isDraggable={editMode}
         breakpoints={{ lg: 640, xxs: 0 }}
         cols={{ lg: COLS, xxs: BASE_WIDTH }}
-        rowHeight={size.height / ROWS}
+        rowHeight={size.height / ROWS - 0.5}
         useCSSTransforms={false}
         onLayoutChange={onLayoutChange}
         width={size.width}
