@@ -12,6 +12,7 @@ import { TreeItemFactory, UserItem } from "../item-views/item-view-factory";
 import Textbox from "./textbox";
 import { UserItemsContext } from "../contexts/user-items-context";
 import { fromIndex } from "../components/sidebar";
+import useLocalStorage from "use-local-storage";
 
 interface TreeProps {
   items: Record<TreeItemIndex, TreeItem>;
@@ -95,7 +96,11 @@ export default function TreeView({
   setSelectedItems,
 }: TreeProps) {
   const [focusedItem, setFocusedItem] = useState<TreeItemIndex>("root");
-  const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>([]);
+  // const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>([]);
+  const [expandedItems, setExpandedItems] = useLocalStorage<TreeItemIndex[]>(
+    "treeExpandedItems",
+    []
+  );
 
   return (
     <ControlledTreeEnvironment
