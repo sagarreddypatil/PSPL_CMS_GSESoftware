@@ -76,6 +76,7 @@ export default function SensorNetPlugin() {
 
           addDataSource({
             identifier,
+            unit: source.unit,
             subscribe,
             unsubscribe,
             historical,

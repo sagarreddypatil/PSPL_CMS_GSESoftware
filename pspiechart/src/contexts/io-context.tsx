@@ -31,6 +31,7 @@ export type DataPoint = {
 
 export type DataSource = {
   identifier: IdentifierType;
+  unit: string;
   subscribe: (callback: (data: DataPoint) => void) => string; // returns subscription id
   unsubscribe: (subId: string) => void;
   historical: (from: Date, to: Date, dt: number) => Promise<DataPoint[]>;

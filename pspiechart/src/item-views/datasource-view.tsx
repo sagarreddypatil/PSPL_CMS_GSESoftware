@@ -55,7 +55,8 @@ export default function DataSourceView({ item }: UserItemProps) {
   useEffect(() => {
     const updateValue = () => {
       // divRef.current!.innerText = value.toString();
-      divRef.current!.innerText = valueRef.current.toFixed(3);
+      divRef.current!.innerText =
+        valueRef.current.toFixed(3) + " " + dataSource?.unit;
 
       animRef.current = requestAnimationFrame(updateValue);
     };
