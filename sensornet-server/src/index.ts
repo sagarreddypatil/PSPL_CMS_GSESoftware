@@ -41,12 +41,12 @@ if (!process.env.INFLUXDB_BUCKET) {
 const influxWriter = influxClient.getWriteApi(
   process.env.INFLUXDB_ORG || "psp-liquids",
   process.env.INFLUXDB_BUCKET || "sensornet",
-  "us"
-  // {
-  //   batchSize: 10000,
-  //   flushInterval: 1000,
-  //   retryJitter: 100,
-  // }
+  "us",
+  {
+    // batchSize: 10000,
+    flushInterval: 1000,
+    retryJitter: 100,
+  }
 );
 const influxReader = influxClient.getQueryApi(
   process.env.INFLUXDB_ORG || "psp-liquids"
@@ -154,8 +154,9 @@ webServer.get("/historical/:id", async (req, res) => {
     .map((a: any) => {
       return { id: a.id, value: a.value, timestamp: a.time_us };
     })
-    .filter((a) => a.value !== null)
+    // .filter((a) => a.value !== null)
     .map((a) => {
+      if (!a.value) return a;
       return { ...a, value: calibFunc(a.value) };
     });
   return res.json(rows);

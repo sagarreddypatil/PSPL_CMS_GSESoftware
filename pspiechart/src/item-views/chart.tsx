@@ -1,9 +1,10 @@
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { ChildTreeItemProps, UserItemProps } from "./item-view-factory";
 import { UserItemsContext } from "../contexts/user-items-context";
 import NotFound from "../not-found";
 import { DataSource, IOContext } from "../contexts/io-context";
-import UPlotChart from "../controls/uplotchart";
+// import UPlotChart from "../controls/uplotchart";
+import UPlotChart from "../controls/newuplot/uplotchart";
 import { HexColorPicker } from "react-colorful";
 // import ChartJSPlot from "../controls/chartjsplot/chartjsplot";
 import { usePbRecord } from "../hooks/pocketbase";
@@ -27,7 +28,32 @@ export function Chart({ item }: UserItemProps) {
   const { dataSources } = useContext(IOContext);
 
   const [_colors] = usePbRecord<ChartColorRecord>("chartColors", item.id);
-  const colors = _colors?.colors ?? {};
+
+  const [myDataSources, myColors] = useMemo(() => {
+    const sources = item.childIds?.map((id) => userItems.get(id));
+    if (!sources) return [[], []];
+
+    const colors = _colors?.colors ?? {};
+    let myDataSources: DataSource[] = [];
+    let myColors: string[] = [];
+
+    for (const source of sources) {
+      if (!source) continue;
+
+      const [namespace, id] = source.id.split(":");
+      const dataSource = dataSources.find(
+        (source) =>
+          source.identifier.namespace === namespace &&
+          source.identifier.id === id
+      );
+
+      if (!dataSource) continue;
+
+      myDataSources.push(dataSource);
+      myColors.push(colors[source.id]?.hex ?? defaultColor);
+    }
+    return [myDataSources, myColors];
+  }, [item, _colors]);
 
   if (!item.childIds) {
     console.log("No child ids");
@@ -40,46 +66,25 @@ export function Chart({ item }: UserItemProps) {
     );
   }
 
-  const sources = item.childIds.map((id) => userItems.get(id));
-  let myDataSources: DataSource[] = [];
-
-  for (const source of sources) {
-    if (!source) continue;
-
-    const [namespace, id] = source.id.split(":");
-    const dataSource = dataSources.find(
-      (source) =>
-        source.identifier.namespace === namespace && source.identifier.id === id
-    );
-
-    if (!dataSource) continue;
-
-    myDataSources.push(dataSource);
-  }
-
-  const myColors = sources.map(
-    (source) => colors[source?.id ?? ""]?.hex ?? defaultColor
-  );
-
   return (
-    // <UPlotChart
-    //   dataSources={myDataSources}
-    //   pointsPerPixel={1}
-    //   title={item.name}
-    //   colors={myColors}
-    // />
+    <UPlotChart
+      dataSources={myDataSources}
+      pointsPerPixel={1}
+      title={item.name}
+      colors={myColors}
+    />
     // <ChartJSPlot
     //   dataSources={myDataSources}
     //   pointsPerPixel={1}
     //   colors={myColors}
     //   title={item.name}
     // />
-    <TimeChartPlot
-      dataSources={myDataSources}
-      pointsPerPixel={1}
-      colors={myColors}
-      title={item.name}
-    />
+    // <TimeChartPlot
+    //   dataSources={myDataSources}
+    //   pointsPerPixel={1}
+    //   colors={myColors}
+    //   title={item.name}
+    // />
   );
 }
 

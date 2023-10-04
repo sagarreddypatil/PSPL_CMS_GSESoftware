@@ -35,7 +35,7 @@ export default function TimeChartPlot({
   const enabledRef = useRef<boolean>(false);
 
   useEffect(() => {
-    chartDataRef.current = dataSources.map(() => []);
+    // chartDataRef.current = dataSources.map(() => []);
     baseTimeRef.current = Date.now();
 
     const promises: Promise<void>[] = [];
@@ -74,6 +74,7 @@ export default function TimeChartPlot({
     });
 
     Promise.all(promises).then(() => {
+      chartRef.current?.dispose();
       chartRef.current = new TimeChart(divRef.current!, {
         baseTime: baseTimeRef.current,
         series: dataSources.map((source, i) => ({
@@ -118,7 +119,6 @@ export default function TimeChartPlot({
 
     return () => {
       enabledRef.current = false;
-      chartRef.current?.dispose();
       dataSources.forEach((source, i) => {
         source.unsubscribe(subIds[i]);
       });
@@ -129,10 +129,6 @@ export default function TimeChartPlot({
     const removeOldData = () => {
       const now = Date.now();
       const cutoff = now - timeConductor.moving.timespan;
-
-      chartDataRef.current = chartDataRef.current.map((series) => {
-        return series.filter((point) => point.x >= cutoff);
-      });
     };
 
     const updatePlot = () => {
@@ -140,7 +136,7 @@ export default function TimeChartPlot({
         animationRef.current = requestAnimationFrame(updatePlot);
         return;
       }
-      // removeOldData();
+      removeOldData();
       chartRef.current!.options.xRange = {
         min: Date.now() - baseTimeRef.current - timeConductor.moving.timespan,
         max: Date.now() - baseTimeRef.current,

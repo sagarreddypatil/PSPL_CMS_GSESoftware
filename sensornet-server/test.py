@@ -52,8 +52,6 @@ def better_sleep(sleep_time):
 
 last = time.time()
 while True:
-    timestamp = int(time.time() * 1000 * 1000)  # microseconds
-
     for sensor_id in ids:
         if sensor_id == 0:
             continue
@@ -64,6 +62,7 @@ while True:
         # data = datas[sensor_id] + math.sin(time.time() * 3) * 1000
         data = datas[sensor_id] * 10
 
+        timestamp = int(time.time() * 1000 * 1000)  # microseconds
         data = int(data)
         packet = make_packet(b"SEN", sensor_id, timestamp, counter, data)
 

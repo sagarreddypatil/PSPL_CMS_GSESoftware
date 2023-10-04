@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { UserItemProps } from "./item-view-factory";
 import { DataPoint, IOContext } from "../contexts/io-context";
 // import { useDebounce } from "@react-hook/debounce";
@@ -16,7 +16,10 @@ export default function DataSourceView({ item }: UserItemProps) {
   );
 
   // const [value, setValue] = useDebounce<number>(NaN, 1000 / UPDATE_RATE);
-  const [value, setValue] = useState(NaN);
+  // const [value, setValue] = useState(NaN);
+  const valueRef = useRef(NaN);
+  const divRef = useRef<HTMLDivElement>(null);
+  const animRef = useRef<number>(0);
   const { paused, fixed } = useContext(TimeConductorContext);
 
   useEffect(() => {
@@ -24,7 +27,8 @@ export default function DataSourceView({ item }: UserItemProps) {
 
     if (!paused) {
       const onData = (point: DataPoint) => {
-        setValue(point.value);
+        // setValue(point.value);
+        valueRef.current = point.value;
       };
 
       const subId = dataSource.subscribe(onData);
@@ -39,12 +43,28 @@ export default function DataSourceView({ item }: UserItemProps) {
 
     dataSource.historical(start, end, dt).then((points) => {
       if (points.length === 0) {
-        setValue(NaN);
+        // setValue(NaN);
+        valueRef.current = NaN;
         return;
       }
-      setValue(points[points.length - 1].value);
+      // setValue(points[points.length - 1].value);
+      valueRef.current = points[points.length - 1].value;
     });
   }, [dataSource, paused, fixed]);
 
-  return <div className="text-4xl">{value.toString()}</div>;
+  useEffect(() => {
+    const updateValue = () => {
+      // divRef.current!.innerText = value.toString();
+      divRef.current!.innerText = valueRef.current.toFixed(3);
+
+      animRef.current = requestAnimationFrame(updateValue);
+    };
+    updateValue();
+
+    return () => {
+      cancelAnimationFrame(animRef.current);
+    };
+  }, [dataSource]);
+
+  return <div className="text-4xl" ref={divRef}></div>;
 }

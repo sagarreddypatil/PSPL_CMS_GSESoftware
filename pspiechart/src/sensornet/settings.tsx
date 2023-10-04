@@ -6,7 +6,8 @@ import {
   Spreadsheet,
 } from "react-spreadsheet";
 import { Button } from "../controls/button";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { DarkModeContext } from "../App";
 // import { FiTrash2 } from "react-icons/fi";
 
 type Sensor = {
@@ -23,6 +24,7 @@ const SENSORNET_SERVER = import.meta.env.VITE_SENSORNET_SERVER as string;
 export default function SensorNetSettings() {
   const [data, setData] = useState<Sensor[]>([]);
   const [selected, setSelected] = useState<Selection>();
+  const darkMode = useContext(DarkModeContext);
 
   const [updateFailed, setUpdateFailed] = useState(false);
 
@@ -101,6 +103,7 @@ export default function SensorNetSettings() {
         onChange={onSpreadsheetChange}
         selected={selected}
         onSelect={setSelected}
+        darkMode={darkMode}
       />
       <Button name="Submit" onClick={submitSensors} />
       {updateFailed ? (
