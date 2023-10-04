@@ -58,12 +58,12 @@ export default function DataSourceView({ item }: UserItemProps) {
       divRef.current!.innerText =
         valueRef.current.toFixed(3) + " " + dataSource?.unit;
 
-      animRef.current = requestAnimationFrame(updateValue);
+      animRef.current = setTimeout(updateValue, 1000 / 15); // 10 fps
     };
     updateValue();
 
     return () => {
-      cancelAnimationFrame(animRef.current);
+      clearTimeout(animRef.current);
     };
   }, [dataSource]);
 
