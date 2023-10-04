@@ -37,18 +37,19 @@ export default function DataSourceView({ item }: UserItemProps) {
       };
     }
 
-    const dt = 0.001;
-    const start = new Date(fixed.end.getTime() - dt * 1000);
+    const dt = 0.5; // seconds
     const end = fixed.end;
+    const start = new Date(end.getTime() - 2500);
 
     dataSource.historical(start, end, dt).then((points) => {
-      if (points.length === 0) {
-        // setValue(NaN);
+      const filtered = points.filter((point) => point);
+
+      if (filtered.length === 0) {
         valueRef.current = NaN;
         return;
       }
-      // setValue(points[points.length - 1].value);
-      valueRef.current = points[points.length - 1].value;
+
+      valueRef.current = filtered[filtered.length - 1].value;
     });
   }, [dataSource, paused, fixed]);
 
