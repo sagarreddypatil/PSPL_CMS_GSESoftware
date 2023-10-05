@@ -200,7 +200,7 @@ export default function Sidebar() {
           <CreateMenu />
         </div>
       </Nav>
-      <div className="pt-2 flex-1">
+      <div className="pt-2 flex-1 overflow-scroll">
         <TreeView
           items={items}
           onPrimaryAction={openItem}

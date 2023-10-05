@@ -33,6 +33,11 @@ export default function SensorNetSettings() {
   useEffect(() => {
     fetch(`http://${SENSORNET_SERVER}/sensors`)
       .then((res) => res.json())
+      .then((sources: Sensor[]) =>
+        sources.sort((a, b) =>
+          a.id.localeCompare(b.id, "en", { numeric: true })
+        )
+      )
       .then((sources: Sensor[]) => {
         setData(sources);
       });

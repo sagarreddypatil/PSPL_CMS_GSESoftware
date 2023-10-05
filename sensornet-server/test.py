@@ -36,7 +36,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_ip = "127.0.0.1"
 server_port = 5001
 
-ids = list(range(1, 3))
+ids = list(range(1, 21))
 counters = [0 for a in range(ids[-1] + 1)]
 datas = [0 for a in range(ids[-1] + 1)]
 
@@ -69,6 +69,7 @@ while True:
         timestamp = int((time.time() - start) * 1000 * 1000)  # microseconds
         data = int(data)
         packet = make_packet(b"SEN", sensor_id, timestamp, counter, data)
+        # time.sleep(1)
 
         sock.sendto(packet, (server_ip, server_port))
 

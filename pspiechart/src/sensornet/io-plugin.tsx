@@ -42,6 +42,11 @@ export default function SensorNetPlugin() {
 
     fetch(`http://${SENSORNET_SERVER}/sources`)
       .then((res) => res.json())
+      .then((sources: IServerSource[]) =>
+        sources.sort((a, b) =>
+          a.id.localeCompare(b.id, "en", { numeric: true })
+        )
+      )
       .then((sources: IServerSource[]) => {
         sources.forEach((source) => {
           const identifier = {

@@ -142,6 +142,7 @@ export default function UPlotChart({
         init: [
           (u) => {
             u.over.ondblclick = () => {
+              timeConductor.setPaused(true); // so you can refresh data by double clicking
               timeConductor.setPaused(false);
             };
           },

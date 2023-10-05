@@ -1,14 +1,16 @@
 import { useContext, useMemo } from "react";
+import { usePbRecord } from "../hooks/pocketbase";
+
 import { ChildTreeItemProps, UserItemProps } from "./item-view-factory";
 import { UserItemsContext } from "../contexts/user-items-context";
-import NotFound from "../not-found";
 import { DataSource, IOContext } from "../contexts/io-context";
-// import UPlotChart from "../controls/uplotchart";
+
 import UPlotChart from "../controls/uplotchart";
-import { HexColorPicker } from "react-colorful";
 // import ChartJSPlot from "../controls/chartjsplot/chartjsplot";
-import { usePbRecord } from "../hooks/pocketbase";
-import TimeChartPlot from "../controls/timechart/timechart";
+// import TimeChartPlot from "../controls/timechart/timechart";
+
+import { HexColorPicker } from "react-colorful";
+import NotFound from "../not-found";
 
 type Color = {
   hex: string;
