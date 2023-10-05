@@ -165,7 +165,7 @@ webServer.get("/historical/:id", async (req, res) => {
 
 webServer.get("/download/", async (req, res) => {
   const query = `from(bucket:"sensornet")
-                  |> range(start:-24h)
+                  |> range(start:time(v: 0), stop: now())
                   |> map(fn: (r) => ({id: r.id, time: r._time, value: r._value}))
   `;
 
