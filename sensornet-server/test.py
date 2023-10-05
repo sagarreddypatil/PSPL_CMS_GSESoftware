@@ -42,6 +42,9 @@ datas = [0 for a in range(ids[-1] + 1)]
 
 rate = 1000  # Hz
 
+# start = time.time() # to test what would happen if time started at zero
+start = 0
+
 
 def better_sleep(sleep_time):
     time.sleep(sleep_time)
@@ -63,7 +66,7 @@ while True:
         data = datas[sensor_id] * 10
         # datas[sensor_id] = data = math.sin(time.time() * 3 + sensor_id * math.pi / 2) * 1000
 
-        timestamp = int(time.time() * 1000 * 1000)  # microseconds
+        timestamp = int((time.time() - start) * 1000 * 1000)  # microseconds
         data = int(data)
         packet = make_packet(b"SEN", sensor_id, timestamp, counter, data)
 
