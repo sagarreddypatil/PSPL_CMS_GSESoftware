@@ -10,6 +10,7 @@ import { closeAll } from "./models/db";
 import dotenv from "dotenv";
 import sensorsRouter from "./routes/sensors";
 import { sensors } from "./models/sensorModel";
+import { spawn } from "node:child_process";
 
 dotenv.config();
 
@@ -160,6 +161,39 @@ webServer.get("/historical/:id", async (req, res) => {
       return { ...a, value: calibFunc(a.value) };
     });
   return res.json(rows);
+});
+
+webServer.get("/download/", async (req, res) => {
+  const query = `from(bucket:"sensornet")
+                  |> range(start:-24h)
+                  |> map(fn: (r) => ({id: r.id, time: r._time, value: r._value}))
+  `;
+
+  const cmd = "influx";
+  const args = [
+    "query",
+    "--host",
+    process.env.INFLUXDB_URL!,
+    "--org",
+    process.env.INFLUXDB_ORG!,
+    "--token",
+    process.env.INFLUXDB_TOKEN!,
+    query,
+    "--raw",
+  ];
+
+  // set the correct headers
+  res.setHeader("Content-Type", "text/csv");
+  res.setHeader("Content-Disposition", "attachment; filename=data.csv");
+
+  // spawn child process
+  const child = spawn(cmd, args);
+  child.stdout.pipe(res);
+
+  child.on("error", (error) => {
+    console.error(`Error executing command: ${error.message}`);
+    res.status(500).send("Internal Server Error");
+  });
 });
 
 webServer.get("*", (req, res) => {

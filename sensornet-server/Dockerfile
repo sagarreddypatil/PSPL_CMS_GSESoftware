@@ -1,5 +1,9 @@
 FROM node:latest
 
+RUN wget https://dl.influxdata.com/influxdb/releases/influxdb2-client-2.7.3-linux-amd64.tar.gz
+RUN tar xvzf influxdb2-client-2.7.3-linux-amd64.tar.gz
+RUN cp influxdb2-client-2.7.3-linux-amd64/influx /usr/local/bin/
+
 COPY package.json yarn.lock /app/
 WORKDIR /app
 RUN yarn install --frozen-lockfile
