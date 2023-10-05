@@ -1,5 +1,5 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { DataSource } from "../contexts/io-context";
+import { DataPoint, DataSource } from "../contexts/io-context";
 import SizedDiv from "./sized-div";
 import uPlot, { Options } from "uplot";
 import "uplot/dist/uPlot.min.css";
@@ -148,7 +148,7 @@ export default function UPlotChart({
         ],
         setSelect: [
           (u) => {
-            if (!pausedRef) return;
+            if (!pausedRef.current) return;
             if (u.select.width <= 0) return;
 
             const min = u.posToVal(u.select.left, "x");
@@ -177,7 +177,7 @@ export default function UPlotChart({
 
     const subIds: string[] = [];
     dataSources.forEach((ds, idx) => {
-      const subId = ds.subscribe((newPoint) => {
+      const addDataPoint = (newPoint: DataPoint) => {
         if (!acceptDataRef.current) return;
 
         // add new point to the chart
@@ -210,7 +210,8 @@ export default function UPlotChart({
           if (i === idx + 1) continue;
           (dataRef.current[i] as (number | null | undefined)[]).push(null);
         }
-      });
+      };
+      const subId = ds.subscribe(addDataPoint);
       subIds.push(subId);
     });
 
@@ -223,7 +224,18 @@ export default function UPlotChart({
   }, [dataSources, darkMode]);
 
   // Fetch historical on time conductor change
+  const oldWidthRef = useRef<number>(1000);
   useEffect(() => {
+    if (size.width !== oldWidthRef.current) {
+      if (Math.abs(1 - size.width / oldWidthRef.current) <= 0.2) {
+        // if the width changed by more than 20%, fetch new data
+        console.log("ah");
+        oldWidthRef.current = size.width;
+        return;
+      }
+      oldWidthRef.current = size.width;
+    }
+
     const endTime = timeConductor.paused ? timeConductor.fixed.end : new Date();
     const startTime = timeConductor.paused
       ? timeConductor.fixed.start
@@ -247,7 +259,7 @@ export default function UPlotChart({
       // only reaccept data if we're not paused
       if (!timeConductor.paused) acceptDataRef.current = true;
     });
-  }, [dataSources, timeConductor]);
+  }, [dataSources, timeConductor, size.width]);
 
   // Update chart, animation loop
   useEffect(() => {
@@ -297,7 +309,7 @@ export default function UPlotChart({
 
       if (!timeConductor.paused) removeOldData(currentTimeStart);
       if (timeConductor.paused) pruneNulls(); // this is only an issue when paused
-      plotRef.current?.setData(dataRef.current, false);
+      plotRef.current?.setData(dataRef.current);
 
       if (timeConductor.paused) {
         plotRef.current?.setScale("x", {

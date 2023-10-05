@@ -18,13 +18,28 @@ interface IServerPoint {
 
 export default function SensorNetPlugin() {
   const { addDataSource } = useContext(IOContext);
-  const { sendJsonMessage, lastJsonMessage } = useWebSocket(
-    `ws://${SENSORNET_SERVER}/data`
-  );
+  // const { sendJsonMessage, lastJsonMessage } = useWebSocket(
+  //   `ws://${SENSORNET_SERVER}/data`
+  // );
+  const wsRef = useRef<WebSocket>();
 
   const listenersRef = useRef<any>({});
 
   useEffect(() => {
+    wsRef.current = new WebSocket(`ws://${SENSORNET_SERVER}/data`);
+    wsRef.current.onmessage = (event) => {
+      const dataPoint = JSON.parse(event.data) as IServerPoint;
+      const listeners = listenersRef.current[dataPoint.id];
+      if (!listeners) return;
+
+      Object.values(listeners).forEach((listener: any) => {
+        listener({
+          timestamp: new Date(dataPoint.timestamp / 1000), // us to ms
+          value: dataPoint.value,
+        });
+      });
+    };
+
     fetch(`http://${SENSORNET_SERVER}/sources`)
       .then((res) => res.json())
       .then((sources: IServerSource[]) => {
@@ -42,7 +57,8 @@ export default function SensorNetPlugin() {
               type: "subscribe",
               id: source.id,
             };
-            sendJsonMessage(subReq);
+            // sendJsonMessage(subReq);
+            wsRef.current!.send(JSON.stringify(subReq));
 
             if (!listenersRef.current[identifier.id]) {
               listenersRef.current[identifier.id] = {};
@@ -53,6 +69,14 @@ export default function SensorNetPlugin() {
 
           const unsubscribe = (subId: string) => {
             delete listenersRef.current[identifier.id][subId];
+            if (listenersRef.current[identifier.id].length === 0) {
+              // send unsubscribe
+              const unsubReq = {
+                type: "unsubscribe",
+                id: source.id,
+              };
+              wsRef.current!.send(JSON.stringify(unsubReq));
+            }
           };
 
           const historical = (from: Date, to: Date, dt: number) => {
@@ -85,20 +109,20 @@ export default function SensorNetPlugin() {
       });
   }, []);
 
-  useEffect(() => {
-    if (!lastJsonMessage) return;
+  // useEffect(() => {
+  //   if (!lastJsonMessage) return;
 
-    const dataPoint = lastJsonMessage as any as IServerPoint;
-    const listeners = listenersRef.current[dataPoint.id];
-    if (!listeners) return;
+  //   const dataPoint = lastJsonMessage as any as IServerPoint;
+  //   const listeners = listenersRef.current[dataPoint.id];
+  //   if (!listeners) return;
 
-    Object.values(listeners).forEach((listener: any) => {
-      listener({
-        timestamp: new Date(dataPoint.timestamp / 1000), // us to ms
-        value: dataPoint.value,
-      });
-    });
-  }, [lastJsonMessage]);
+  //   Object.values(listeners).forEach((listener: any) => {
+  //     listener({
+  //       timestamp: new Date(dataPoint.timestamp / 1000), // us to ms
+  //       value: dataPoint.value,
+  //     });
+  //   });
+  // }, [lastJsonMessage]);
 
   return <></>;
 }

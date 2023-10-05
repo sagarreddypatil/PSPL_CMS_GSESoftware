@@ -61,6 +61,7 @@ while True:
         datas[sensor_id] += randnorm(0, 1) * 100 / rate
         # data = datas[sensor_id] + math.sin(time.time() * 3) * 1000
         data = datas[sensor_id] * 10
+        # datas[sensor_id] = data = math.sin(time.time() * 3 + sensor_id * math.pi / 2) * 1000
 
         timestamp = int(time.time() * 1000 * 1000)  # microseconds
         data = int(data)
