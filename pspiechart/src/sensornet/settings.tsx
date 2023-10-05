@@ -26,7 +26,9 @@ export default function SensorNetSettings() {
   const [selected, setSelected] = useState<Selection>();
   const darkMode = useContext(DarkModeContext);
 
+  const [testInput, setTestInput] = useState(0);
   const [updateFailed, setUpdateFailed] = useState(false);
+  const [parseErrors, setParseErrors] = useState("");
 
   useEffect(() => {
     fetch(`http://${SENSORNET_SERVER}/sensors`)
@@ -36,12 +38,24 @@ export default function SensorNetSettings() {
       });
   }, []);
 
+  const testOutput = (ipt: number, cal: string) => {
+    // validate calibration
+    try {
+      const calibFunc = new Function("x", `return ${cal}`);
+      const calibResult = calibFunc(ipt);
+      return JSON.stringify(calibResult);
+    } catch (e) {
+      return <label className="text-red-500">Error</label>;
+    }
+  };
+
   const spreadsheetData: Matrix<CellBase> = data
     .map((sensor) => [
       { value: sensor.id },
       { value: sensor.name },
       { value: sensor.unit },
       { value: sensor.calibration },
+      { value: testOutput(testInput, sensor.calibration) },
     ])
     .concat([[{ value: "" }, { value: "" }, { value: "" }, { value: "" }]]);
 
@@ -53,6 +67,7 @@ export default function SensorNetSettings() {
       return !empty;
     });
 
+    const errors: string[] = [];
     const newData = filteredData.map((row) => {
       const [id, name, unit, calibration] = row;
 
@@ -64,6 +79,7 @@ export default function SensorNetSettings() {
       };
     });
 
+    setParseErrors(errors.join("\n"));
     setData(newData);
   };
 
@@ -94,9 +110,26 @@ export default function SensorNetSettings() {
     <div className="flex flex-col p-4 gap-2">
       <label className="text-2xl">SensorNet Settings</label>
       <hr />
-      <label className="text-xl">Configure Sensors</label>
+      <label className="text-xl underline">Misc</label>
+      <Button
+        name="Download All Data"
+        onClick={() =>
+          window.open("http://sensornet.localhost/download/", "_blank")
+        }
+      />
+      <div className="h-2"></div>
+      <label className="text-xl underline">Configure Sensors</label>
+      <div className="flex flex-row gap-2">
+        <label>Test Input: </label>
+        <input
+          className="px-2 w-16 border border-rush dark:bg-black"
+          value={testInput}
+          onChange={(e) => setTestInput(Number(e.target.value))}
+        />
+      </div>
+
       <Spreadsheet
-        columnLabels={["ID", "Name", "Unit", "Calibration"]}
+        columnLabels={["ID", "Name", "Unit", "Calibration", "Test Output"]}
         // hideRowIndicators={true}
         rowLabels={data.map((_) => "")}
         data={spreadsheetData}
@@ -105,6 +138,7 @@ export default function SensorNetSettings() {
         onSelect={setSelected}
         darkMode={darkMode}
       />
+      <label className="text-sm text-red-500">{parseErrors}</label>
       <Button name="Submit" onClick={submitSensors} />
       {updateFailed ? (
         <label className="text-red-500">Update failed</label>

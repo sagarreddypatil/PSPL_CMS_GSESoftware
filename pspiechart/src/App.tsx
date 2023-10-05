@@ -58,7 +58,7 @@ function App() {
   const mainView = (
     <div className="h-full flex flex-col">
       <Nav>
-        <div className="flex-1">
+        <div className="flex-1 flex flex-row gap-1">
           {collapsed ? (
             <div className="flex">
               <Logo />
@@ -71,7 +71,6 @@ function App() {
           <TimeConductorView />
         </div>
         <div className="flex-1 flex justify-end gap-2">
-          {/* <Button className="mr-2" name="Download" /> */}
           <Select checked={darkMode} onChange={setDarkMode}>
             {darkMode ? <FiSun /> : <FiMoon />}
           </Select>
