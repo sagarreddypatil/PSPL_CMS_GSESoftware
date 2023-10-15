@@ -3,10 +3,8 @@ version: "3"
 services:
   influxdb:
     image: influxdb:latest
-    # ports:
-    #   - 8086:8086
     volumes:
-      - ./data/influxdb:/var/lib/influxdb
+      - ./data/influxdb:/var/lib/influxdb2
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=admin
@@ -52,12 +50,6 @@ services:
     ports:
       - 8080:8080
       - 5001:5001/udp
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
-      interval: 1m30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
     restart: always
 
   nginx-proxy:
