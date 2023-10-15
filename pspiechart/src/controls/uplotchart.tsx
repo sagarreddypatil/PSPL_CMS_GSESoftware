@@ -135,7 +135,7 @@ export default function UPlotChart({
         ...dataSources.map((ds, idx) => ({
           label: ds.identifier.name + " (" + ds.unit + ")",
           stroke: colors[idx],
-          width: 1.2,
+          width: 1.25,
         })),
       ],
       hooks: {
