@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:lts
 
 RUN wget https://dl.influxdata.com/influxdb/releases/influxdb2-client-2.7.3-linux-amd64.tar.gz
 RUN tar xvzf influxdb2-client-2.7.3-linux-amd64.tar.gz
