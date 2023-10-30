@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { UserItem, ItemViewType } from "../item-views/item-view-factory";
 import { usePbRecord, usePbRecords } from "../hooks/pocketbase";
+import Banner from "../controls/banner";
 
 export type UserItemsContextType = {
   userItems: Map<string, UserItem>;
@@ -63,6 +64,7 @@ export default function UserItemsContextProvider({
     "edvfpfakwyydd9i"
   ); // hardcoded project id, TODO: make it dynamic
   useEffect(() => {
+    if (storedRootItem == null) return;
     if (!storedRootItem) {
       // create one
       setStoredRootItem({
@@ -84,6 +86,8 @@ export default function UserItemsContextProvider({
       },
     ])
   );
+
+  if (storedRootItem == null) return <Banner text="Loading..." />;
 
   // const [userItems, setUserItems] = useState<Map<string, UserItem>>(
   //   fromList([])
