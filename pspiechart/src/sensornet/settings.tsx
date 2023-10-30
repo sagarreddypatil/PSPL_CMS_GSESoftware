@@ -1,10 +1,4 @@
-import {
-  CellBase,
-  Matrix,
-  RowIndicatorProps,
-  Selection,
-  Spreadsheet,
-} from "react-spreadsheet";
+import { CellBase, Matrix, Selection, Spreadsheet } from "react-spreadsheet";
 import { Button } from "../controls/button";
 import { useContext, useEffect, useState } from "react";
 import { DarkModeContext } from "../App";

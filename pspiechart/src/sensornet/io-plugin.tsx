@@ -1,6 +1,5 @@
 import { IOContext, DataPoint, genSubId } from "../contexts/io-context";
 import { useContext, useEffect, useRef } from "react";
-import useWebSocket from "react-use-websocket";
 
 const SENSORNET_SERVER = import.meta.env.VITE_SENSORNET_SERVER as string;
 

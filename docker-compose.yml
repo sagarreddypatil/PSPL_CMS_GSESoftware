@@ -2,7 +2,7 @@ version: "3"
 
 services:
   influxdb:
-    image: influxdb:latest
+    image: influxdb:2.7.3
     volumes:
       - ./data/influxdb:/var/lib/influxdb2
     environment:
@@ -26,10 +26,14 @@ services:
       - VIRTUAL_PORT=8093
 
   pspiechart:
-    build: ./pspiechart
+    build:
+      context: ./pspiechart
+      args:
+        - VITE_SENSORNET_SERVER=sensornet.localhost
     ports:
       - 4173:4173
     environment:
+      - VITE_SENSORNET_SERVER=sensornet.localhost
       - VIRTUAL_HOST=pspc.*
       - VIRTUAL_PORT=4173
     restart: always

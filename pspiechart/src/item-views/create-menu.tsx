@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { Dropdown, DropdownItem } from "../controls/dropdown";
-import { DefaultUserItem, ItemViewType, UserItem } from "./item-view-factory";
+import { DefaultUserItem, ItemViewType } from "./item-view-factory";
 import { UserItemsContext } from "../contexts/user-items-context";
 
 function _randomId() {

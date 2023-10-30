@@ -1,7 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { UserItem, ItemViewType } from "../item-views/item-view-factory";
 import { usePbRecord, usePbRecords } from "../hooks/pocketbase";
-import { set } from "date-fns";
 
 export type UserItemsContextType = {
   userItems: Map<string, UserItem>;
