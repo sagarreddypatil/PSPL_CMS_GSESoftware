@@ -230,7 +230,6 @@ export default function UPlotChart({
     if (size.width !== oldWidthRef.current) {
       if (Math.abs(1 - size.width / oldWidthRef.current) <= 0.2) {
         // if the width changed by more than 20%, fetch new data
-        console.log("ah");
         oldWidthRef.current = size.width;
         return;
       }

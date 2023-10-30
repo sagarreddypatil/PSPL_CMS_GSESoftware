@@ -109,7 +109,7 @@ export default function SensorNetSettings() {
     <div className="flex flex-col p-4 gap-2">
       <label className="text-2xl">SensorNet Settings</label>
       <hr />
-      <label className="text-xl underline">Misc</label>
+      <label className="text-xl ">Misc</label>
       <Button
         name="Download All Data"
         onClick={() =>
@@ -117,7 +117,7 @@ export default function SensorNetSettings() {
         }
       />
       <div className="h-2"></div>
-      <label className="text-xl underline">Configure Sensors</label>
+      <label className="text-xl ">Configure Sensors</label>
       <div className="flex flex-row gap-2">
         <label>Test Input: </label>
         <input

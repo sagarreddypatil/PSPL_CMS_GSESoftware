@@ -14,6 +14,7 @@ import Select from "../controls/select";
 import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { useDebounce } from "@react-hook/debounce";
 import { usePbRecord } from "../hooks/pocketbase";
+import Banner from "../controls/banner";
 
 const COLS = 20;
 const ROWS = 14;
@@ -35,6 +36,8 @@ const useEditMode = create<EditModeState>((set) => ({
 }));
 
 export function Dashboard({ item }: UserItemProps) {
+  const { userItems } = useContext(UserItemsContext);
+
   const [size, setSize] = useDebounce({ width: 0, height: 0 }, 100);
   const editMode = useEditMode((state) => state.editMode);
 
@@ -42,9 +45,14 @@ export function Dashboard({ item }: UserItemProps) {
     "dashboardLayouts",
     item.id
   );
-  const myLayout = layout?.layout ?? [];
 
-  const { userItems } = useContext(UserItemsContext);
+  const onResize = useCallback((width: number, height: number) => {
+    setSize({ width, height });
+  }, []);
+
+  if (!layout) return <Banner text="Loading..." />;
+
+  const myLayout = layout?.layout ?? [];
 
   const genSmallLayout = (curLayout: Layout[]) => {
     if (curLayout.length === 0) return [];
@@ -64,10 +72,6 @@ export function Dashboard({ item }: UserItemProps) {
     lg: myLayout,
     xxs: genSmallLayout(myLayout),
   };
-
-  const onResize = useCallback((width: number, height: number) => {
-    setSize({ width, height });
-  }, []);
 
   const onLayoutChange = (_: Layout[], allLayouts: Layouts) => {
     // setAllLayouts((oldAllLayouts) => {
