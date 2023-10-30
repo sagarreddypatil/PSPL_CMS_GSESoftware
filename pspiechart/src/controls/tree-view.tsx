@@ -153,7 +153,12 @@ export default function TreeView({
         return <div className="bg-rush h-1 w-full"></div>;
       }}
       renderItem={({ item, arrow, context, depth, children }) => {
-        const isSelected = context.isSelected;
+        // const isSelected = context.isSelected;
+        const isSelected =
+          selectedItems.filter((selectedItem) => {
+            const selectedId = fromIndex(selectedItem).id;
+            return selectedId == item.data.id;
+          }).length > 0;
         const isFocused = context.isFocused;
 
         const selectedClass =
