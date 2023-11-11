@@ -1,5 +1,5 @@
-from flask import Flask, make_response
-from ..cmdnet import *
+from flask import Flask
+from cmdnet import *
 
 app = Flask(__name__)
 devices = {
@@ -14,7 +14,7 @@ def root():
 
 @app.route("/devices")
 def get_devices():
-    return devices.keys()
+    return list(devices.keys())
 
 
 @app.route("/devices/<device>")
@@ -25,15 +25,15 @@ def get_device(device):
         return "Device not found", 404
 
     return {
-        "instructions": device_obj.instructions.keys(),
-        "variables": device_obj.variables.keys(),
+        "instructions": list(device_obj.instructions.keys()),
+        "variables": list(device_obj.variables.keys()),
     }
 
 
 @app.route("/devices/<device>/instructions")
 def get_instructions(device):
     try:
-        return devices[device].instructions.keys()
+        return list(devices[device].instructions.keys())
     except KeyError:
         return "Device not found", 404
 
@@ -58,7 +58,7 @@ def get_variables(device):
     except KeyError:
         return "Device not found", 404
 
-    return device_obj.variables.keys()
+    return list(device_obj.variables.keys())
 
 
 @app.route("/devices/<device>/variables/<variable>")

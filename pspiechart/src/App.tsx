@@ -1,16 +1,21 @@
+import { createContext, useEffect, useState } from "react";
+
 import IOContextProvider from "./contexts/io-context";
+import TimeConductorProvider from "./contexts/time-conductor-context";
+import UserItemsContextProvider from "./contexts/user-items-context";
+
 import VertLayout from "./layouts/vert-layout";
 import Select from "./controls/select";
 import { FiMoon, FiSun } from "react-icons/fi";
 import { Outlet, useNavigate, useOutlet } from "react-router-dom";
 import Sidebar from "./components/sidebar";
-import { createContext, useEffect, useState } from "react";
+
 import SensorNetPlugin from "./sensornet/io-plugin";
-import TimeConductorProvider from "./contexts/time-conductor-context";
+import CmdNetPlugin from "./cmdnet/io-plugin";
+
 import TimeConductorView from "./components/time-conductor";
 import Logo from "./controls/logo";
 import Nav from "./controls/nav";
-import UserItemsContextProvider from "./contexts/user-items-context";
 import { Dropdown, DropdownItem } from "./controls/dropdown";
 import { pb } from "./Login";
 import { Button } from "./controls/button";
@@ -98,6 +103,7 @@ function App() {
           <IOContextProvider>
             <>
               <SensorNetPlugin />
+              <CmdNetPlugin />
             </>
             <div className="bg-white dark:bg-black text-black dark:text-gray-100 h-full">
               <VertLayout onCollapse={setCollapsed}>
