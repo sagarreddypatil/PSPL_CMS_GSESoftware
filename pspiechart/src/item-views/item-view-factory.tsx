@@ -8,6 +8,7 @@ import DataSourceView from "./datasource-view";
 import { RpcButton } from "./rpc-button";
 import NotFound from "../not-found";
 import { Chart, ChartChildTreeItem } from "./chart";
+import { ConfigOption } from "./config-option";
 
 export enum ItemViewType {
   Folder = "Folder",
@@ -82,6 +83,8 @@ export function ItemViewFactory({ itemId }: ItemViewFactoryProps) {
       return <Dashboard item={item} />;
     case ItemViewType.Folder:
       return <Folder item={item} />;
+    case ItemViewType.ConfigOption:
+      return <ConfigOption item={item} />;
     case ItemViewType.RPC:
       return <RpcButton item={item} />;
   }

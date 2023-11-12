@@ -27,15 +27,12 @@ export default function CmdNetPlugin() {
                     const res = await fetch(
                       `http://${CMDNET_SERVER}/devices/${device}/variables/${variable}`
                     );
-                    return res.json();
+                    const json = await res.json();
+                    return json.value;
                   },
                   setValue: async (value) => {
                     const res = await fetch(
-                      `http://${CMDNET_SERVER}/devices/${device}/variables/${variable}/set/${value}`,
-                      {
-                        method: "PUT",
-                        body: JSON.stringify(value),
-                      }
+                      `http://${CMDNET_SERVER}/devices/${device}/variables/${variable}/set/${value}`
                     );
                     return res.ok;
                   },

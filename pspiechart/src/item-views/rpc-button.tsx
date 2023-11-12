@@ -13,7 +13,7 @@ export function RpcButton({ item }: UserItemProps) {
 
   return (
     <Button
-      className="grow m-2 text-[1.5rem] self-stretch"
+      className="grow m-2 text-[24px] self-stretch"
       onClick={() => remoteCall?.call()}
     >
       {item.name}
