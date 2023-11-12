@@ -1,9 +1,14 @@
 from flask import Flask
+from flask_cors import CORS
 from cmdnet import *
 
 app = Flask(__name__)
+CORS(app)
+
 devices = {
-    "emu": DeviceContext("localhost", 5000),
+    # "mock": DeviceContext("localhost", 1234).connect(),
+    "mock": DeviceContext("host.docker.internal", 1234).connect(),
+    # "emu": DeviceContext("localhost", 5000),
 }
 
 

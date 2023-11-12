@@ -105,7 +105,7 @@ export function Dashboard({ item }: UserItemProps) {
           const child = userItems.get(childId);
           return (
             <div key={childId} className="pb-1">
-              <fieldset className="bg-white dark:bg-black ring-1 ring-opacity-20 dark:ring-opacity-20 ring-black dark:ring-white w-full h-full min-w-0 text-center flex flex-col justify-center">
+              <fieldset className="bg-white dark:bg-black ring-1 ring-opacity-20 dark:ring-opacity-20 ring-black dark:ring-white w-full h-full min-w-0 text-center items-center flex flex-col justify-center">
                 <legend className="w-auto mx-auto bg-white dark:bg-black">
                   {child?.name}
                 </legend>

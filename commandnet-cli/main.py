@@ -42,8 +42,8 @@ eval: NUMBER
 %ignore WS_INLINE
 """
 
-host = "192.168.2.50"
-port = 8080
+host = "localhost"
+port = 1234
 timeout = 1
 
 

@@ -50,6 +50,8 @@ class DeviceContext:
 
             self.variables[name] = Variable(self, name, value)
 
+        return self
+
     def send(self, req: list) -> list:
         """
         Send an arbitrary msgpack list to the device.

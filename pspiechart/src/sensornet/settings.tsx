@@ -112,6 +112,7 @@ export default function SensorNetSettings() {
       <label className="text-xl ">Misc</label>
       <Button
         name="Download All Data"
+        className="w-56"
         onClick={() =>
           window.open("http://sensornet.localhost/download/", "_blank")
         }
@@ -138,7 +139,7 @@ export default function SensorNetSettings() {
         darkMode={darkMode}
       />
       <label className="text-sm text-red-500">{parseErrors}</label>
-      <Button name="Submit" onClick={submitSensors} />
+      <Button className="w-24" name="Submit" onClick={submitSensors} />
       {updateFailed ? (
         <label className="text-red-500">Update failed</label>
       ) : (

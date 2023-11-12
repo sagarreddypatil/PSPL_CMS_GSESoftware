@@ -1,5 +1,5 @@
-import { IOContext, DataPoint, genSubId } from "../contexts/io-context";
-import { useContext, useEffect, useRef } from "react";
+import { IOContext } from "../contexts/io-context";
+import { useContext, useEffect } from "react";
 
 const CMDNET_SERVER = import.meta.env.VITE_CMDNET_SERVER as string;
 
@@ -20,7 +20,7 @@ export default function CmdNetPlugin() {
               variables.map((variable) => {
                 addConfigOption({
                   identifier: {
-                    namespace: `CmdNet/${device}`,
+                    namespace: `CmdNet-${device}`,
                     id: variable,
                   },
                   getValue: async () => {
@@ -49,15 +49,12 @@ export default function CmdNetPlugin() {
               instructions.map((instruction) => {
                 addRemoteCall({
                   identifier: {
-                    namespace: `CmdNet/${device}`,
+                    namespace: `CmdNet-${device}`,
                     id: instruction,
                   },
                   call: async () => {
                     const res = await fetch(
-                      `http://${CMDNET_SERVER}/devices/${device}/instructions/${instruction}`,
-                      {
-                        method: "POST",
-                      }
+                      `http://${CMDNET_SERVER}/devices/${device}/instructions/${instruction}/call`
                     );
                     return res.ok;
                   },

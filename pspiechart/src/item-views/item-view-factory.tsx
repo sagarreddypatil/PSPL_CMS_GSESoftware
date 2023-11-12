@@ -5,6 +5,7 @@ import { Dashboard, DashboardTreeItem } from "./dashboard";
 import { UserItemsContext } from "../contexts/user-items-context";
 import { Folder } from "./folder";
 import DataSourceView from "./datasource-view";
+import { RpcButton } from "./rpc-button";
 import NotFound from "../not-found";
 import { Chart, ChartChildTreeItem } from "./chart";
 
@@ -81,6 +82,8 @@ export function ItemViewFactory({ itemId }: ItemViewFactoryProps) {
       return <Dashboard item={item} />;
     case ItemViewType.Folder:
       return <Folder item={item} />;
+    case ItemViewType.RPC:
+      return <RpcButton item={item} />;
   }
 
   return <NotFound />;

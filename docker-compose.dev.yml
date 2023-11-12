@@ -37,6 +37,7 @@ services:
       - ./pspiechart:/app
     environment:
       - VITE_SENSORNET_SERVER=sensornet.localhost
+      - VITE_CMDNET_SERVER=cmdnet.localhost
       - VIRTUAL_HOST=pspc.*
       - VIRTUAL_PORT=5173
     restart: always
@@ -65,7 +66,7 @@ services:
   cmdnet-server:
     build:
       context: ./cmdnet-server
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     environment:
       - DB_PATH=/data
       - VIRTUAL_HOST=cmdnet.*
@@ -74,6 +75,8 @@ services:
       - ./cmdnet-server:/app
     ports:
       - 8081:8080
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # testing ONLY!, lets the container access the host machine
 
   nginx-proxy:
     image: nginxproxy/nginx-proxy
