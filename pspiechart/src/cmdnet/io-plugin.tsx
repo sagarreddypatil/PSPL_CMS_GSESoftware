@@ -12,7 +12,7 @@ export default function CmdNetPlugin() {
       .then((res) => res.json())
       .then((devices: string[]) => {
         devices.map((device) => {
-          // device
+          const namespace = `${device} CmdNet`;
 
           fetch(`http://${CMDNET_SERVER}/devices/${device}/variables`)
             .then((res) => res.json())
@@ -20,7 +20,7 @@ export default function CmdNetPlugin() {
               variables.map((variable) => {
                 addConfigOption({
                   identifier: {
-                    namespace: `CmdNet-${device}`,
+                    namespace: namespace,
                     id: variable,
                   },
                   getValue: async () => {
@@ -46,7 +46,7 @@ export default function CmdNetPlugin() {
               instructions.map((instruction) => {
                 addRemoteCall({
                   identifier: {
-                    namespace: `CmdNet-${device}`,
+                    namespace: namespace,
                     id: instruction,
                   },
                   call: async () => {
