@@ -50,7 +50,7 @@ export function Dashboard({ item }: UserItemProps) {
     setSize({ width, height });
   }, []);
 
-  if (!layout) return <Banner text="Loading..." />;
+  // if (!layout) return <Banner text="Loading..." />;
 
   const myLayout = layout?.layout ?? [];
 
