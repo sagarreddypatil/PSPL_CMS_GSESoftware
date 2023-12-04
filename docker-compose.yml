@@ -28,11 +28,12 @@ services:
   pspiechart:
     build:
       context: ./pspiechart
+      args:
+        VITE_SENSORNET_SERVER: sensornet.localhost
+        VITE_CMDNET_SERVER: cmdnet.localhost
     ports:
       - 4173:4173
     environment:
-      - VITE_SENSORNET_SERVER=sensornet.localhost
-      - VITE_CMDNET_SERVER=cmdnet.localhost
       - VIRTUAL_HOST=pspc.*
       - VIRTUAL_PORT=4173
     restart: always

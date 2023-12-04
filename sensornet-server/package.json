@@ -14,9 +14,9 @@
         "@influxdata/influxdb-client": "^1.33.2",
         "binary-parser": "^2.2.1",
         "cors": "^2.8.5",
-        "hyper-express": "^6.7.1",
+        "hyper-express": "^6.14.3",
         "pouchdb-node": "^8.0.1",
-        "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.25.0"
+        "uWebSockets.js": "uNetworking/uWebSockets.js#v20.33.0"
     },
     "devDependencies": {
         "@types/binary-parser": "^1.5.1",
