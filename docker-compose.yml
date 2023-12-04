@@ -28,12 +28,11 @@ services:
   pspiechart:
     build:
       context: ./pspiechart
-      args:
-        - VITE_SENSORNET_SERVER=sensornet.localhost
     ports:
       - 4173:4173
     environment:
       - VITE_SENSORNET_SERVER=sensornet.localhost
+      - VITE_CMDNET_SERVER=cmdnet.localhost
       - VIRTUAL_HOST=pspc.*
       - VIRTUAL_PORT=4173
     restart: always
@@ -55,6 +54,19 @@ services:
       - 8080:8080
       - 5001:5001/udp
     restart: always
+
+  cmdnet-server:
+    build: ./cmdnet-server
+    environment:
+      - DB_PATH=/data
+      - VIRTUAL_HOST=cmdnet.*
+      - VIRTUAL_PORT=8080
+    volumes:
+      - ./data/cmdnet-server:/data
+    ports:
+      - 8081:8080
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # testing ONLY!, lets the container access the host machine
 
   nginx-proxy:
     image: nginxproxy/nginx-proxy
