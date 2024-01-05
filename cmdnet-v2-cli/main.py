@@ -5,17 +5,17 @@ import time
 
 host = "192.168.2.50"
 port = 8080
-timeout = 1
+TIMEOUT = 1
 
 
 def cmdnet_send(cmd):
     start = time.time()
     while True:
-        if time.time() - start > timeout:
+        if time.time() - start > TIMEOUT:
             raise Exception("Timeout")
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(timeout)
+            sock.settimeout(TIMEOUT)
             sock.connect((host, port))
             sock.settimeout(None)
             break
