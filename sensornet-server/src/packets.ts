@@ -1,7 +1,6 @@
 import { Parser } from "binary-parser";
 
 const packetParser = new Parser()
-  .string("type", { length: 4 })
   .uint16le("id")
   .array("_", {
     // pad bytes
