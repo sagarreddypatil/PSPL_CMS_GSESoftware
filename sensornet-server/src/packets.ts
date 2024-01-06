@@ -5,7 +5,7 @@ const packetParser = new Parser()
   .array("_", {
     // pad bytes
     type: "uint8",
-    length: 2,
+    length: 6,
   })
   .uint64le("time_us")
   .uint64le("counter")
