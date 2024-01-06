@@ -11,7 +11,6 @@ import { Outlet, useNavigate, useOutlet } from "react-router-dom";
 import Sidebar from "./components/sidebar";
 
 import SensorNetPlugin from "./sensornet/io-plugin";
-import CmdNetPlugin from "./cmdnet/io-plugin";
 
 import TimeConductorView from "./components/time-conductor";
 import Logo from "./controls/logo";
@@ -103,7 +102,6 @@ function App() {
           <IOContextProvider>
             <>
               <SensorNetPlugin />
-              <CmdNetPlugin />
             </>
             <div className="bg-white dark:bg-black text-black dark:text-gray-100 h-full">
               <VertLayout onCollapse={setCollapsed}>
