@@ -31,10 +31,6 @@ services:
   pspiechart:
     build:
       context: ./pspiechart
-      args:
-        VITE_PB_SERVER: pb.boombox
-        VITE_SENSORNET_SERVER: sensornet.boombox
-        # VITE_CMDNET_SERVER: cmdnet.boombox
     ports:
       - 4173:4173
     environment:

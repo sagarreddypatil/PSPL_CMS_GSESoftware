@@ -17,7 +17,10 @@ services:
     restart: always
 
   pocketbase:
-    build: ./pocketbase
+    build:
+      context: ./pocketbase
+      args:
+        ARCH: arm64
     ports:
       - 8093:8093
     volumes:
@@ -36,8 +39,6 @@ services:
     volumes:
       - ./pspiechart:/app
     environment:
-      - VITE_SENSORNET_SERVER=sensornet.localhost
-      - VITE_CMDNET_SERVER=cmdnet.localhost
       - VIRTUAL_HOST=pspc.*
       - VIRTUAL_PORT=5173
     restart: always
@@ -63,20 +64,20 @@ services:
       - 5001:5001/udp
     restart: always
 
-  cmdnet-server:
-    build:
-      context: ./cmdnet-server
-      dockerfile: Dockerfile.dev
-    environment:
-      - DB_PATH=/data
-      - VIRTUAL_HOST=cmdnet.*
-      - VIRTUAL_PORT=8080
-    volumes:
-      - ./cmdnet-server:/app
-    ports:
-      - 8081:8080
-    extra_hosts:
-      - "host.docker.internal:host-gateway" # testing ONLY!, lets the container access the host machine
+  # cmdnet-server:
+  #   build:
+  #     context: ./cmdnet-server
+  #     dockerfile: Dockerfile.dev
+  #   environment:
+  #     - DB_PATH=/data
+  #     - VIRTUAL_HOST=cmdnet.*
+  #     - VIRTUAL_PORT=8080
+  #   volumes:
+  #     - ./cmdnet-server:/app
+  #   ports:
+  #     - 8081:8080
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway" # testing ONLY!, lets the container access the host machine
 
   nginx-proxy:
     image: nginxproxy/nginx-proxy
