@@ -15,7 +15,10 @@ services:
     restart: always
 
   pocketbase:
-    build: ./pocketbase
+    build:
+      context: ./pocketbase
+      args:
+        ARCH: arm64
     ports:
       - 8093:8093
     volumes:
@@ -29,8 +32,9 @@ services:
     build:
       context: ./pspiechart
       args:
-        VITE_SENSORNET_SERVER: sensornet.localhost
-        VITE_CMDNET_SERVER: cmdnet.localhost
+        VITE_PB_SERVER: pb.boombox
+        VITE_SENSORNET_SERVER: sensornet.boombox
+        # VITE_CMDNET_SERVER: cmdnet.boombox
     ports:
       - 4173:4173
     environment:

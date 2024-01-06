@@ -1,6 +1,7 @@
 import PocketBase from "pocketbase";
 
-export const pb = new PocketBase("http://pb.localhost/");
+const PB_SERVER = import.meta.env.VITE_PB_SERVER as string;
+export const pb = new PocketBase(PB_SERVER);
 pb.autoCancellation(false);
 
 import FullpageForm from "./components/fullpage-form";
