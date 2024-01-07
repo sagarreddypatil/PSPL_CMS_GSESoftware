@@ -207,16 +207,16 @@ webServer.get("*", (req, res) => {
 //   })
 // );
 
+
 webServer.options(
   "/*",
-  useCORS({
-    origin: "*",
-    credentials: true,
-    optionsRoute: true,
-  })
+  (req, res) => {
+      res.send("");
+  }
 );
 
 webServer.use(useCORS({ origin: "*", credentials: true }));
+
 
 webServer
   .listen(8080, "0.0.0.0")
