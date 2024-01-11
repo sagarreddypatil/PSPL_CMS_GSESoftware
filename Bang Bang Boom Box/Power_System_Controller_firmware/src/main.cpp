@@ -1,5 +1,13 @@
 #include <Arduino.h>
 
+/*
+Etherent:   0
+*/
+
+
+//#define Start_Config 0
+#define Start_Config "Etherent"
+
 #define INPUT_SIZE 37  // Max number of bytes expected to come over in a command (1 char + 9 longs)
 #define NUM_INPUTS 10  // Max number of different inputs we expect
 #define INPUT_SIZE1 100  // Max number of bytes to come over from charger Rx
@@ -16,33 +24,99 @@ char input1[INPUT_SIZE1 + 1];
 byte size;  // Size of the incoming command as read from Serial
 
 void read_command();
-//void Drok_off();
 
 void setup() {
-
   Serial.begin(9600);   //start coms with control computer 
   Serial1.begin(BUAD);  //start coms with Drok_0 
   Serial2.begin(BUAD);  //start coms with Drok_1
   Serial3.begin(BUAD);  //start coms with Drok_2
 
-  //Start with all Droks off 
-  Serial1.println("awo0");
-  delay(50);
-  while (Serial1.available() > 0) {
-    Serial1.read();
-  }
-  Serial2.println("awo0");
-  delay(50);
-  while (Serial2.available() > 0) {
-    Serial2.read();
-  }
-  Serial3.println("awo0");
-  delay(50);
-  while (Serial3.available() > 0) {
-    Serial3.read();
+  //start 5V power for Ethernet and Rasppbery Pi based fucitons 
+  if (Start_Config == "Etherent"){ 
+    /*Serial2.println("awo0");
+    delay(50);
+    while (Serial2.available() > 0) {
+      Serial2.read();
+    } */
+    //set output to 5 volts 
+    Serial2.println("awo0");
+    delay(50);
+    while (Serial2.available() > 0) {
+      Serial2.read();
+    }
+    Serial2.println("awu0500");
+    delay(50);   
+        while (Serial2.available() > 0) {
+      Serial2.read();
+    }
+    delay(50);
+    Serial2.println("awo1");
+    delay(50);
+    while (Serial2.available() > 0) {
+      Serial2.read();
+    }
+    Serial1.println("awo0");
+    delay(50);
+    while (Serial1.available() > 0) {
+      Serial1.read();
+    }
+    Serial3.println("awo0");
+    delay(50);
+    while (Serial3.available() > 0) {
+      Serial3.read();
+    }
   }
 
-  //add some system safety checks in here before allowing power up of the system 
+  /*
+  //Start with 5V power for Ethernet and Rasppbery Pi based fucitons + 24 Volt supply on DROK 2 
+  if (Start_Config == "Etherent"){ 
+    Serial1.println("awo0");
+    delay(50);
+    while (Serial1.available() > 0) {
+      Serial1.read();
+    }
+    Serial2.println("awo0");
+    delay(50);
+    while (Serial2.available() > 0) {
+      Serial2.read();
+    }
+    Serial3.println("awo0");
+    delay(50);
+    while (Serial3.available() > 0) {
+      Serial3.read();
+    }
+    //set output to 5 volts 
+    Serial2.println("awu0500");
+    delay(50);   
+        while (Serial2.available() > 0) {
+      Serial2.read();
+    }
+    Serial2.println("awo1");
+    delay(50);
+    while (Serial2.available() > 0) {
+      Serial2.read();
+    }
+  } */
+
+  //Start with all Droks off and set to defualt voltage. Default voltage is set using the program fucntion 
+  else {
+    Serial1.println("awo0");
+    delay(50);
+    while (Serial1.available() > 0) {
+      Serial1.read();
+    }
+    Serial2.println("awo0");
+    delay(50);
+    while (Serial2.available() > 0) {
+      Serial2.read();
+    }
+    Serial3.println("awo0");
+    delay(50);
+    while (Serial3.available() > 0) {
+      Serial3.read();
+    }
+  }
+  
 
   Serial.println("System start");
 
@@ -51,9 +125,6 @@ void setup() {
 void loop() {
 
   read_command();
-
-  //unknown command handeling 
-  //if (cmd == 0){Serial.println("unknonw command registerd");}
 
   /* 
   cmd_parameter[subCommand]
@@ -184,10 +255,11 @@ void loop() {
     case 0:
         Serial.println("Drok 0 Set to: " + String(cmd_parameter[1] / 100.0) + "V");
         Serial1.println("awu" + String(cmd_parameter[1]) );
-      break;
+    break;
     case 1:
-        Serial.println("Drok 1 Set to: " + String(cmd_parameter[1] / 100.0) + "V");
-        Serial2.println("awu" + String(cmd_parameter[1]) );
+      Serial.println("Fuck Off Drok_1 is a Protected 5V Supply");
+    //    Serial.println("Drok 1 Set to: " + String(cmd_parameter[1] / 100.0) + "V");
+    //    Serial2.println("awu" + String(cmd_parameter[1]) );
     break;
     case 2:
         Serial.println("Drok 2 Set to: " + String(cmd_parameter[1] / 100.0) + "V");
@@ -395,7 +467,7 @@ void loop() {
       default:
         break;
       }
-      Serial.println("Drok: " + String(cmd_parameter[0]) + " is outputing" + String(reading_i / 100.0) + "");
+      Serial.println("Drok: " + String(cmd_parameter[0]) + " is outputing " + String(reading_i / 100.0) + " Watts");
     
   }
 
