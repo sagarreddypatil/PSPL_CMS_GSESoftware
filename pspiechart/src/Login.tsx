@@ -29,7 +29,7 @@ export default function Login() {
   };
 
   // assuming there's already a subdomain
-  const hostname = window.location.hostname.split(".")[1];
+  const pbAdminLink = `${PB_SERVER_URL}/_`
 
   return (
     <FullpageForm>
@@ -71,7 +71,7 @@ export default function Login() {
       {admin ? (
         <a
           className="text-sm text-rush underline -mt-4"
-          href={`http://pb.${hostname}/_`}
+          href={pbAdminLink}
         >
           Admin Dashboard
         </a>
