@@ -119,19 +119,21 @@ export function ChartChildTreeItem({ item, parent }: ChildTreeItemProps) {
   return (
     <>
       <div
-        className="flex group flex-col justify-center"
+        className="group"
         onClick={(e) => {
           e.stopPropagation();
         }}
       >
-        <button
-          className="rounded-none border border-1 border-rush w-4 h-4"
-          style={{
-            backgroundColor: myColor,
-          }}
-        />
-        <div className="hidden group-focus-within:block overflow-visible absolute pl-8 z-50">
-          <div className="p-4 px-8 border border-rush bg-white dark:bg-black">
+        <div className="flex flex-col justify-center">
+          <button
+            className="rounded-none border border-1 border-rush w-4 h-4"
+            style={{
+              backgroundColor: myColor,
+            }}
+          />
+        </div>
+        <div className="hidden group-focus-within:block absolute z-50 left-0 top-10">
+          <div className="p-4 px-4 border border-rush bg-white dark:bg-black">
             <HexColorPicker
               className="my-color-picker"
               color={myColor}

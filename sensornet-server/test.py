@@ -12,21 +12,20 @@ def randnorm(mu, sigma):
 
 """
 Packet Format
-    4s: Header (b"SEN")
     H: Sensor ID (u16)
     2x: Padding bytes (4-byte aligned)
     Q: Timestamp (u64 microseconds)
     Q: Counter (u64)
     q: Data (i64)
 """
-packet_format = "<4s H 2x Q Q q"
+packet_format = "<H 6x Q Q q"
 fmt_compiled = struct.Struct(packet_format)
 
 
 def make_packet(
     header: bytes, sensor_id: int, timestamp: int, counter: int, data: int
 ) -> bytes:
-    return fmt_compiled.pack(header, sensor_id, timestamp, counter, data)
+    return fmt_compiled.pack(sensor_id, timestamp, counter, data)
 
 
 # Create a UDP socket
@@ -36,7 +35,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_ip = "127.0.0.1"
 server_port = 5001
 
-ids = list(range(1, 21))
+ids = list(range(1, 6))
 counters = [0 for a in range(ids[-1] + 1)]
 datas = [0 for a in range(ids[-1] + 1)]
 

@@ -76,7 +76,7 @@ function TreeItemContent({
         if (!allowEdit) return; // can't rename if not allowed
         setEditMode(true);
       }}
-      className="h-full flex-grow min-w-0 flex flex-row items-center mr-2 whitespace-nowrap"
+      className="h-full flex-grow min-w-0 flex flex-row items-center mr-2 whitespace-nowrap relative"
       title={item.name}
     >
       <span className="truncate">
