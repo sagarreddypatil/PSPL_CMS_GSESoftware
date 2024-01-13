@@ -28,6 +28,9 @@ export default function Login() {
     }
   };
 
+  // assuming there's already a subdomain
+  const hostname = window.location.hostname.split(".")[1];
+
   return (
     <FullpageForm>
       <span className="text-2xl">Login</span>
@@ -65,6 +68,16 @@ export default function Login() {
           </a>
         )}
       </div>
+      {admin ? (
+        <a
+          className="text-sm text-rush underline -mt-4"
+          href={`http://pb.${hostname}/_`}
+        >
+          Admin Dashboard
+        </a>
+      ) : (
+        <></>
+      )}
       <Button onClick={login}>Login</Button>
     </FullpageForm>
   );

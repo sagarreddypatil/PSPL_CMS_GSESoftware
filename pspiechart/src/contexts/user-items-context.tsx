@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { UserItem, ItemViewType } from "../item-views/item-view-factory";
 import { usePbRecord, usePbRecords } from "../hooks/pocketbase";
 import Banner from "../controls/banner";
+import { pb } from "../Login";
 
 export type UserItemsContextType = {
   userItems: Map<string, UserItem>;
@@ -59,20 +60,26 @@ export default function UserItemsContextProvider({
     return map;
   };
 
-  const [storedRootItem, setStoredRootItem] = usePbRecord<RootItem>(
-    "projects",
-    "edvfpfakwyydd9i"
-  ); // hardcoded project id, TODO: make it dynamic
+  const {
+    loading,
+    error,
+    record: storedRootItem,
+    setRecord: setStoredRootItem,
+  } = usePbRecord<RootItem>("projects", "edvfpfakwyydd9i"); // hardcoded project id, TODO: make it dynamic
+
   useEffect(() => {
-    if (storedRootItem == null) return;
-    if (!storedRootItem) {
-      // create one
-      setStoredRootItem({
+    if (!loading && error) {
+      // create root item
+      // setStoredRootItem({
+      //   id: "edvfpfakwyydd9i",
+      //   childIds: [],
+      // });
+      pb.collection("projects").create({
         id: "edvfpfakwyydd9i",
         childIds: [],
       });
     }
-  }, [storedRootItem]);
+  }, [loading, error]);
 
   const [storedItems, createStoredItem, updateStoredItem, deleteStoredItem] =
     usePbRecords<UserItem>("userItems");

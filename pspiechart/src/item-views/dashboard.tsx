@@ -1,4 +1,4 @@
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import { create } from "zustand";
 
 import { Responsive, Layout, Layouts } from "react-grid-layout";
@@ -15,6 +15,7 @@ import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { useDebounce } from "@react-hook/debounce";
 import { usePbRecord } from "../hooks/pocketbase";
 import Banner from "../controls/banner";
+import { pb } from "../Login";
 
 const COLS = 20;
 const ROWS = 14;
@@ -41,16 +42,27 @@ export function Dashboard({ item }: UserItemProps) {
   const [size, setSize] = useDebounce({ width: 0, height: 0 }, 100);
   const editMode = useEditMode((state) => state.editMode);
 
-  const [layout, setLayout] = usePbRecord<SavedLayout>(
-    "dashboardLayouts",
-    item.id
-  );
+  const {
+    loading,
+    error,
+    record: layout,
+    setRecord: setLayout,
+  } = usePbRecord<SavedLayout>("dashboardLayouts", item.id);
 
   const onResize = useCallback((width: number, height: number) => {
     setSize({ width, height });
   }, []);
 
-  // if (!layout) return <Banner text="Loading..." />;
+  useEffect(() => {
+    if (!loading && error) {
+      pb.collection("dashboardLayouts").create({
+        id: item.id,
+        layout: [],
+      });
+    }
+  }, [loading, error]);
+
+  if (loading) return <Banner text="Loading..." />;
 
   const myLayout = layout?.layout ?? [];
 

@@ -1,4 +1,4 @@
-import { useContext, useMemo } from "react";
+import { useContext, useEffect, useMemo } from "react";
 import { usePbRecord } from "../hooks/pocketbase";
 
 import { ChildTreeItemProps, UserItemProps } from "./item-view-factory";
@@ -11,6 +11,7 @@ import UPlotChart from "../controls/uplotchart";
 
 import { HexColorPicker } from "react-colorful";
 import NotFound from "../not-found";
+import { pb } from "../Login";
 
 type Color = {
   hex: string;
@@ -29,7 +30,20 @@ export function Chart({ item }: UserItemProps) {
   const { userItems } = useContext(UserItemsContext);
   const { dataSources } = useContext(IOContext);
 
-  const [_colors] = usePbRecord<ChartColorRecord>("chartColors", item.id);
+  const {
+    loading,
+    error,
+    record: _colors,
+  } = usePbRecord<ChartColorRecord>("chartColors", item.id);
+
+  useEffect(() => {
+    if (!loading && error) {
+      pb.collection("chartColors").create({
+        id: item.id,
+        colors: {},
+      });
+    }
+  }, [loading, error]);
 
   const [myDataSources, myColors] = useMemo(() => {
     const sources = item.childIds?.map((id) => userItems.get(id));
@@ -92,10 +106,12 @@ export function Chart({ item }: UserItemProps) {
 
 export function ChartChildTreeItem({ item, parent }: ChildTreeItemProps) {
   // const { colors, setColor } = useChartColors();
-  const [_colors, setColors] = usePbRecord<ChartColorRecord>(
-    "chartColors",
-    parent.id
-  );
+  const {
+    loading,
+    error,
+    record: _colors,
+    setRecord: setColors,
+  } = usePbRecord<ChartColorRecord>("chartColors", parent.id);
   const colors = _colors?.colors ?? {};
 
   const myColor = colors[item.id]?.hex ?? defaultColor;

@@ -12,15 +12,20 @@ export function usePbRecord<Type extends RecordBase>(
   id: string
 ) {
   const [record, _setRecord] = useState<Type | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     pb.collection(collection)
       .getOne<Type>(id)
       .then((res) => {
         _setRecord(res);
+        setLoading(false);
       })
       .catch((err) => {
         _setRecord(null);
+        setError(true);
+        setLoading(false);
         console.error(err);
       });
 
@@ -39,16 +44,6 @@ export function usePbRecord<Type extends RecordBase>(
   }, [collection, id]);
 
   const setRecord = (newRecord: Type) => {
-    // create if doesn't exist
-    if (!record) {
-      return pb
-        .collection(collection)
-        .create<Type>(newRecord as { [key: string]: any })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
-
     return pb
       .collection(collection)
       .update<Type>(id, newRecord as { [key: string]: any })
@@ -57,7 +52,12 @@ export function usePbRecord<Type extends RecordBase>(
       });
   };
 
-  return [record, setRecord] as const;
+  return {
+    loading,
+    error,
+    record,
+    setRecord,
+  };
 }
 
 export function usePbRecords<Type extends RecordBase>(collection: string) {
