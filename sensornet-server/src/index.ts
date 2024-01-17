@@ -209,16 +209,11 @@ webServer.get("*", (req, res) => {
 //   })
 // );
 
-
-webServer.options(
-  "/*",
-  (req, res) => {
-      res.send("");
-  }
-);
+webServer.options("/*", (req, res) => {
+  res.send("");
+});
 
 webServer.use(useCORS({ origin: "*", credentials: true }));
-
 
 webServer
   .listen(3180, "0.0.0.0")
@@ -242,41 +237,39 @@ udpSocket.on("message", async (msg) => {
   try {
     const packets: [any] = packetParser.parse(msg);
     packets.map((packet) => {
+      // Writing to InfluxDB
+      const influxPoint = new Point("sensor")
+        .tag("id", packet.id.toString())
+        .intField("data", packet.value)
+        .timestamp(Number(packet.time_us));
+      influxWriter.writePoint(influxPoint);
 
-    
-    // Writing to InfluxDB
-    const influxPoint = new Point("sensor")
-      .tag("id", packet.id.toString())
-      .intField("data", packet.value)
-      .timestamp(Number(packet.time_us));
-    influxWriter.writePoint(influxPoint);
+      if (!sensors.has(packet.id.toString())) {
+        return; // don't write to WebSocket if sensor doesn't exist
+      }
 
-    if (!sensors.has(packet.id.toString())) {
-      return; // don't write to WebSocket if sensor doesn't exist
-    }
+      // Writing to WebSocket, ratelimited
+      const idStr = packet.id.toString();
+      const timestamp_s = Number(packet.time_us) / 1000000;
+      if (!lastPacketTimestamps[idStr]) lastPacketTimestamps[idStr] = 0;
 
-    // Writing to WebSocket, ratelimited
-    const idStr = packet.id.toString();
-    const timestamp_s = Number(packet.time_us) / 1000000;
-    if (!lastPacketTimestamps[idStr]) lastPacketTimestamps[idStr] = 0;
+      if (timestamp_s - lastPacketTimestamps[idStr] > 1 / outRate) {
+        // get the calibration function
 
-    if (timestamp_s - lastPacketTimestamps[idStr] > 1 / outRate) {
-      // get the calibration function
+        const calibratedValue = getOrCreateCalibration(idStr)(
+          Number(packet.value)
+        );
 
-      const calibratedValue = getOrCreateCalibration(idStr)(
-        Number(packet.value)
-      );
-
-      const wsPoint = {
-        id: packet.id.toString(),
-        timestamp: Number(packet.time_us),
-        // value: Number(packet.value),
-        value: calibratedValue,
-      };
-      webServer.publish(wsPoint.id, JSON.stringify(wsPoint));
-      lastPacketTimestamps[idStr] = timestamp_s;
-    }
-  });
+        const wsPoint = {
+          id: packet.id.toString(),
+          timestamp: Number(packet.time_us),
+          // value: Number(packet.value),
+          value: calibratedValue,
+        };
+        webServer.publish(wsPoint.id, JSON.stringify(wsPoint));
+        lastPacketTimestamps[idStr] = timestamp_s;
+      }
+    });
   } catch (e) {
     console.error(e);
   }
