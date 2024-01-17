@@ -6,7 +6,6 @@ import HyperExpress from "hyper-express";
 interface CORSOptions {
   origin: string;
   credentials: boolean;
-  optionsRoute?: boolean;
 }
 
 const useCORS = (options: CORSOptions) => {
@@ -23,8 +22,10 @@ const useCORS = (options: CORSOptions) => {
       options.credentials.toString()
     );
 
-    if (options.optionsRoute === true) {
+    if (request.method === "OPTIONS") {
+      response.status(200);
       response.send("");
+      
     }
   };
 };

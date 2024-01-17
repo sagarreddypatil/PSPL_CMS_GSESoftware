@@ -3,11 +3,7 @@ import struct
 import random
 import math
 import time
-import numpy as np
-
-
-def randnorm(mu, sigma):
-    return np.random.normal(mu, sigma)
+from random import gauss as randnorm
 
 
 """
@@ -33,7 +29,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 # Server IP address and port
 server_ip = "127.0.0.1"
-server_port = 5001
+server_port = 5555
 
 ids = list(range(1, 6))
 counters = [0 for a in range(ids[-1] + 1)]

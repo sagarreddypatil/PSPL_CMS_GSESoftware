@@ -12,6 +12,8 @@ services:
       - DOCKER_INFLUXDB_INIT_ORG=psp-liquids
       - DOCKER_INFLUXDB_INIT_BUCKET=sensornet
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=super-secret-influx-token
+    ports:
+      - 8086:8086
     restart: always
 
   pocketbase:
@@ -27,6 +29,7 @@ services:
     environment:
       - VIRTUAL_HOST=pb.*
       - VIRTUAL_PORT=8093
+    restart: always
 
   pspiechart:
     build:
@@ -52,8 +55,8 @@ services:
     volumes:
       - ./data/sensornet-server:/data
     ports:
-      - 8080:8080
-      - 5001:5001/udp
+      - 8081:8080
+      - 5555:5001/udp
     restart: always
 
   # cmdnet-server:

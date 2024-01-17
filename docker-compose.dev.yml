@@ -29,6 +29,7 @@ services:
     environment:
       - VIRTUAL_HOST=pb.*
       - VIRTUAL_PORT=8093
+    restart: always
 
   pspiechart:
     build:

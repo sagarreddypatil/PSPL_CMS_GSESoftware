@@ -202,8 +202,10 @@ webServer.get("*", (req, res) => {
 
 // webServer.options(
 // "*",
-//   myCORS({
+//   useCORS({
 //     origin: "*",
+//     credentials: true,
+//     optionsRoute: true
 //   })
 // );
 
@@ -239,7 +241,6 @@ const outRate = 100; // Hz
 udpSocket.on("message", async (msg) => {
   try {
     const packet = packetParser.parse(msg);
-
     // Writing to InfluxDB
     const influxPoint = new Point("sensor")
       .tag("id", packet.id.toString())

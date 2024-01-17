@@ -1,4 +1,3 @@
-import cors from "cors";
 import { Router } from "hyper-express";
 import {
   getSensors,
