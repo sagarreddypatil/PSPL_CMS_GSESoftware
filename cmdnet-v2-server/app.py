@@ -7,7 +7,7 @@ app = Flask(__name__)
 CORS(app)
 
 devices = {
-    "emu": Device("192.168.1.50", 8080),
+    "emu": Device("192.168.1.50", 8106),
 }
 
 

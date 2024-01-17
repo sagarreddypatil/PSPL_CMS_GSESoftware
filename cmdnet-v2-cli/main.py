@@ -4,7 +4,7 @@ import time
 
 
 host = "192.168.2.50"
-port = 8080
+port = 8106
 TIMEOUT = 1
 
 
