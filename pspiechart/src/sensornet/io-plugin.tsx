@@ -1,7 +1,10 @@
 import { IOContext, DataPoint, genSubId } from "../contexts/io-context";
 import { useContext, useEffect, useRef } from "react";
 
-const SENSORNET_SERVER = import.meta.env.VITE_SENSORNET_SERVER as string;
+// const SENSORNET_SERVER = import.meta.env.VITE_SENSORNET_SERVER as string;
+const myURL = new URL(window.location.href);
+myURL.port = "3180";
+const SENSORNET_SERVER = myURL.host;
 
 
 interface IServerSource {

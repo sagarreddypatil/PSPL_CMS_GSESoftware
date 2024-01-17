@@ -13,7 +13,9 @@ type Sensor = {
   calibration: string;
 };
 
-const SENSORNET_SERVER = import.meta.env.VITE_SENSORNET_SERVER as string;
+const myURL = new URL(window.location.href);
+myURL.port = "3180";
+const SENSORNET_SERVER = myURL.host;
 
 export default function SensorNetSettings() {
   const [data, setData] = useState<Sensor[]>([]);

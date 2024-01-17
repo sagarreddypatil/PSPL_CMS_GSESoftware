@@ -35,7 +35,7 @@ services:
     build:
       context: ./pspiechart
     ports:
-      - 4173:4173
+      - 80:4173
     environment:
       - VIRTUAL_HOST=pspc.*
       - VIRTUAL_PORT=4173
@@ -55,7 +55,7 @@ services:
     volumes:
       - ./data/sensornet-server:/data
     ports:
-      - 8081:8080
+      - 3180:3180
       - 3746:3746/udp
     restart: always
 
@@ -72,10 +72,10 @@ services:
   #   extra_hosts:
   #     - "host.docker.internal:host-gateway" # testing ONLY!, lets the container access the host machine
 
-  nginx-proxy:
-    image: nginxproxy/nginx-proxy
-    ports:
-      - 80:80
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-    restart: always
+  # nginx-proxy:
+  #   image: nginxproxy/nginx-proxy
+  #   ports:
+  #     - 80:80
+  #   volumes:
+  #     - /var/run/docker.sock:/tmp/docker.sock:ro
+  #   restart: always

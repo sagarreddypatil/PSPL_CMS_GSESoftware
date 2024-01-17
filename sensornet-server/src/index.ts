@@ -221,9 +221,9 @@ webServer.use(useCORS({ origin: "*", credentials: true }));
 
 
 webServer
-  .listen(8080, "0.0.0.0")
+  .listen(3180, "0.0.0.0")
   .then((socket) => {
-    console.log("Web Server listening on port 8080");
+    console.log("Web Server listening on port 3180");
   })
   .catch((err) => {
     console.error(err);

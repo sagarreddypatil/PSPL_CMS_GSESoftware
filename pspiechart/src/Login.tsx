@@ -1,6 +1,11 @@
 import PocketBase from "pocketbase";
 
-const PB_SERVER_URL = import.meta.env.VITE_PB_SERVER_URL as string;
+// const PB_SERVER_URL = import.meta.env.VITE_PB_SERVER_URL as string;
+const myURL = new URL(window.location.href);
+myURL.port = "8093";
+
+const PB_SERVER_URL = myURL.origin;
+
 export const pb = new PocketBase(PB_SERVER_URL);
 pb.autoCancellation(false);
 
