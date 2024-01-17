@@ -62,7 +62,7 @@ services:
       - ./sensornet-server:/app
     ports:
       - 8080:8080
-      - 5001:5001/udp
+      - 3746:3746/udp
     restart: always
 
   # cmdnet-server:

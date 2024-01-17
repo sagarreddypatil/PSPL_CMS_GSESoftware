@@ -278,8 +278,8 @@ udpSocket.on("message", async (msg) => {
   }
 });
 
-udpSocket.bind(5001, () => {
-  console.log("UDP Socket Listening on port 5001");
+udpSocket.bind(3746, () => {
+  console.log("UDP Socket Listening on port 3746");
 });
 
 async function terminator() {

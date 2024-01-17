@@ -46,7 +46,7 @@ const i64 get_time() {
 
 int main() {
   const char *host = "127.0.0.1";
-  const int port = 5001;
+  const int port = 3746;
 
   int sock = socket(AF_INET, SOCK_DGRAM, 0);
   if (sock < 0) {

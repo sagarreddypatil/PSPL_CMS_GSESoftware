@@ -12,6 +12,6 @@ COPY . /app
 RUN yarn build
 
 EXPOSE 8080
-EXPOSE 5001/udp
+EXPOSE 3746/udp
 
 CMD ["yarn", "start"]

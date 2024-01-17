@@ -56,7 +56,7 @@ services:
       - ./data/sensornet-server:/data
     ports:
       - 8081:8080
-      - 5555:5001/udp
+      - 3746:3746/udp
     restart: always
 
   # cmdnet-server:
