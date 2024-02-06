@@ -10,6 +10,18 @@ import NotFound from "./not-found.tsx";
 import SensorNetSettings from "./sensornet/settings.tsx";
 import Login from "./Login.tsx";
 
+/*
+Four accessible routes for whole we app:
+1. "/" - Home Page
+  - where user is redirected to after logging in.
+2. "login" - Login Page
+  - User must login to access web application
+3. "/item/:id" - IN PROGRESS
+4. "/sensornet" - IN PROGRESS
+
+Any other url parameter will lead user to a Not Found page
+*/
+
 const router = createBrowserRouter([
   {
     path: "/",

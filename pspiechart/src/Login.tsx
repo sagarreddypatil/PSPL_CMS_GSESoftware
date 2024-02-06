@@ -1,5 +1,14 @@
 import PocketBase from "pocketbase";
 
+/*
+Component for the login into the server.
+Nothing fancy here. 
+Usernams/passwords are stored on a pocketbase database stored in the pocketbase folder. Thus, when trying to login, your query
+is sent there.
+Unlimited attempts at login.
+I do not know what login is -- ask higher up.
+*/
+
 // const PB_SERVER_URL = import.meta.env.VITE_PB_SERVER_URL as string;
 const myURL = new URL(window.location.href);
 myURL.port = "8093";
