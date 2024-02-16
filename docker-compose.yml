@@ -20,7 +20,7 @@ services:
     build:
       context: ./pocketbase
       args:
-        ARCH: amd64
+        ARCH: arm64
     ports:
       - 8093:8093
     volumes:

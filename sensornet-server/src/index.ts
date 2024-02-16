@@ -235,8 +235,9 @@ const outRate = 100; // Hz
 
 udpSocket.on("message", async (msg) => {
   try {
-    const packets: [any] = packetParser.parse(msg);
-    packets.map((packet) => {
+    const packets: {data: [any]} = packetParser.parse(msg);
+
+    packets.data.forEach((packet) => {
       // Writing to InfluxDB
       const influxPoint = new Point("sensor")
         .tag("id", packet.id.toString())
@@ -266,6 +267,7 @@ udpSocket.on("message", async (msg) => {
           // value: Number(packet.value),
           value: calibratedValue,
         };
+
         webServer.publish(wsPoint.id, JSON.stringify(wsPoint));
         lastPacketTimestamps[idStr] = timestamp_s;
       }
