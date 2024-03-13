@@ -27,11 +27,15 @@ builddir:
 clean:
 	rm -rf build
 
-deps: external/tsdb
+deps: external/tsdb external/uWebSockets
 
 external/tsdb:
 	mkdir external/tsdb
 	wget -O external/tsdb/database.hpp https://raw.githubusercontent.com/sagarreddypatil/tsdb-cpp/main/include/database.hpp
+
+external/uWebSockets:
+	git clone --depth 1 https://github.com/uNetworking/uWebSockets.git --branch v20.62.0 external/uWebSockets
+	cd external/uWebSockets && git submodule init && git submodule update
 
 .PHONY: cmake
 .PHONY: builddir
