@@ -1,21 +1,6 @@
 version: "3"
 
 services:
-  influxdb:
-    image: influxdb:2.7.3
-    ports:
-      - 8086:8086
-    volumes:
-      - ./data/influxdb:/var/lib/influxdb2
-    environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=admin
-      - DOCKER_INFLUXDB_INIT_PASSWORD=super-secret-influx-pwd
-      - DOCKER_INFLUXDB_INIT_ORG=psp-liquids
-      - DOCKER_INFLUXDB_INIT_BUCKET=sensornet
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=super-secret-influx-token
-    restart: always
-
   pocketbase:
     build:
       context: ./pocketbase
@@ -26,9 +11,9 @@ services:
     volumes:
       - ./data/pocketbase:/pb/pb_data
       - ./pocketbase/migrations:/pb/pb_migrations
-    environment:
-      - VIRTUAL_HOST=pb.*
-      - VIRTUAL_PORT=8093
+    # environment:
+    #   - VIRTUAL_HOST=pb.*
+    #   - VIRTUAL_PORT=8093
     restart: always
 
   pspiechart:
@@ -39,31 +24,55 @@ services:
       - 5173:5173
     volumes:
       - ./pspiechart:/app
-    environment:
-      - VIRTUAL_HOST=pspc.*
-      - VIRTUAL_PORT=5173
+    # environment:
+    #   - VIRTUAL_HOST=pspc.*
+    #   - VIRTUAL_PORT=5173
     restart: always
 
-  sensornet-server:
-    build:
-      context: ./sensornet-server
-      dockerfile: Dockerfile.dev
-    environment:
-      - INFLUXDB_URL=http://influxdb:8086
-      - INFLUXDB_ORG=psp-liquids
-      - INFLUXDB_BUCKET=sensornet
-      - INFLUXDB_TOKEN=super-secret-influx-token
-      - DB_PATH=/data
-
-      - VIRTUAL_HOST=sensornet.*
-      - VIRTUAL_PORT=8080
-    volumes:
-      - ./data/sensornet-server:/data
-      - ./sensornet-server:/app
+  sensornet-server-cpp:
+    build: ./sensornet-server-cpp
     ports:
-      - 8080:8080
+      - 3180:3180
       - 3746:3746/udp
+    volumes:
+      - ./data/sensornet-server-cpp:/app/data
     restart: always
+
+  # influxdb:
+  #   image: influxdb:2.7.3
+  #   ports:
+  #     - 8086:8086
+  #   volumes:
+  #     - ./data/influxdb:/var/lib/influxdb2
+  #   environment:
+  #     - DOCKER_INFLUXDB_INIT_MODE=setup
+  #     - DOCKER_INFLUXDB_INIT_USERNAME=admin
+  #     - DOCKER_INFLUXDB_INIT_PASSWORD=super-secret-influx-pwd
+  #     - DOCKER_INFLUXDB_INIT_ORG=psp-liquids
+  #     - DOCKER_INFLUXDB_INIT_BUCKET=sensornet
+  #     - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=super-secret-influx-token
+  #   restart: always
+
+  # sensornet-server:
+  #   build:
+  #     context: ./sensornet-server
+  #     dockerfile: Dockerfile.dev
+  #   environment:
+  #     - INFLUXDB_URL=http://influxdb:8086
+  #     - INFLUXDB_ORG=psp-liquids
+  #     - INFLUXDB_BUCKET=sensornet
+  #     - INFLUXDB_TOKEN=super-secret-influx-token
+  #     - DB_PATH=/data
+
+  #     # - VIRTUAL_HOST=sensornet.*
+  #     # - VIRTUAL_PORT=8080
+  #   volumes:
+  #     - ./data/sensornet-server:/data
+  #     - ./sensornet-server:/app
+  #   ports:
+  #     - 3180:3180
+  #     - 3746:3746/udp
+  #   restart: always
 
   # cmdnet-server:
   #   build:
@@ -79,11 +88,3 @@ services:
   #     - 8081:8080
   #   extra_hosts:
   #     - "host.docker.internal:host-gateway" # testing ONLY!, lets the container access the host machine
-
-  nginx-proxy:
-    image: nginxproxy/nginx-proxy
-    ports:
-      - 80:80
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-    restart: always
