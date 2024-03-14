@@ -9,7 +9,7 @@ from random import gauss as randnorm
 """
 Packet Format
     H: Sensor ID (u16)
-    2x: Padding bytes (4-byte aligned)
+    6x: Padding bytes (4-byte aligned)
     Q: Timestamp (u64 microseconds)
     Q: Counter (u64)
     q: Data (i64)
@@ -31,7 +31,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_ip = "127.0.0.1"
 server_port = 3746
 
-ids = list(range(1, 6))
+ids = list(range(1, 2))
 counters = [0 for a in range(ids[-1] + 1)]
 datas = [0 for a in range(ids[-1] + 1)]
 
@@ -49,6 +49,7 @@ def better_sleep(sleep_time):
 
 
 last = time.time()
+packets = []
 while True:
     for sensor_id in ids:
         if sensor_id == 0:
@@ -64,9 +65,17 @@ while True:
         timestamp = int((time.time() - start) * 1000 * 1000)  # microseconds
         data = int(data)
         packet = make_packet(b"SEN", sensor_id, timestamp, counter, data)
-        # time.sleep(1)
 
-        sock.sendto(packet, (server_ip, server_port))
+        packets.append(packet)
+
+        if len(packets) >= 32:
+            # make one big packet
+            packetbuf = bytearray(0)
+            for packet in packets:
+                packetbuf += packet
+
+            sock.sendto(packetbuf, (server_ip, server_port))
+            packets = []
 
     diff = time.time() - last
     sleepval = (1 / rate) - diff

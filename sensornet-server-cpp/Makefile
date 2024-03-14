@@ -1,13 +1,13 @@
 # use ninja, DONT DO DEBUG HERE DO IT LATER
 CMAKE_FLAGS := -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -G Ninja
 
-CCACHE_EXISTS := $(shell command -v ccache 2> /dev/null)
+# CCACHE_EXISTS := $(shell command -v ccache 2> /dev/null)
 
-ifdef CCACHE_EXISTS
-    CMAKE_FLAGS += -DCMAKE_C_COMPILER_LAUNCHER=ccache
-else
-    $(warning ccache not found, build may be slower)
-endif
+# ifdef CCACHE_EXISTS
+#     CMAKE_FLAGS += -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+# else
+#     $(warning ccache not found, build may be slower)
+# endif
 
 all: build
 

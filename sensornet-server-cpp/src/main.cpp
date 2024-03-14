@@ -2,7 +2,6 @@
 #include <csignal>
 
 #include <database.hpp>
-#include <exprtk.hpp>
 #include <App.h> // uWebSockets, not sure why it's not nested
 
 #include "sensor-store.hpp"
@@ -33,22 +32,7 @@ struct SensorNetStored {
     int64_t value;
 };
 
-double apply_calibration(const std::string& sensor_id, const int64_t value) {
-    auto& sensor = psdb->get(sensor_id);
-
-    double dvalue = (double) value;
-
-    exprtk::symbol_table<double> symbol_table;
-
-    symbol_table.add_variable("x", dvalue, true);
-    exprtk::expression<double> expression;
-    expression.register_symbol_table(symbol_table);
-
-    exprtk::parser<double> parser;
-    parser.compile(sensor.calibration, expression);
-
-    return expression.value();
-}
+double apply_calibration(const std::string& sensor_id, const int64_t value);
 
 void handle_packet(char* payload, int length) {
     if (length % sizeof(SensorNetRemotePacket) != 0) {
@@ -124,6 +108,10 @@ std::map<std::string, std::string> parseQueryString(const std::string& queryStri
 int main() {
     uWS::App app = uWS::App();
     papp = &app;
+
+    if (!std::filesystem::exists("data")) {
+        std::filesystem::create_directory("data");
+    }
 
     tsdb::Database timedb("data/tsdb");
     ptimedb = &timedb;
@@ -221,8 +209,12 @@ int main() {
 
     app.run();
 
-    std::signal(SIGINT, [](int) {
-        
+    std::signal(SIGINT, [](int signal) {
+        // sync all dbs
+        psdb->sync();
+        ptimedb->sync();
+
+        exit(0);
     });
 
     return 0;
