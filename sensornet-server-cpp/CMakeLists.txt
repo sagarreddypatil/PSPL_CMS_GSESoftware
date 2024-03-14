@@ -16,5 +16,7 @@ add_executable (sensornet-server src/main.cpp)
 target_link_libraries(sensornet-server
     PRIVATE
         tsdb
+        ExprTk
         uWebSockets
+        nlohmann_json::nlohmann_json
 )

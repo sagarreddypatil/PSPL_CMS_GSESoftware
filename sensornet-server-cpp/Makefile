@@ -27,7 +27,7 @@ builddir:
 clean:
 	rm -rf build
 
-deps: external/tsdb external/uWebSockets
+deps: external/tsdb external/uWebSockets external/ExprTk
 
 external/tsdb:
 	mkdir external/tsdb
@@ -36,6 +36,10 @@ external/tsdb:
 external/uWebSockets:
 	git clone --depth 1 https://github.com/uNetworking/uWebSockets.git --branch v20.62.0 external/uWebSockets
 	cd external/uWebSockets && git submodule init && git submodule update
+
+external/ExprTk:
+	mkdir external/ExprTk
+	wget -O external/ExprTk/exprtk.hpp https://raw.githubusercontent.com/ArashPartow/exprtk/master/exprtk.hpp
 
 .PHONY: cmake
 .PHONY: builddir
