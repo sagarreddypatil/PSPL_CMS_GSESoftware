@@ -1,14 +1,11 @@
 #include <iostream>
-#include <fstream>
 #include <csignal>
 
-#include <nlohmann/json.hpp>
 #include <database.hpp>
 #include <exprtk.hpp>
-#include <boost/serialization/map.hpp>
 #include <App.h> // uWebSockets, not sure why it's not nested
 
-#include "SensorModel.hpp"
+#include "sensor-store.hpp"
 
 using json = nlohmann::json;
 static const uint port = 3180;
@@ -98,13 +95,6 @@ void on_server_data(us_udp_socket_t *s, us_udp_packet_buffer_t *buf, int packets
     }
 }
 
-template<bool SSL>
-void allow_cors(uWS::HttpResponse<SSL> *res) {
-    res->writeHeader("Access-Control-Allow-Origin", "*");
-    res->writeHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res->writeHeader("Access-Control-Allow-Headers", "Content-Type");
-}
-
 std::map<std::string, std::string> parseQueryString(const std::string& queryString) {
     std::map<std::string, std::string> result;
 
@@ -135,10 +125,10 @@ int main() {
     uWS::App app = uWS::App();
     papp = &app;
 
-    tsdb::Database timedb("tsdb");
+    tsdb::Database timedb("data/tsdb");
     ptimedb = &timedb;
 
-    SensorsStore sdb("sensors.dat");
+    SensorsStore sdb("data/sensors.dat");
     psdb = &sdb;
 
     app.ws<PerSocketData>("/data", {
@@ -161,129 +151,7 @@ int main() {
         res->end();
     });
 
-    app.get("/sensors", [&](auto *res, auto *req) {
-        allow_cors(res);
-        json sensors = sdb.all();
-        res->end(sensors.dump());
-    });
-
-    app.get("/sensors/:id", [&](auto *res, auto *req) {
-        allow_cors(res);
-        std::string id(req->getParameter(0));
-
-        if(!sdb.exists(id)) {
-            res->writeStatus("404 Not Found")
-            ->end("Sensor not found");
-        }
-        else {
-            auto& sensor = sdb.get(id);
-            json sensorJson = sensor;
-            res->end(sensorJson.dump());
-        }
-    });
-
-    app.post("/sensors", [&](auto *res, auto *req) {
-        allow_cors(res);
-        std::string buffer;
-
-        res->onData([res, buffer = std::move(buffer), &sdb](std::string_view data, bool last) mutable {
-            buffer.append(data.data(), data.length());
-
-            if (last) {
-                json sensor = json::parse(data);
-
-                // verify
-                if (!sensor.contains("id") || !sensor.contains("name") || !sensor.contains("unit") || !sensor.contains("calibration")) {
-                    res->writeStatus("400 Bad Request")
-                    ->end("Invalid sensor data");
-                    return;
-                }
-
-                sdb.add(sensor.get<SensorModel>());
-                sdb.sync();
-            }
-        });
-
-        res->onAborted([res] {
-            res->writeStatus("400 Bad Request")
-            ->end("Aborted");
-        });
-
-        res->end("Sensor added");
-    });
-
-    app.post("/sensors/bulk", [&](auto *res, auto *req) {
-        allow_cors(res);
-        std::string buffer;
-
-        res->onData([res, buffer = std::move(buffer), &sdb](std::string_view data, bool last) mutable {
-            buffer.append(data.data(), data.length());
-
-            if (last) {
-                json sensors = json::parse(data);
-
-                if (!sensors.is_array()) {
-                    res->writeStatus("400 Bad Request");
-                    res->end("Invalid sensor data");
-                    return;
-                }
-
-                for (auto &sensor : sensors) {
-                    if (!sensor.contains("id") || !sensor.contains("name") || !sensor.contains("unit") || !sensor.contains("calibration")) {
-                        res->writeStatus("400 Bad Request");
-                        res->end("Invalid sensor data");
-                        return;
-                    }
-                }
-
-                sdb.update(sensors.get<std::vector<SensorModel>>());
-                sdb.sync();
-            }
-        });
-
-        res->onAborted([res] {
-            res->writeStatus("400 Bad Request")
-            ->end("Aborted");
-        });
-
-        res->end("Sensor added");
-    });
-
-    app.put("/sensors/:id", [&](auto *res, auto *req) {
-        allow_cors(res);
-        std::string id(req->getParameter(0));
-        std::string buffer;
-
-        res->onData([res, buffer = std::move(buffer), id, &sdb](std::string_view data, bool last) mutable {
-            buffer.append(data.data(), data.length());
-
-            if (last) {
-                json sensor = json::parse(data);
-
-                sdb.update(sensor.get<SensorModel>());
-
-                res->writeStatus("404 Not Found");
-                res->end("Sensor not found");
-            }
-        });
-
-        res->onAborted([res] {
-            res->writeStatus("400 Bad Request")
-            ->end("Aborted");
-        });
-
-        res->end("Sensor updated");
-    });
-
-    app.del("/sensors/:id", [&](auto *res, auto *req) {
-        allow_cors(res);
-        std::string id(req->getParameter(0));
-
-        sdb.remove(id);
-
-        res->writeStatus("404 Not Found");
-        res->end("Sensor not found");
-    });
+    addSensorRoutes(sdb, app);
 
     app.get("/sources", [&](auto *res, auto *req) {
         allow_cors(res);

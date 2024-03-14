@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.20)
 
 project(sensornet-server)
 
@@ -21,7 +21,12 @@ set (CMAKE_CXX_FLAGS_DEBUG "-g -O2 -pg")
 set (CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 include_directories(include)
-add_executable (sensornet-server src/main.cpp)
+
+# glob cpp files in src/
+file(GLOB SOURCES "src/*.cpp")
+
+# add_compile_options(-save-temps)
+add_executable (sensornet-server ${SOURCES})
 
 target_link_libraries(sensornet-server
     PRIVATE

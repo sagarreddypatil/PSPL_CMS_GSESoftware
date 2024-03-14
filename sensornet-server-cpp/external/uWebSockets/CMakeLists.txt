@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.20)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -10,7 +10,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(uWebSockets_content)
 
-find_package(ZLIB REQUIRED)
+# find_package(ZLIB REQUIRED)
 add_library(uWebSockets INTERFACE)
 target_include_directories(uWebSockets INTERFACE ${uwebsockets_content_SOURCE_DIR}/src/)
 target_link_libraries(uWebSockets INTERFACE uSockets ${ZLIB_LIBRARIES})
+target_compile_definitions(uWebSockets INTERFACE UWS_NO_ZLIB)
