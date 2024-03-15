@@ -93,7 +93,7 @@ export default function SensorNetSettings() {
       body: JSON.stringify(data),
     })
       .then((res) => {
-        if (res.status === 201) {
+        if (res.status === 201 || res.status === 200) {
           // refresh the page
           window.location.reload();
         } else {

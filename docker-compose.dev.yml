@@ -36,7 +36,13 @@ services:
       - 3746:3746/udp
     volumes:
       - ./data/sensornet-server-cpp:/app/data
+      - ccache:/ccache
+    environment:
+      - CCACHE_DIR=/ccache
     restart: always
+
+volumes:
+  ccache:
 
   # influxdb:
   #   image: influxdb:2.7.3

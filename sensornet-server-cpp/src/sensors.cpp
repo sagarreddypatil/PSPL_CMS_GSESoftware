@@ -50,6 +50,7 @@ void addSensorRoutes(SensorsStore& sdb, uWS::App& app) {
             ->end("Aborted");
         });
 
+        res->writeStatus("201");
         res->end("Sensor added");
     });
 
@@ -87,6 +88,7 @@ void addSensorRoutes(SensorsStore& sdb, uWS::App& app) {
             ->end("Aborted");
         });
 
+        res->writeStatus("201");
         res->end("Sensor added");
     });
 
