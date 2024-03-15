@@ -175,15 +175,33 @@ int main() {
         auto table = ptimedb->get_table<SensorNetStored>(id);
         auto data = table->reduce(start_us, end_us, dt_us);
 
-        json resp = json::array();
+        // json resp = json::array();
+        // for (auto& entry : data) {
+        //     resp.push_back({
+        //         {"timestamp", (double)entry.timestamp}, // convert to ms
+        //         {"value", apply_calibration(id, entry.value.value)}
+        //     });
+        // }
+
+        // manually make json
+        std::string resp = "[";
         for (auto& entry : data) {
-            resp.push_back({
-                {"timestamp", (double)entry.timestamp}, // convert to ms
-                {"value", apply_calibration(id, entry.value.value)}
-            });
+            // ss << "{\"timestamp\":";
+            // ss << entry.timestamp;
+            // ss << ",\"value\":";
+            // ss << apply_calibration(id, entry.value.value);
+            // ss << "},";
+            resp += "{\"timestamp\":";
+            resp += std::to_string(entry.timestamp);
+            resp += ",\"value\":";
+            resp += std::to_string(apply_calibration(id, entry.value.value));
+            resp += "},";
         }
 
-        res->end(resp.dump());
+        resp.pop_back(); // remove last comma
+        resp += "]";
+
+        res->end(resp);
     });
 
     app.listen(port, [](auto *listen_socket) {

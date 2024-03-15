@@ -25,7 +25,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Boost)
 
-
 set(CMAKE_CXX_STANDARD 23)
 
 set (CMAKE_CXX_FLAGS "-Wall -Wno-deprecated-declarations -Wno-unused-variable")
