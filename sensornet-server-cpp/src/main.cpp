@@ -204,6 +204,48 @@ int main() {
         res->end(resp);
     });
 
+    app.get("/download/:id", [](auto *res, auto *req) {
+        allow_cors(res);
+
+        // export all data as a CSV
+        std::string id(req->getParameter(0));
+
+        if(ptimedb->tables.find(id) == ptimedb->tables.end()) {
+            res->writeStatus("404 Not Found")
+            ->end("Sensor not found");
+            return;
+        }
+
+        auto table = ptimedb->get_table<SensorNetStored>(id);
+
+        res->writeHeader("Content-Type", "text/csv");
+        res->writeHeader("Content-Disposition", "attachment; filename=\"" + id + ".csv\"");
+
+        std::string outBuffer;
+        outBuffer += "timestamp,value,calibrated\n";
+
+        res->cork([&]() {
+            for (uint64_t i = 0; i < table->size(); i++) {
+                auto entry = table->get(i);
+                outBuffer +=
+                    std::to_string(entry->timestamp) + "," +
+                    std::to_string(entry->value.value) + "," +
+                    std::to_string(apply_calibration(id, entry->value.value)) + "\n";
+                
+                if(outBuffer.size() > 4096) {
+                    res->write(outBuffer);
+                    outBuffer.clear();
+                }
+            }
+
+            if(outBuffer.size() > 0) {
+                res->write(outBuffer);
+            }
+        });
+
+        res->end();
+    });
+
     app.listen(port, [](auto *listen_socket) {
         if (listen_socket) {
             std::cout << "Listening on port " << port << std::endl;
