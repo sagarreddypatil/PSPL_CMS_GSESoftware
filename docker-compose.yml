@@ -1,21 +1,6 @@
 version: "3"
 
 services:
-  influxdb:
-    image: influxdb:2.7.3
-    volumes:
-      - ./data/influxdb:/var/lib/influxdb2
-    environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=admin
-      - DOCKER_INFLUXDB_INIT_PASSWORD=super-secret-influx-pwd
-      - DOCKER_INFLUXDB_INIT_ORG=psp-liquids
-      - DOCKER_INFLUXDB_INIT_BUCKET=sensornet
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=super-secret-influx-token
-    ports:
-      - 8086:8086
-    restart: always
-
   pocketbase:
     build:
       context: ./pocketbase
@@ -41,23 +26,54 @@ services:
       - VIRTUAL_PORT=4173
     restart: always
 
-  sensornet-server:
-    build: ./sensornet-server
-    environment:
-      - INFLUXDB_URL=http://influxdb:8086
-      - INFLUXDB_ORG=psp-liquids
-      - INFLUXDB_BUCKET=sensornet
-      - INFLUXDB_TOKEN=super-secret-influx-token
-      - DB_PATH=/data
-
-      - VIRTUAL_HOST=sensornet.*
-      - VIRTUAL_PORT=8080
-    volumes:
-      - ./data/sensornet-server:/data
+  sensornet-server-cpp:
+    build: ./sensornet-server-cpp
     ports:
       - 3180:3180
       - 3746:3746/udp
+    volumes:
+      - ./data/sensornet-server-cpp:/app/data
+      - ccache:/ccache
+    environment:
+      - CCACHE_DIR=/ccache
     restart: always
+
+volumes:
+  ccache:
+
+  # sensornet-server:
+  #   build: ./sensornet-server
+  #   environment:
+  #     - INFLUXDB_URL=http://influxdb:8086
+  #     - INFLUXDB_ORG=psp-liquids
+  #     - INFLUXDB_BUCKET=sensornet
+  #     - INFLUXDB_TOKEN=super-secret-influx-token
+  #     - DB_PATH=/data
+
+  #     - VIRTUAL_HOST=sensornet.*
+  #     - VIRTUAL_PORT=8080
+  #   volumes:
+  #     - ./data/sensornet-server:/data
+  #   ports:
+  #     - 3180:3180
+  #     - 3746:3746/udp
+  #   restart: always
+
+  # influxdb:
+  #   image: influxdb:2.7.3
+  #   volumes:
+  #     - ./data/influxdb:/var/lib/influxdb2
+  #   environment:
+  #     - DOCKER_INFLUXDB_INIT_MODE=setup
+  #     - DOCKER_INFLUXDB_INIT_USERNAME=admin
+  #     - DOCKER_INFLUXDB_INIT_PASSWORD=super-secret-influx-pwd
+  #     - DOCKER_INFLUXDB_INIT_ORG=psp-liquids
+  #     - DOCKER_INFLUXDB_INIT_BUCKET=sensornet
+  #     - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=super-secret-influx-token
+  #   ports:
+  #     - 8086:8086
+  #   restart: always
+
 
   # cmdnet-server:
   #   build: ./cmdnet-server
