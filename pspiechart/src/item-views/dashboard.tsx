@@ -136,7 +136,7 @@ export function Dashboard({ item }: UserItemProps) {
           return (
             <div key={childId} className="pb-1">
               <fieldset className="bg-white dark:bg-black ring-1 ring-opacity-20 dark:ring-opacity-20 ring-black dark:ring-white w-full h-full min-w-0 text-center items-center flex flex-col justify-center">
-                <legend className="w-auto mx-auto bg-white dark:bg-black">
+                <legend className="w-auto mx-auto bg-white dark:bg-black max-w-[80%] truncate">
                   {child?.name}
                 </legend>
                 {editMode ? (
@@ -144,7 +144,9 @@ export function Dashboard({ item }: UserItemProps) {
                     <div className="m-auto">It goeth here</div>
                   </div>
                 ) : (
-                  <ItemViewFactory itemId={childId} />
+                  <div className="w-full h-full overflow-hidden">
+                    <ItemViewFactory itemId={childId} />
+                  </div>
                 )}
               </fieldset>
             </div>

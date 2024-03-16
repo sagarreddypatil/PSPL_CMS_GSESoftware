@@ -186,7 +186,7 @@ export function CmdNetButton({ item }: UserItemProps) {
 
     return (
         <div className="flex flex-col gap-1 p-2 pt-0 w-full">
-            <span className="self-start mt-0">Device {command.device}</span>
+            {/* <span className="self-start mt-0">Device {command.device}</span> */}
             {command.params.map((param, i) => (
                 <CmdNetField key={i} field={param} setValue={setParam(i)} />
             ))}
