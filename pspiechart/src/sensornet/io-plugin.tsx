@@ -77,7 +77,10 @@ export default function SensorNetPlugin() {
 
           const unsubscribe = (subId: string) => {
             delete listenersRef.current[identifier.id][subId];
-            if (listenersRef.current[identifier.id].length === 0) {
+
+            const numListeners = Object.keys(listenersRef.current[identifier.id]).length
+
+            if (numListeners === 0) {
               // send unsubscribe
               const unsubReq = {
                 type: "unsubscribe",

@@ -1,5 +1,7 @@
 #include <iostream>
 #include <csignal>
+#include <unordered_map>
+#include <chrono>
 
 #include <database.hpp>
 #include <App.h> // uWebSockets, not sure why it's not nested
@@ -34,6 +36,12 @@ struct SensorNetStored {
 
 double apply_calibration(const std::string& sensor_id, const int64_t value);
 
+uint64_t time_us() {
+    return std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::system_clock::now().time_since_epoch()
+    ).count();
+}
+
 void handle_packet(char* payload, int length) {
     if (length % sizeof(SensorNetRemotePacket) != 0) {
         // TODO: remove error log, might be slow
@@ -44,27 +52,42 @@ void handle_packet(char* payload, int length) {
     int packets = length / sizeof(SensorNetRemotePacket);
     SensorNetRemotePacket* packet = (SensorNetRemotePacket*) payload;
 
+    static std::unordered_map<std::string, uint64_t> lastWsSends;
+    static const uint64_t wsSendInterval = 1000000 / 100; // 100 Hz
+
     for (int i = 0; i < packets; i++) {
         SensorNetRemotePacket* p = packet + i;
+        auto idstr = std::to_string(p->id);
 
-        if(!psdb->exists(std::to_string(p->id))) {
+        if(!psdb->exists(idstr)) {
             // sensor not found
             return;
         }
 
-        auto table = ptimedb->get_table<SensorNetStored>(std::to_string(p->id));
+        if (lastWsSends.find(idstr) == lastWsSends.end()) {
+            lastWsSends[idstr] = 0;
+        }
+
+        auto table = ptimedb->get_table<SensorNetStored>(idstr);
         table->append(p->timestamp, {p->counter, p->value});
 
+        // throttle websocket sends to 100 Hz
+        if(time_us() - lastWsSends[idstr] < wsSendInterval) {
+            continue;
+        }
+
+        lastWsSends[idstr] = time_us();
+
         // send it over websocket
-        double value_calibrated = apply_calibration(std::to_string(p->id), p->value);
+        double value_calibrated = apply_calibration(idstr, p->value);
 
         json wsPacket = {
-            {"id", std::to_string(p->id)},
+            {"id", idstr},
             {"timestamp", (double)p->timestamp},
             {"value", value_calibrated}
         };
 
-        papp->publish(std::to_string(p->id), wsPacket.dump(), uWS::OpCode::TEXT, false);
+        papp->publish(idstr, wsPacket.dump(), uWS::OpCode::TEXT, false);
     }
 }
 
