@@ -241,21 +241,62 @@ export default function UPlotChart({
       ? timeConductor.fixed.start
       : new Date(endTime.getTime() - timeConductor.moving.timespan);
 
-    const newData: ChartDataType = [[], ...dataSources.map(() => [])];
+    // const newData: ChartDataType = [[], ...dataSources.map(() => [])];
+    const newDataRaw: DataPoint[][] = Array(dataSources.length).fill([]);
 
     const promises = dataSources.map((source, srcIdx) => {
       return source.historical(startTime, endTime, pointDt).then((data) => {
-        data.forEach((point, pointIdx) => {
-          newData[0][pointIdx] = point.timestamp.getTime() / 1000;
-          newData[srcIdx + 1][pointIdx] = point.value;
-        });
+        // data.forEach((point, pointIdx) => {
+        //   if(srcIdx === 0)
+        //     newData[0][pointIdx] = point.timestamp.getTime() / 1000;
+        //   newData[srcIdx + 1][pointIdx] = point.value;
+        // });
+        newDataRaw[srcIdx] = data;
       });
     });
 
     // swap out data after all promises resolve
     Promise.all(promises).then(() => {
-      acceptDataRef.current = false;
+      // acceptDataRef.current = false;
+
+      const newData: ChartDataType = [[], ...dataSources.map(() => [])];
+      let idx = 0;
+
+      // while any of the sources still have data
+      while(newDataRaw.some((data) => data.length > 0)) {
+        let earliestTime = Number.MAX_VALUE;
+        let earliestIdx = -1;
+
+        newDataRaw.forEach((data, idx) => {
+          if(data.length === 0) return;
+
+          if(data[0].timestamp.getTime() < earliestTime) {
+            earliestTime = data[0].timestamp.getTime();
+            earliestIdx = idx;
+          }
+        });
+
+        // insert the earliest point, unless last timestamp is the same
+        if(newData[0].length === 0 || newData[0][newData[0].length - 1] !== earliestTime / 1000) {
+          newData[0].push(earliestTime / 1000);
+          for(let i = 0; i < dataSources.length; i++) {
+            if(i === earliestIdx) {
+              newData[i + 1].push(newDataRaw[earliestIdx][0].value);
+            } else {
+              newData[i + 1].push(undefined);
+            }
+          }
+        }
+        else {
+          newData[earliestIdx + 1][newData[0].length - 1] = newDataRaw[earliestIdx][0].value;
+        }
+
+        // remove the earliest point from the source
+        newDataRaw[earliestIdx].shift();
+      }
+
       dataRef.current = newData;
+
       // only reaccept data if we're not paused
       if (!timeConductor.paused) acceptDataRef.current = true;
     });

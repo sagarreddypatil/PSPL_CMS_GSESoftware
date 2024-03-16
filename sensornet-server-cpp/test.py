@@ -31,7 +31,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_ip = "127.0.0.1"
 server_port = 3746
 
-ids = list(range(1, 2))
+ids = list(range(1, 3))
 counters = [0 for a in range(ids[-1] + 1)]
 datas = [0 for a in range(ids[-1] + 1)]
 
