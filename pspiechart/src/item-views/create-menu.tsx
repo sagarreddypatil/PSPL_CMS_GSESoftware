@@ -31,10 +31,16 @@ const defaultChart: DefaultUserItem = {
   childIds: [],
 };
 
+const defaultCmdNetButton: DefaultUserItem = {
+  name: "Untitled CmdNetButton",
+  type: ItemViewType.CmdNetButton,
+};
+
 const typeDefaults = new Map<ItemViewType, DefaultUserItem>([
   [ItemViewType.Folder, defaultFolder],
   [ItemViewType.Dashboard, defaultDashboard],
   [ItemViewType.Chart, defaultChart],
+  [ItemViewType.CmdNetButton, defaultCmdNetButton],
 ]);
 
 export default function CreateMenu() {

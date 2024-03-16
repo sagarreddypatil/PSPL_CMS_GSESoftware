@@ -10,6 +10,7 @@ export default forwardRef(
       onBlur,
       className,
       password,
+      numeric,
     }: {
       className?: string;
       value?: string;
@@ -18,12 +19,13 @@ export default forwardRef(
       onBlur?: () => void;
       onSubmit?: () => void;
       password?: boolean;
+      numeric?: boolean;
     },
     ref: React.Ref<HTMLInputElement>
   ) => {
     return (
       <input
-        type={password ? "password" : "text"}
+        type={password ? "password" : numeric ? "number" : "text"}
         className={`rounded-none border border-rush dark:bg-night-sky px-2 ${className}`}
         value={value}
         placeholder={placeholder}

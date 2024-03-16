@@ -161,6 +161,7 @@ export default function Sidebar() {
     // the below line is because the library uses "root" for the parentId
     // instead of the index I specifically told it was the root
 
+    console.log("wow", childItems, parentId);
     if (parentId == "root") return;
 
     // if (parentId == "root") parentId = items.root.index.toString();

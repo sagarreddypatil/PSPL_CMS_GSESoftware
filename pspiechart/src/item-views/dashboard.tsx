@@ -36,10 +36,30 @@ const useEditMode = create<EditModeState>((set) => ({
   setEditMode: (editMode) => set({ editMode }),
 }));
 
+// to prevent this thing from spamming the db
+let prevLayout: Layout[] = [];
+function layoutsEqual(a: Layout[], b: Layout[]) {
+  if (a.length !== b.length) return false;
+
+  for (let i = 0; i < a.length; i++) {
+    if (
+      a[i].i !== b[i].i ||
+      a[i].x !== b[i].x ||
+      a[i].y !== b[i].y ||
+      a[i].w !== b[i].w ||
+      a[i].h !== b[i].h
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export function Dashboard({ item }: UserItemProps) {
   const { userItems } = useContext(UserItemsContext);
 
-  const [size, setSize] = useDebounce({ width: 0, height: 0 }, 100);
+  const [size, setSize] = useDebounce({ width: 0, height: 0 }, 10);
   const editMode = useEditMode((state) => state.editMode);
 
   const {
@@ -62,7 +82,7 @@ export function Dashboard({ item }: UserItemProps) {
     }
   }, [loading, error]);
 
-  if (loading) return <Banner text="Loading..." />;
+  // if (loading) return <Banner text="Loading..." />;
 
   const myLayout = layout?.layout ?? [];
 
@@ -86,12 +106,9 @@ export function Dashboard({ item }: UserItemProps) {
   };
 
   const onLayoutChange = (_: Layout[], allLayouts: Layouts) => {
-    // setAllLayouts((oldAllLayouts) => {
-    //   return {
-    //     ...oldAllLayouts,
-    //     [item.id]: allLayouts.lg,
-    //   };
-    // });
+    if (layoutsEqual(prevLayout, allLayouts.lg)) return;
+
+    prevLayout = allLayouts.lg;
     setLayout({
       id: item.id,
       layout: allLayouts.lg,
@@ -100,6 +117,7 @@ export function Dashboard({ item }: UserItemProps) {
 
   return (
     <SizedDiv onResize={onResize}>
+      { (loading || size.width <= 1e-2) ? <Banner text="Loading..." /> :
       <Responsive
         className="layout"
         layouts={layouts}
@@ -132,7 +150,7 @@ export function Dashboard({ item }: UserItemProps) {
             </div>
           );
         })}
-      </Responsive>
+      </Responsive> }
     </SizedDiv>
   );
 }
