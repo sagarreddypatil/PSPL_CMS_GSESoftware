@@ -41,6 +41,16 @@ services:
       - CCACHE_DIR=/ccache
     restart: always
 
+  cmdnet-server:
+    build: ./cmdnet-v2-server
+    # environment:
+    #   - VIRTUAL_HOST=cmdnet.*
+    #   - VIRTUAL_PORT=8080
+    ports:
+      - 8080:8080
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # testing ONLY!, lets the container access the host machine
+
 volumes:
   ccache:
 
@@ -79,18 +89,3 @@ volumes:
   #     - 3180:3180
   #     - 3746:3746/udp
   #   restart: always
-
-  # cmdnet-server:
-  #   build:
-  #     context: ./cmdnet-server
-  #     dockerfile: Dockerfile.dev
-  #   environment:
-  #     - DB_PATH=/data
-  #     - VIRTUAL_HOST=cmdnet.*
-  #     - VIRTUAL_PORT=8080
-  #   volumes:
-  #     - ./cmdnet-server:/app
-  #   ports:
-  #     - 8081:8080
-  #   extra_hosts:
-  #     - "host.docker.internal:host-gateway" # testing ONLY!, lets the container access the host machine
