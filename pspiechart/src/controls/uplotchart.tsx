@@ -283,6 +283,7 @@ export default function UPlotChart({
             if(i === earliestIdx) {
               newData[i + 1].push(newDataRaw[earliestIdx][0].value);
             } else {
+              // @ts-ignore
               newData[i + 1].push(undefined);
             }
           }

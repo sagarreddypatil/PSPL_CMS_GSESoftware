@@ -37,35 +37,14 @@ export type DataSource = {
   historical: (from: Date, to: Date, dt: number) => Promise<DataPoint[]>;
 };
 
-export type ConfigOption<T> = {
-  identifier: IdentifierType;
-  getValue: () => Promise<T>;
-  setValue: (value: T) => Promise<boolean>; // returns success
-};
-
-export type RemoteCall = {
-  identifier: IdentifierType;
-  call: () => Promise<boolean>; // returns success
-};
-
 export type IOContextType = {
   dataSources: DataSource[];
   addDataSource: (dataSource: DataSource) => void;
-
-  configOptions: ConfigOption<any>[];
-  addConfigOption: (configOption: ConfigOption<any>) => void;
-
-  remoteCalls: RemoteCall[];
-  addRemoteCall: (remoteCall: RemoteCall) => void;
 };
 
 export const IOContext = createContext<IOContextType>({
   dataSources: [],
   addDataSource: () => {},
-  configOptions: [],
-  addConfigOption: () => {},
-  remoteCalls: [],
-  addRemoteCall: () => {},
 });
 
 interface IOContextProviderProps {
@@ -145,49 +124,11 @@ export default function IOContextProvider({
     });
   };
 
-  const [configOptions, setConfigOptions] = useState<ConfigOption<any>[]>([]);
-  const addConfigOption = (configOption: ConfigOption<any>) => {
-    setConfigOptions((configOptions) => {
-      const filtered = filterObjectList(configOptions, configOption.identifier);
-      return [...filtered, configOption];
-    });
-
-    const newItemId = `${configOption.identifier.namespace}:${configOption.identifier.id}`;
-
-    addNamespacedItem(configOption.identifier.namespace, {
-      id: newItemId,
-      name: configOption.identifier.name || configOption.identifier.id,
-      type: ItemViewType.ConfigOption,
-      noStore: true,
-    });
-  };
-
-  const [remoteCalls, setRemoteCalls] = useState<RemoteCall[]>([]);
-  const addRemoteCall = (remoteCall: RemoteCall) => {
-    setRemoteCalls((remoteCalls) => {
-      const filtered = filterObjectList(remoteCalls, remoteCall.identifier);
-      return [...filtered, remoteCall];
-    });
-
-    const newItemId = `${remoteCall.identifier.namespace}:${remoteCall.identifier.id}`;
-
-    addNamespacedItem(remoteCall.identifier.namespace, {
-      id: newItemId,
-      name: remoteCall.identifier.name || remoteCall.identifier.id,
-      type: ItemViewType.RPC,
-      noStore: true,
-    });
-  };
-
   return (
     <IOContext.Provider
       value={{
         dataSources,
         addDataSource,
-        configOptions,
-        addConfigOption,
-        remoteCalls,
-        addRemoteCall,
       }}
     >
       {children}

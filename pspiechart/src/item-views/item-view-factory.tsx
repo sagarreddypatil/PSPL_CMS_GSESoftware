@@ -7,7 +7,6 @@ import { Folder } from "./folder";
 import DataSourceView from "./datasource-view";
 import NotFound from "../not-found";
 import { Chart, ChartChildTreeItem } from "./chart";
-import { ConfigOption } from "./config-option";
 import { CmdNetButton } from "./cmdnet-button";
 
 export enum ItemViewType {
@@ -18,7 +17,6 @@ export enum ItemViewType {
   CmdNetButton = "CmdNetButton",
 
   DataSource = "datasource",
-  ConfigOption = "configoption",
 }
 
 export type DefaultUserItem = {
@@ -83,8 +81,6 @@ export function ItemViewFactory({ itemId }: ItemViewFactoryProps) {
       return <Dashboard item={item} />;
     case ItemViewType.Folder:
       return <Folder item={item} />;
-    case ItemViewType.ConfigOption:
-      return <ConfigOption item={item} />;
     case ItemViewType.CmdNetButton:
       return <CmdNetButton item={item} />;
   }
