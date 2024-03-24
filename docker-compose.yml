@@ -4,8 +4,8 @@ services:
   pocketbase:
     build:
       context: ./pocketbase
-      args:
-        ARCH: amd64
+    # github registry
+    image: ghcr.io/purdue-space-program/pocketbase:latest
     ports:
       - 8093:8093
     volumes:
@@ -19,6 +19,7 @@ services:
   pspiechart:
     build:
       context: ./pspiechart
+    image: ghcr.io/purdue-space-program/pspiechart:latest
     ports:
       - 80:4173
     environment:
@@ -28,6 +29,7 @@ services:
 
   sensornet-server-cpp:
     build: ./sensornet-server-cpp
+    image: ghcr.io/purdue-space-program/sensornet-server-cpp:latest
     ports:
       - 3180:3180
       - 3746:3746/udp
@@ -44,6 +46,7 @@ services:
 
   cmdnet-server:
     build: ./cmdnet-v2-server
+    image: ghcr.io/purdue-space-program/cmdnet-server:latest
     # environment:
     #   - VIRTUAL_HOST=cmdnet.*
     #   - VIRTUAL_PORT=8080

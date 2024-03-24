@@ -9,8 +9,12 @@ RUN apk add --no-cache \
     unzip \
     ca-certificates
 
+# determine the architecture and store in $ARCH
 # download and unzip PocketBase
-ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_${ARCH}.zip /tmp/pb.zip
+RUN case $(uname -m) in x86_64) ARCH=amd64;; aarch64) ARCH=arm64;; *) ARCH=$(uname -m);; esac \
+    && wget -O /tmp/pb.zip https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_${ARCH}.zip
+
+# ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_${ARCH}.zip /tmp/pb.zip
 RUN unzip /tmp/pb.zip -d /pb/
 
 # uncomment to copy the local pb_migrations dir into the image
