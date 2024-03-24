@@ -27,5 +27,7 @@ jobs:
 
       - name: Build and Push
         uses: docker/bake-action@v4
+        env:
+          TAG: ${{ github.ref }}
         with:
           push: true
