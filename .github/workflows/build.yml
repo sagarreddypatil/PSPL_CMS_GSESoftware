@@ -25,10 +25,13 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
       - name: Build and Push
         uses: docker/bake-action@v4
         env:
-          TAG: ${{ github.ref }}
+          TAG: ${{ env.RELEASE_VERSION }}
         with:
           push: true
           set: |
