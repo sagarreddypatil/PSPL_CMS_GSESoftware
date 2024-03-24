@@ -4,11 +4,14 @@ services:
   pocketbase:
     build:
       context: ./pocketbase
+      tags:
+        - ghcr.io/purdue-space-program/pocketbase:latest
+        - ghcr.io/purdue-space-program/pocketbase:${TAG:-latest}
       x-bake:
         platforms:
           - linux/amd64
           - linux/arm64
-    image: ghcr.io/purdue-space-program/pocketbase:${TAG:-latest}
+    image: ghcr.io/purdue-space-program/pocketbase:latest
     ports:
       - 8093:8093
     volumes:
@@ -22,11 +25,14 @@ services:
   pspiechart:
     build:
       context: ./pspiechart
+      tags:
+        - ghcr.io/purdue-space-program/pspiechart:latest
+        - ghcr.io/purdue-space-program/pspiechart:${TAG:-latest}
       x-bake:
         platforms:
           - linux/amd64
           - linux/arm64
-    image: ghcr.io/purdue-space-program/pspiechart:${TAG:-latest}
+    image: ghcr.io/purdue-space-program/pspiechart:latest
     ports:
       - 80:4173
     environment:
@@ -37,11 +43,14 @@ services:
   sensornet-server-cpp:
     build:
       context: ./sensornet-server-cpp
+      tags:
+        - ghcr.io/purdue-space-program/sensornet-server-cpp:latest
+        - ghcr.io/purdue-space-program/sensornet-server-cpp:${TAG:-latest}
       x-bake:
         platforms:
           - linux/amd64
           - linux/arm64
-    image: ghcr.io/purdue-space-program/sensornet-server-cpp:${TAG:-latest}
+    image: ghcr.io/purdue-space-program/sensornet-server-cpp:latest
     ports:
       - 3180:3180
       - 3746:3746/udp
@@ -59,11 +68,14 @@ services:
   cmdnet-server:
     build:
       context: ./cmdnet-v2-server
+      tags:
+        - ghcr.io/purdue-space-program/cmdnet-server:latest
+        - ghcr.io/purdue-space-program/cmdnet-server:${TAG:-latest}
       x-bake:
         platforms:
           - linux/amd64
           - linux/arm64
-    image: ghcr.io/purdue-space-program/cmdnet-server:${TAG:-latest}
+    image: ghcr.io/purdue-space-program/cmdnet-server:latest
     # environment:
     #   - VIRTUAL_HOST=cmdnet.*
     #   - VIRTUAL_PORT=8080
