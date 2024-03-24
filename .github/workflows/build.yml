@@ -34,6 +34,3 @@ jobs:
           TAG: ${{ env.RELEASE_VERSION }}
         with:
           push: true
-          # set: |
-          #   *.cache-from=type=gha
-          #   *.cache-to=type=gha,mode=max
