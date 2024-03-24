@@ -19,7 +19,7 @@ release: cmake
 
 # create 
 cmake: builddir deps
-	cd build && cmake .. $(CMAKE_FLAGS) && ninja
+	cd build && cmake .. $(CMAKE_FLAGS) && NINJA_STATUS='[%r procs, %f/%t @ %o/s : %es ] ' ninja
 
 builddir:
 	mkdir -p build
