@@ -34,7 +34,8 @@ services:
           - linux/arm64
     image: ghcr.io/purdue-space-program/pspiechart:latest
     ports:
-      - 80:4173
+      # - 80:4173
+      - 80:80
     environment:
       - VIRTUAL_HOST=pspc.*
       - VIRTUAL_PORT=4173

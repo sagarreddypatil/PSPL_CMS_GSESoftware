@@ -4,3 +4,4 @@ external/ExprTk
 build/
 
 data/
+Dockerfile

@@ -8,7 +8,10 @@ COPY Makefile .
 COPY external/ external/
 RUN make deps
 
-COPY . .
+# COPY . .
+COPY src/ src/
+COPY include/ include/
+COPY CMakeLists.txt .
 RUN make release
 
 FROM ubuntu:latest
