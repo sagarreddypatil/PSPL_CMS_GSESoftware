@@ -30,6 +30,7 @@ clean:
 deps: external/tsdb external/uWebSockets external/ExprTk
 
 external/tsdb:
+	rm -rf external/tsdb
 	mkdir external/tsdb
 	wget -O external/tsdb/database.hpp https://raw.githubusercontent.com/sagarreddypatil/tsdb-cpp/main/include/database.hpp
 
@@ -44,3 +45,4 @@ external/ExprTk:
 .PHONY: cmake
 .PHONY: builddir
 .PHONY: clean
+.PHONY: external/tsdb # tsdb isn't versioned

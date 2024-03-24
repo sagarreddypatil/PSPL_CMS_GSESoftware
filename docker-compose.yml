@@ -36,6 +36,10 @@ services:
       - ccache:/ccache
     environment:
       - CCACHE_DIR=/ccache
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     restart: always
 
   cmdnet-server:
