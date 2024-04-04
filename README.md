@@ -1,5 +1,11 @@
 # CMS GSE Software
 
+See write-up on [sagarpatil.me](https://sagarpatil.me/posts/projects/cms-avi-sw)
+
+## System Diagram
+
+![System Diagram](https://sagarpatil.me/assets/data-path-diagram.png)
+
 ## Components
 
 - `cmdnet`: CommandNet Python library
